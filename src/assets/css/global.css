@@ -1,0 +1,124 @@
+@import "tailwindcss";
+
+@theme {
+  --font-headline: 'Plus Jakarta Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-label: 'Inter', sans-serif;
+
+  --color-primary: #a33700;
+  --color-primary-container: #ff7943;
+  --color-primary-dim: #8f2f00;
+  --color-primary-fixed: #ff7943;
+  --color-primary-fixed-dim: #fc6018;
+  --color-on-primary: #ffefeb;
+  --color-on-primary-container: #441200;
+  --color-on-primary-fixed: #000000;
+  --color-on-primary-fixed-variant: #531800;
+
+  --color-secondary: #176a21;
+  --color-secondary-container: #9df197;
+  --color-secondary-dim: #025d16;
+  --color-secondary-fixed: #9df197;
+  --color-secondary-fixed-dim: #90e28a;
+  --color-on-secondary: #d1ffc8;
+  --color-on-secondary-container: #005c15;
+  --color-on-secondary-fixed: #00460e;
+  --color-on-secondary-fixed-variant: #12661e;
+
+  --color-tertiary: #7f5200;
+  --color-tertiary-container: #ffae26;
+  --color-tertiary-dim: #6f4700;
+  --color-tertiary-fixed: #ffae26;
+  --color-tertiary-fixed-dim: #efa114;
+  --color-on-tertiary: #fff0e2;
+  --color-on-tertiary-container: #533400;
+  --color-on-tertiary-fixed: #362100;
+  --color-on-tertiary-fixed-variant: #5e3c00;
+
+  --color-surface: #f7f6f3;
+  --color-surface-bright: #f7f6f3;
+  --color-surface-dim: #d4d5d1;
+  --color-surface-variant: #ddddd9;
+  --color-surface-tint: #a33700;
+  --color-surface-container: #e8e8e5;
+  --color-surface-container-low: #f1f1ee;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e3e3df;
+  --color-surface-container-highest: #ddddd9;
+  --color-on-surface: #2e2f2d;
+  --color-on-surface-variant: #5b5c5a;
+  --color-on-background: #2e2f2d;
+  --color-background: #f7f6f3;
+
+  --color-outline: #767775;
+  --color-outline-variant: #adadab;
+
+  --color-error: #b31b25;
+  --color-error-dim: #9f0519;
+  --color-error-container: #fb5151;
+  --color-on-error: #ffefee;
+  --color-on-error-container: #570008;
+
+  --color-inverse-surface: #0d0f0d;
+  --color-inverse-primary: #fc6018;
+  --color-inverse-on-surface: #9d9d9a;
+
+  --radius-DEFAULT: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+}
+
+@layer base {
+  body {
+    min-height: 100dvh;
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
+  }
+}
+
+@layer utilities {
+  .recipe-card-shadow {
+    box-shadow: 0 4px 24px -4px rgba(46, 47, 45, 0.06);
+  }
+
+  .editorial-gradient {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-container) 100%);
+  }
+
+  .glass-header {
+    background-color: rgba(247, 246, 243, 0.7);
+    backdrop-filter: blur(12px);
+  }
+
+  .glass-nav {
+    background-color: rgba(247, 246, 243, 0.8);
+    backdrop-filter: blur(24px);
+  }
+
+  .recipe-modal-backdrop {
+    background-color: rgba(247, 246, 243, 0.7);
+    backdrop-filter: blur(12px);
+  }
+
+  .tap-highlight-none {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

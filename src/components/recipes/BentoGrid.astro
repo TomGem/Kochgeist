@@ -1,0 +1,28 @@
+---
+import RecipeCardFeatured from './RecipeCardFeatured.astro';
+import RecipeCardVertical from './RecipeCardVertical.astro';
+import RecipeCardHorizontal from './RecipeCardHorizontal.astro';
+
+interface Recipe {
+  id: string;
+  title: string;
+  description: string;
+  cookTime: string;
+  difficulty: string;
+  imageUrl?: string;
+}
+
+interface Props {
+  recipes: Recipe[];
+}
+
+const { recipes } = Astro.props;
+const [featured, vertical, horizontal1, horizontal2] = recipes;
+---
+
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+  {featured && <RecipeCardFeatured {...featured} />}
+  {vertical && <RecipeCardVertical {...vertical} />}
+  {horizontal1 && <RecipeCardHorizontal {...horizontal1} />}
+  {horizontal2 && <RecipeCardHorizontal {...horizontal2} />}
+</div>

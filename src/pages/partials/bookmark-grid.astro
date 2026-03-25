@@ -1,0 +1,49 @@
+---
+import { db } from '../../db/index';
+import { bookmarks, recipes } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+import BookmarkCard from '../../components/bookmarks/BookmarkCard.astro';
+import EmptyState from '../../components/bookmarks/EmptyState.astro';
+
+const filter = Astro.url.searchParams.get('filter') || 'all';
+
+const allBookmarks = db
+  .select({
+    recipeId: recipes.id,
+    title: recipes.title,
+    description: recipes.description,
+    cookTime: recipes.cookTime,
+    difficulty: recipes.difficulty,
+    imageUrl: recipes.imageUrl,
+    dietaryTags: recipes.dietaryTags,
+  })
+  .from(bookmarks)
+  .innerJoin(recipes, eq(bookmarks.recipeId, recipes.id))
+  .all();
+
+// Filter by category if needed
+const filtered = filter === 'all'
+  ? allBookmarks
+  : allBookmarks.filter((b) => {
+      if (!b.dietaryTags) return false;
+      const tags: string[] = JSON.parse(b.dietaryTags);
+      return tags.some((tag) => tag.toLowerCase().includes(filter.toLowerCase()));
+    });
+---
+
+{filtered.length === 0 ? (
+  <EmptyState />
+) : (
+  <section class="grid gap-8" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+    {filtered.map((recipe, i) => (
+      <BookmarkCard
+        id={recipe.recipeId}
+        title={recipe.title}
+        description={recipe.description}
+        cookTime={recipe.cookTime}
+        imageUrl={recipe.imageUrl ?? undefined}
+        tall={i === 1}
+      />
+    ))}
+  </section>
+)}

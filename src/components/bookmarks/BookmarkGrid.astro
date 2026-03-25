@@ -1,0 +1,25 @@
+---
+import BookmarkCard from './BookmarkCard.astro';
+
+interface Recipe {
+  id: string;
+  title: string;
+  description: string;
+  cookTime: string;
+  badge?: string;
+  badgeColor?: 'secondary' | 'tertiary' | 'primary';
+  imageUrl?: string;
+}
+
+interface Props {
+  recipes: Recipe[];
+}
+
+const { recipes } = Astro.props;
+---
+
+<section class="grid gap-8" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+  {recipes.map((recipe, i) => (
+    <BookmarkCard {...recipe} tall={i === 1} />
+  ))}
+</section>

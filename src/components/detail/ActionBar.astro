@@ -1,0 +1,33 @@
+---
+interface Props {
+  recipeId: string;
+  isBookmarked?: boolean;
+}
+
+const { recipeId, isBookmarked = false } = Astro.props;
+---
+
+<div class="fixed bottom-0 left-0 w-full flex justify-between items-center h-24 px-8 pb-4 glass-nav border-t border-outline-variant/20 z-50">
+  <button
+    class="flex items-center gap-2 text-on-surface font-semibold hover:opacity-70 transition-opacity"
+    x-on:click="$store.ui.modalOpen = false"
+  >
+    <span class="material-symbols-outlined">arrow_back</span>
+    <span class="text-xs uppercase tracking-widest font-label">Back to Feed</span>
+  </button>
+  <div class="flex gap-4">
+    <button
+      class="flex items-center gap-3 bg-surface-container-highest px-6 py-3 rounded-full text-on-surface font-bold text-sm transition-all active:scale-95"
+      hx-post={`/api/bookmarks`}
+      hx-vals={`{"recipeId": "${recipeId}"}`}
+      hx-swap="outerHTML"
+    >
+      <span class="material-symbols-outlined" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
+      {isBookmarked ? 'Saved' : 'Save'}
+    </button>
+    <button class="flex items-center gap-3 editorial-gradient px-8 py-3 rounded-full text-on-primary font-bold text-sm shadow-xl shadow-primary/20 transition-all active:scale-95">
+      <span class="material-symbols-outlined">restaurant</span>
+      Start Cooking
+    </button>
+  </div>
+</div>

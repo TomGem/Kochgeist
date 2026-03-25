@@ -1,0 +1,22 @@
+---
+import { type Locale } from '../../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+---
+
+<div class="flex items-center gap-1" x-data={`{ lang: '${lang}' }`}>
+  <button
+    x-on:click="lang = 'en'; document.cookie = 'kochgeist-lang=en;path=/;max-age=31536000'; $store.ui.lang = 'en'; location.reload();"
+    x-bind:class="lang === 'en' ? 'bg-surface-container-high text-on-surface' : 'text-on-surface-variant'"
+    class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+  >
+    EN
+  </button>
+  <button
+    x-on:click="lang = 'de'; document.cookie = 'kochgeist-lang=de;path=/;max-age=31536000'; $store.ui.lang = 'de'; location.reload();"
+    x-bind:class="lang === 'de' ? 'bg-surface-container-high text-on-surface' : 'text-on-surface-variant'"
+    class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+  >
+    DE
+  </button>
+</div>

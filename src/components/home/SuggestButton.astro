@@ -1,0 +1,31 @@
+---
+import { t, type Locale } from '../../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+---
+
+<div class="fixed bottom-24 left-0 w-full px-6 pointer-events-none z-40">
+  <div class="max-w-2xl mx-auto flex justify-center">
+    <button
+      id="suggest-btn"
+      class="pointer-events-auto w-full py-5 rounded-full editorial-gradient text-white font-headline font-bold text-lg shadow-2xl flex items-center justify-center gap-3 hover:opacity-95 active:scale-95 transition-all duration-200"
+      x-data
+      x-on:click="
+        if ($store.ingredients.items.length === 0) return;
+        $store.ui.loading = true;
+        htmx.ajax('POST', '/api/recipes/suggest', {
+          target: '#main-content',
+          swap: 'innerHTML',
+          values: {
+            ingredients: JSON.stringify($store.ingredients.items),
+            filters: JSON.stringify($store.filters.active),
+            lang: $store.ui.lang
+          }
+        }).finally(() => { $store.ui.loading = false; });
+      "
+    >
+      <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+      {t('home.suggestButton', lang)}
+    </button>
+  </div>
+</div>

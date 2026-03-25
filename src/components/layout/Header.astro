@@ -1,0 +1,32 @@
+---
+import LanguageSwitcher from '../shared/LanguageSwitcher.astro';
+
+interface Props {
+  showBack?: boolean;
+}
+
+const { showBack = false } = Astro.props;
+---
+
+<header class="fixed top-0 w-full z-50 glass-header">
+  <div class="flex justify-between items-center px-6 h-16 w-full max-w-7xl mx-auto">
+    <div class="flex items-center gap-3">
+      {showBack && (
+        <button
+          onclick="history.back()"
+          class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-surface-container-high transition-colors active:scale-95 duration-200"
+        >
+          <span class="material-symbols-outlined text-on-surface">arrow_back</span>
+        </button>
+      )}
+      <span class="material-symbols-outlined text-primary">restaurant_menu</span>
+      <h1 class="font-headline font-extrabold text-xl tracking-tighter text-primary">Kochgeist</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <LanguageSwitcher />
+      <a href="/settings" class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity active:scale-95 duration-200">
+        <span class="material-symbols-outlined text-on-surface">settings</span>
+      </a>
+    </div>
+  </div>
+</header>

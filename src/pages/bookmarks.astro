@@ -1,0 +1,64 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import BottomNav from '../components/layout/BottomNav.astro';
+import FilterPills from '../components/bookmarks/FilterPills.astro';
+import BookmarkCard from '../components/bookmarks/BookmarkCard.astro';
+import EmptyState from '../components/bookmarks/EmptyState.astro';
+import RecipeModal from '../components/detail/RecipeModal.astro';
+import LoadingSpinner from '../components/shared/LoadingSpinner.astro';
+import ErrorToast from '../components/shared/ErrorToast.astro';
+import { db } from '../db/index';
+import { bookmarks, recipes } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { t, type Locale } from '../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+
+const savedRecipes = db
+  .select({
+    recipeId: recipes.id,
+    title: recipes.title,
+    description: recipes.description,
+    cookTime: recipes.cookTime,
+    difficulty: recipes.difficulty,
+    imageUrl: recipes.imageUrl,
+    dietaryTags: recipes.dietaryTags,
+  })
+  .from(bookmarks)
+  .innerJoin(recipes, eq(bookmarks.recipeId, recipes.id))
+  .all();
+---
+
+<BaseLayout title={`Kochgeist - ${t('bookmarks.title', lang)}`} activePage="saved">
+  <Header />
+  <main class="pt-24 pb-32 px-6 max-w-7xl mx-auto min-h-screen">
+    <div class="mb-12">
+      <span class="font-label text-xs uppercase tracking-[0.2em] text-primary font-bold mb-2 block">{t('bookmarks.collection', lang)}</span>
+      <h2 class="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-on-surface">{t('bookmarks.title', lang)}</h2>
+      <FilterPills active="all" />
+    </div>
+    <div id="bookmark-grid">
+      {savedRecipes.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <section class="grid gap-8" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+          {savedRecipes.map((recipe, i) => (
+            <BookmarkCard
+              id={recipe.recipeId}
+              title={recipe.title}
+              description={recipe.description}
+              cookTime={recipe.cookTime}
+              imageUrl={recipe.imageUrl ?? undefined}
+              tall={i === 1}
+            />
+          ))}
+        </section>
+      )}
+    </div>
+  </main>
+  <BottomNav active="saved" />
+  <RecipeModal />
+  <LoadingSpinner />
+  <ErrorToast />
+</BaseLayout>

@@ -1,0 +1,139 @@
+---
+import { db } from '../../db/index';
+import { recipes, bookmarks } from '../../db/schema';
+import { eq } from 'drizzle-orm';
+
+const id = Astro.url.searchParams.get('id');
+if (!id) return new Response('Missing recipe ID', { status: 400 });
+
+const recipe = db.select().from(recipes).where(eq(recipes.id, id)).get();
+if (!recipe) return new Response('Recipe not found', { status: 404 });
+
+const isBookmarked = !!db.select().from(bookmarks).where(eq(bookmarks.recipeId, id)).get();
+
+const ingredientsList = JSON.parse(recipe.ingredients) as Array<{ name: string; amount: string; isExtra: boolean }>;
+const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title: string; description: string }>;
+---
+
+<div class="bg-surface min-h-screen" x-data x-init="$store.ui.modalOpen = true" x-on:click.self="$store.ui.modalOpen = false">
+  <nav class="sticky top-0 w-full z-50 glass-header flex justify-between items-center px-6 h-16">
+    <div class="flex items-center gap-3">
+      <span class="material-symbols-outlined text-primary">restaurant_menu</span>
+      <span class="text-xl font-extrabold text-primary tracking-tighter font-headline">Kochgeist</span>
+    </div>
+    <div class="flex gap-4">
+      <button class="material-symbols-outlined text-on-surface hover:opacity-80 transition-opacity" x-on:click="$store.ui.modalOpen = false">close</button>
+    </div>
+  </nav>
+
+  <main class="pb-32 max-w-5xl mx-auto px-4 sm:px-8">
+    <!-- Hero Section -->
+    <section class="mt-8 grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+      <div class="lg:col-span-7 overflow-hidden rounded-xl">
+        {recipe.imageUrl ? (
+          <img class="w-full aspect-[4/3] object-cover hover:scale-105 transition-transform duration-700" src={recipe.imageUrl} alt={recipe.title} />
+        ) : (
+          <div class="w-full aspect-[4/3] bg-gradient-to-br from-primary/20 to-tertiary-container/30 flex items-center justify-center rounded-xl">
+            <span class="material-symbols-outlined text-8xl text-primary/20">restaurant</span>
+          </div>
+        )}
+      </div>
+      <div class="lg:col-span-5 pb-4">
+        <span class="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">Chef's Selection</span>
+        <h1 class="font-headline font-extrabold text-5xl md:text-6xl text-on-surface leading-[1.1] tracking-tighter mb-6">{recipe.title}</h1>
+        <div class="flex flex-wrap gap-3">
+          <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full">
+            <span class="material-symbols-outlined text-primary text-sm">schedule</span>
+            <span class="text-xs font-semibold uppercase tracking-wider">{recipe.cookTime}</span>
+          </div>
+          <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full">
+            <span class="material-symbols-outlined text-secondary text-sm">bar_chart</span>
+            <span class="text-xs font-semibold uppercase tracking-wider">{recipe.difficulty}</span>
+          </div>
+          {recipe.servings && (
+            <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full">
+              <span class="material-symbols-outlined text-secondary text-sm">group</span>
+              <span class="text-xs font-semibold uppercase tracking-wider">{recipe.servings}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- Recipe Content -->
+    <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-16">
+      <!-- Ingredients -->
+      <aside class="md:col-span-1">
+        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">Ingredients</h2>
+        <ul class="space-y-4">
+          {ingredientsList.map((item) => (
+            <li class="flex items-start justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-medium">{item.amount} {item.name}</span>
+                {item.isExtra && (
+                  <span class="text-[9px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">buy</span>
+                )}
+              </div>
+              <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors text-lg">check_circle</span>
+            </li>
+          ))}
+        </ul>
+
+        <!-- Chef's Note -->
+        <div class="mt-12 p-6 bg-tertiary-fixed rounded-xl border-l-4 border-on-tertiary-fixed-variant">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-on-tertiary-fixed text-lg">lightbulb</span>
+            <h4 class="font-headline font-bold text-sm text-on-tertiary-fixed">Chef's Note</h4>
+          </div>
+          <p class="text-xs text-on-tertiary-fixed leading-relaxed">{recipe.description}</p>
+        </div>
+      </aside>
+
+      <!-- Instructions -->
+      <article class="md:col-span-2">
+        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">Cooking Steps</h2>
+        <div class="space-y-12">
+          {stepsList.map((step) => (
+            <div class="flex gap-6 group">
+              <span class="font-headline text-4xl font-black text-outline-variant/30 group-hover:text-primary transition-colors duration-300">
+                {String(step.step).padStart(2, '0')}
+              </span>
+              <div class="pt-2">
+                <h3 class="font-headline font-bold text-lg mb-2">{step.title}</h3>
+                <p class="text-on-surface-variant leading-relaxed text-sm">{step.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <!-- Bottom Action Bar -->
+  <div class="sticky bottom-0 left-0 w-full flex justify-between items-center h-24 px-8 pb-4 glass-nav border-t border-outline-variant/20 z-50">
+    <button
+      class="flex items-center gap-2 text-on-surface font-semibold hover:opacity-70 transition-opacity"
+      x-on:click="$store.ui.modalOpen = false"
+    >
+      <span class="material-symbols-outlined">arrow_back</span>
+      <span class="text-xs uppercase tracking-widest font-label">Back to Feed</span>
+    </button>
+    <div class="flex gap-4">
+      <button
+        id={`bookmark-${recipe.id}`}
+        class="flex items-center gap-3 bg-surface-container-highest px-6 py-3 rounded-full text-on-surface font-bold text-sm transition-all active:scale-95"
+        hx-post="/api/bookmarks"
+        hx-vals={JSON.stringify({ recipeId: recipe.id })}
+        hx-target={`#bookmark-${recipe.id}`}
+        hx-swap="outerHTML"
+      >
+        <span class="material-symbols-outlined" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
+        {isBookmarked ? 'Saved' : 'Save'}
+      </button>
+      <button class="flex items-center gap-3 editorial-gradient px-8 py-3 rounded-full text-on-primary font-bold text-sm shadow-xl shadow-primary/20 transition-all active:scale-95">
+        <span class="material-symbols-outlined">restaurant</span>
+        Start Cooking
+      </button>
+    </div>
+  </div>
+</div>

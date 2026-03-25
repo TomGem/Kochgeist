@@ -1,0 +1,32 @@
+---
+interface Props {
+  active?: string;
+}
+
+const { active = 'all' } = Astro.props;
+
+const filters = [
+  { id: 'all', label: 'All Saved' },
+  { id: 'quick', label: 'Quick Dinners' },
+  { id: 'vegetarian', label: 'Vegetarian' },
+  { id: 'desserts', label: 'Desserts' },
+];
+---
+
+<div class="mt-4 flex flex-wrap gap-3">
+  {filters.map((filter) => (
+    <button
+      class:list={[
+        'px-4 py-2 rounded-full text-sm font-semibold transition-colors',
+        active === filter.id
+          ? 'bg-surface-container-high text-on-surface'
+          : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high',
+      ]}
+      hx-get={`/partials/bookmark-grid?filter=${filter.id}`}
+      hx-target="#bookmark-grid"
+      hx-swap="innerHTML"
+    >
+      {filter.label}
+    </button>
+  ))}
+</div>

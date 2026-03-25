@@ -1,0 +1,45 @@
+---
+import { t, type Locale } from '../../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+---
+
+<section class="mb-12" x-data="{ scanning: false }">
+  <button
+    class="w-full relative overflow-hidden rounded-2xl aspect-[16/10] flex flex-col items-center justify-center gap-4 group active:scale-[0.98] transition-all duration-200 bg-surface-container-high"
+    x-on:click="$refs.cameraInput.click()"
+  >
+    <div class="absolute inset-0 w-full h-full bg-gradient-to-br from-primary-dim/60 to-primary/40"></div>
+    <div class="z-10 bg-white/10 backdrop-blur-md p-6 rounded-full border border-white/20">
+      <span x-show="!scanning" class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+      <div x-show="scanning" class="w-9 h-9 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
+    </div>
+    <div class="z-10 text-center">
+      <span class="text-white font-headline font-bold text-2xl block" x-text="scanning ? 'Scanning...' : '{t('home.takePhoto', lang)}'"></span>
+      <span class="text-white/80 text-sm font-label uppercase tracking-widest mt-1">{t('home.scanSubtitle', lang)}</span>
+    </div>
+  </button>
+  <input
+    x-ref="cameraInput"
+    type="file"
+    accept="image/*"
+    capture="environment"
+    class="hidden"
+    x-on:change="
+      if ($event.target.files.length === 0) return;
+      scanning = true;
+      const formData = new FormData();
+      formData.append('image', $event.target.files[0]);
+      formData.append('lang', $store.ui.lang);
+      fetch('/api/ingredients/recognize', { method: 'POST', body: formData })
+        .then(r => r.json().catch(() => r.text()))
+        .then(data => {
+          if (Array.isArray(data)) {
+            data.forEach(name => $store.ingredients.add(name));
+          }
+        })
+        .catch(err => { $store.ui.error = 'Could not scan image'; })
+        .finally(() => { scanning = false; $event.target.value = ''; });
+    "
+  />
+</section>

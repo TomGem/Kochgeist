@@ -1,0 +1,83 @@
+---
+interface Props {
+  title?: string;
+  activePage?: 'discover' | 'saved' | 'scanner';
+}
+
+const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <style is:global>
+    @import '../../assets/css/global.css';
+  </style>
+</head>
+<body
+  class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
+  hx-boost="true"
+>
+  <slot />
+
+  <script>
+    import htmx from 'htmx.org';
+    import Alpine from 'alpinejs';
+
+    // Make htmx available globally
+    window.htmx = htmx;
+
+    if (!window.Alpine) {
+      Alpine.store('ingredients', {
+        items: [] as string[],
+        add(name: string) {
+          const trimmed = name.trim();
+          if (trimmed && !this.items.includes(trimmed)) {
+            this.items.push(trimmed);
+          }
+        },
+        remove(index: number) {
+          this.items.splice(index, 1);
+        },
+        clear() {
+          this.items = [];
+        },
+      });
+
+      Alpine.store('filters', {
+        active: [] as string[],
+        toggle(filter: string) {
+          const idx = this.active.indexOf(filter);
+          if (idx === -1) {
+            this.active.push(filter);
+          } else {
+            this.active.splice(idx, 1);
+          }
+        },
+        isActive(filter: string) {
+          return this.active.includes(filter);
+        },
+      });
+
+      Alpine.store('ui', {
+        lang: 'en',
+        modalOpen: false,
+        modalRecipeId: null as string | null,
+        loading: false,
+        error: null as string | null,
+        toastMessage: null as string | null,
+      });
+
+      window.Alpine = Alpine;
+      Alpine.start();
+    }
+  </script>
+</body>
+</html>

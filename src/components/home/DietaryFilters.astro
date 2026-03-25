@@ -1,0 +1,20 @@
+---
+const filters = [
+  { id: 'vegetarian', label: 'Vegetarian' },
+  { id: 'vegan', label: 'Vegan' },
+  { id: 'gluten-free', label: 'Gluten-Free' },
+  { id: 'low-cholesterol', label: 'Low Cholesterol' },
+];
+---
+
+<div class="flex flex-wrap gap-2 mb-8" x-data>
+  {filters.map((filter) => (
+    <button
+      x-on:click={`$store.filters.toggle('${filter.id}')`}
+      x-bind:class={`$store.filters.isActive('${filter.id}') ? 'bg-surface-container-high text-on-surface' : 'bg-surface-container-low text-on-surface-variant'`}
+      class="px-4 py-2 rounded-full text-sm font-semibold transition-colors hover:bg-surface-container-high"
+    >
+      {filter.label}
+    </button>
+  ))}
+</div>

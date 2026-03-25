@@ -1,0 +1,18 @@
+---
+---
+
+<div
+  x-data
+  x-show="$store.ui.error"
+  x-transition
+  class="fixed top-20 left-1/2 -translate-x-1/2 z-[80] max-w-md w-full px-6"
+  style="display: none;"
+>
+  <div class="bg-error-container text-on-error-container p-4 rounded-xl shadow-lg flex items-center gap-3">
+    <span class="material-symbols-outlined">error</span>
+    <p class="text-sm font-medium flex-1" x-text="$store.ui.error"></p>
+    <button x-on:click="$store.ui.error = null" class="hover:opacity-70">
+      <span class="material-symbols-outlined text-sm">close</span>
+    </button>
+  </div>
+</div>

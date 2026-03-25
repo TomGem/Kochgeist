@@ -1,0 +1,82 @@
+{
+  "app": {
+    "name": "Kochgeist",
+    "tagline": "AI Kitchen Assistant"
+  },
+  "home": {
+    "hero": "What's in your pantry?",
+    "searchPlaceholder": "Add ingredients one by one",
+    "suggestButton": "Suggest Recipes",
+    "takePhoto": "Take Photo",
+    "scanSubtitle": "Scan Pantry Items",
+    "quickStart": "Quick Start",
+    "chefRecommended": "Chef Recommended",
+    "leafyGreens": "Leafy Greens",
+    "leafyGreensCount": "12 Quick Recipes",
+    "quickMeals": "15 Min Meals",
+    "quickMealsDesc": "For busy chefs"
+  },
+  "results": {
+    "curatedResults": "Curated Results",
+    "recipesFor": "Recipes for:",
+    "analysisNote": "We've analyzed your pantry and selected 4 recipes that maximize flavor while minimizing prep time.",
+    "editorsChoice": "Editor's Choice",
+    "chefSecret": "Chef's Secret",
+    "chefSecretTitle": "Chef's Secret: The Sizzle",
+    "chefSecretText": "To get the most out of your ingredients, ensure your pan is shimmering hot before adding protein. This creates a Maillard reaction that locks in juices and deepens the flavor."
+  },
+  "detail": {
+    "ingredients": "Ingredients",
+    "cookingSteps": "Cooking Steps",
+    "chefsNote": "Chef's Note",
+    "chefsSelection": "Chef's Selection",
+    "backToFeed": "Back to Feed",
+    "startCooking": "Start Cooking",
+    "save": "Save",
+    "saved": "Saved",
+    "share": "Share",
+    "buy": "buy"
+  },
+  "bookmarks": {
+    "collection": "Personal Collection",
+    "title": "My Saved Recipes",
+    "allSaved": "All Saved",
+    "quickDinners": "Quick Dinners",
+    "vegetarian": "Vegetarian",
+    "desserts": "Desserts",
+    "cookNow": "Cook Now",
+    "editorialPick": "Editorial Pick",
+    "emptyTitle": "No recipes saved yet.",
+    "emptyDescription": "Build your personal cookbook by exploring our editorial collections.",
+    "emptyAction": "Start Cooking!"
+  },
+  "filters": {
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan",
+    "glutenFree": "Gluten-Free",
+    "lowCholesterol": "Low Cholesterol"
+  },
+  "nav": {
+    "discover": "Discover",
+    "saved": "Saved",
+    "scanner": "Scanner"
+  },
+  "errors": {
+    "aiFailure": "Our chef is taking a break. Please try again.",
+    "rateLimit": "Too many requests. Please wait a moment.",
+    "invalidResponse": "Something went wrong with the recipe. Trying again...",
+    "networkError": "Can't reach the kitchen. Check your connection.",
+    "noIngredients": "Add some ingredients first!"
+  },
+  "metrics": {
+    "cook": "Cook",
+    "prep": "Prep",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "servings": "Servings"
+  },
+  "loading": {
+    "crafting": "Crafting your recipes..."
+  }
+}

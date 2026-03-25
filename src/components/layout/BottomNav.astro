@@ -1,0 +1,39 @@
+---
+import { t, type Locale } from '../../lib/i18n/index';
+
+interface Props {
+  active?: 'discover' | 'saved' | 'scanner';
+}
+
+const { active = 'discover' } = Astro.props;
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+
+const items = [
+  { id: 'discover', icon: 'auto_awesome', label: t('nav.discover', lang), href: '/', filled: true },
+  { id: 'saved', icon: 'bookmark', label: t('nav.saved', lang), href: '/bookmarks', filled: true },
+  { id: 'scanner', icon: 'cooking', label: t('nav.scanner', lang), href: '#', filled: false },
+] as const;
+---
+
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-4 pb-safe glass-nav border-t border-outline-variant/20 z-50">
+  {items.map((item) => {
+    const isActive = active === item.id;
+    return (
+      <a
+        href={item.href}
+        class:list={[
+          'flex flex-col items-center justify-center tap-highlight-none transition-all',
+          isActive ? 'text-primary scale-110' : 'text-outline-variant hover:text-primary',
+        ]}
+      >
+        <span
+          class="material-symbols-outlined"
+          style={isActive && item.filled ? "font-variation-settings: 'FILL' 1;" : ''}
+        >
+          {item.icon}
+        </span>
+        <span class="font-label text-[10px] uppercase tracking-[0.05em] font-semibold mt-1">{item.label}</span>
+      </a>
+    );
+  })}
+</nav>
