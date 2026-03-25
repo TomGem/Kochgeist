@@ -1,6 +1,6 @@
 # Kochgeist
 
-AI-powered recipe suggestion app. Enter the ingredients you have on hand and Kochgeist will suggest 4 recipes with AI-generated images. Available in English and German.
+AI-powered recipe suggestion app. Enter the ingredients you have on hand and Kochgeist will suggest 4 recipes with AI-generated images. Available in English, German, French, Italian, Spanish, and Portuguese.
 
 ## Features
 
@@ -9,8 +9,9 @@ AI-powered recipe suggestion app. Enter the ingredients you have on hand and Koc
 - **Quick Start presets** -- one-tap ingredient combos (Leafy Greens, 15-Min Meals) for instant inspiration
 - **Bookmarks** -- save recipes for later
 - **Search history** -- revisit past ingredient searches
-- **Dietary filters** -- vegan, vegetarian, gluten-free, etc.
-- **Multilingual** -- English and German (casual "du" form)
+- **Dietary & lifestyle filters** -- 16 filters across diet (vegetarian, vegan, gluten-free, dairy-free, low-carb, high-protein, low-cholesterol), time & budget (quick, elaborate, budget, gourmet), and occasion (kid-friendly, date night, comfort food, one-pot, meal prep). Filters apply to both recipe suggestions and saved bookmarks.
+- **Comma-separated input** -- enter multiple ingredients at once separated by commas; tags are auto-capitalized
+- **Multilingual** -- English, German, French, Italian, Spanish, and Portuguese with a dropdown language switcher
 - **Multi-provider AI** -- supports Azure AI, OpenAI, Anthropic, Ollama, and LM Studio
 
 ## Tech Stack
@@ -86,7 +87,7 @@ kochgeist/
     lib/
       ai/             # AI provider system (interface, registry, providers, prompts)
       images/         # Image generation provider system
-      i18n/           # Translations (en.json, de.json)
+      i18n/           # Translations (en, de, fr, it, es, pt)
       cache.ts        # Ingredient hash for recipe caching
     db/
       schema.ts       # Drizzle schema (recipes, bookmarks, cache, history)

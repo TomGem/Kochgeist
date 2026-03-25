@@ -1,15 +1,34 @@
 ---
+import { t, type Locale } from '../../lib/i18n/index';
+
 interface Props {
   active?: string;
 }
 
 const { active = 'all' } = Astro.props;
+const lang = (Astro.locals.lang ?? 'en') as Locale;
 
 const filters = [
-  { id: 'all', label: 'All Saved' },
-  { id: 'quick', label: 'Quick Dinners' },
-  { id: 'vegetarian', label: 'Vegetarian' },
-  { id: 'desserts', label: 'Desserts' },
+  { id: 'all', labelKey: 'bookmarks.allSaved', icon: 'select_all' },
+  // Diet
+  { id: 'vegetarian', labelKey: 'filters.vegetarian', icon: 'eco' },
+  { id: 'vegan', labelKey: 'filters.vegan', icon: 'spa' },
+  { id: 'gluten-free', labelKey: 'filters.glutenFree', icon: 'grain' },
+  { id: 'dairy-free', labelKey: 'filters.dairyFree', icon: 'water_drop' },
+  { id: 'low-carb', labelKey: 'filters.lowCarb', icon: 'trending_down' },
+  { id: 'high-protein', labelKey: 'filters.highProtein', icon: 'fitness_center' },
+  { id: 'low-cholesterol', labelKey: 'filters.lowCholesterol', icon: 'favorite' },
+  // Time & Budget
+  { id: 'quick', labelKey: 'filters.quick', icon: 'timer' },
+  { id: 'elaborate', labelKey: 'filters.elaborate', icon: 'menu_book' },
+  { id: 'budget', labelKey: 'filters.budget', icon: 'savings' },
+  { id: 'gourmet', labelKey: 'filters.gourmet', icon: 'star' },
+  // Occasion
+  { id: 'kid-friendly', labelKey: 'filters.kidFriendly', icon: 'child_care' },
+  { id: 'date-night', labelKey: 'filters.dateNight', icon: 'local_dining' },
+  { id: 'comfort', labelKey: 'filters.comfort', icon: 'cottage' },
+  { id: 'one-pot', labelKey: 'filters.onePot', icon: 'soup_kitchen' },
+  { id: 'meal-prep', labelKey: 'filters.mealPrep', icon: 'kitchen' },
 ];
 ---
 
@@ -17,7 +36,7 @@ const filters = [
   {filters.map((filter) => (
     <button
       class:list={[
-        'px-4 py-2 rounded-full text-sm font-semibold transition-colors',
+        'inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-colors',
         active === filter.id
           ? 'bg-surface-container-high text-on-surface'
           : 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high',
@@ -26,7 +45,8 @@ const filters = [
       hx-target="#bookmark-grid"
       hx-swap="innerHTML"
     >
-      {filter.label}
+      <span class="material-symbols-outlined text-base">{filter.icon}</span>
+      {t(filter.labelKey, lang)}
     </button>
   ))}
 </div>

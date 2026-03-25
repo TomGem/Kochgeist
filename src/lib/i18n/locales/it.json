@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "Kochgeist",
+    "tagline": "Assistente culinario IA"
+  },
+  "home": {
+    "hero": "Cosa hai in frigo?",
+    "searchPlaceholder": "Aggiungi ingredienti uno alla volta",
+    "suggestButton": "Suggerisci ricette",
+    "takePhoto": "Scatta una foto",
+    "scanSubtitle": "Scansiona la dispensa",
+    "quickStart": "Avvio rapido",
+    "chefRecommended": "Consigliato dallo chef",
+    "leafyGreens": "Verdure a foglia",
+    "leafyGreensCount": "12 ricette veloci",
+    "quickMeals": "Piatti in 15 min",
+    "quickMealsDesc": "Per cuochi indaffarati"
+  },
+  "results": {
+    "curatedResults": "Risultati selezionati",
+    "recipesFor": "Ricette per:",
+    "analysisNote": "Abbiamo analizzato la tua dispensa e selezionato 4 ricette che massimizzano il sapore.",
+    "editorsChoice": "Scelta della redazione",
+    "chefSecret": "Segreto dello chef",
+    "chefSecretTitle": "Segreto dello chef: Lo sfrigolio",
+    "chefSecretText": "Per ottenere il massimo dai tuoi ingredienti, assicurati che la padella sia ben calda prima di aggiungere la carne. Questo crea una reazione di Maillard che sigilla i succhi e intensifica il sapore."
+  },
+  "detail": {
+    "ingredients": "Ingredienti",
+    "cookingSteps": "Passaggi",
+    "chefsNote": "Nota dello chef",
+    "chefsSelection": "Selezione dello chef",
+    "backToFeed": "Indietro",
+    "startCooking": "Inizia a cucinare",
+    "save": "Salva",
+    "saved": "Salvato",
+    "share": "Condividi",
+    "buy": "comprare"
+  },
+  "bookmarks": {
+    "collection": "Collezione personale",
+    "title": "Le mie ricette salvate",
+    "allSaved": "Tutte",
+    "quickDinners": "Cene veloci",
+    "vegetarian": "Vegetariano",
+    "desserts": "Dolci",
+    "cookNow": "Cucina ora",
+    "editorialPick": "Scelta della redazione",
+    "emptyTitle": "Nessuna ricetta salvata.",
+    "emptyDescription": "Crea il tuo ricettario personale esplorando le nostre collezioni.",
+    "emptyAction": "Inizia a cucinare!"
+  },
+  "filters": {
+    "vegetarian": "Vegetariano",
+    "vegan": "Vegano",
+    "glutenFree": "Senza glutine",
+    "dairyFree": "Senza lattosio",
+    "lowCarb": "Low Carb",
+    "highProtein": "Ricco di proteine",
+    "lowCholesterol": "Basso colesterolo",
+    "quick": "Veloce",
+    "elaborate": "Elaborato",
+    "budget": "Economico",
+    "gourmet": "Gourmet",
+    "kidFriendly": "Per bambini",
+    "dateNight": "Cena romantica",
+    "comfort": "Comfort Food",
+    "onePot": "One Pot",
+    "mealPrep": "Meal Prep"
+  },
+  "nav": {
+    "discover": "Scopri",
+    "saved": "Salvati",
+    "scanner": "Scanner"
+  },
+  "errors": {
+    "aiFailure": "Il nostro chef è in pausa. Riprova più tardi.",
+    "rateLimit": "Troppe richieste. Attendi un momento.",
+    "invalidResponse": "Qualcosa è andato storto con la ricetta. Riproviamo...",
+    "networkError": "Impossibile raggiungere la cucina. Controlla la connessione.",
+    "noIngredients": "Aggiungi prima qualche ingrediente!"
+  },
+  "metrics": {
+    "cook": "Cottura",
+    "prep": "Preparazione",
+    "easy": "Facile",
+    "medium": "Medio",
+    "hard": "Difficile",
+    "servings": "Porzioni"
+  },
+  "loading": {
+    "crafting": "Stiamo creando le tue ricette..."
+  }
+}

@@ -54,7 +54,19 @@
     "vegetarian": "Vegetarian",
     "vegan": "Vegan",
     "glutenFree": "Gluten-Free",
-    "lowCholesterol": "Low Cholesterol"
+    "dairyFree": "Dairy-Free",
+    "lowCarb": "Low Carb",
+    "highProtein": "High Protein",
+    "lowCholesterol": "Low Cholesterol",
+    "quick": "Quick",
+    "elaborate": "Elaborate",
+    "budget": "Budget",
+    "gourmet": "Gourmet",
+    "kidFriendly": "Kid-Friendly",
+    "dateNight": "Date Night",
+    "comfort": "Comfort Food",
+    "onePot": "One Pot",
+    "mealPrep": "Meal Prep"
   },
   "nav": {
     "discover": "Discover",

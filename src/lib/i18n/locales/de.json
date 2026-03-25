@@ -1,36 +1,36 @@
 {
   "app": {
     "name": "Kochgeist",
-    "tagline": "KI-Kuechenassistent"
+    "tagline": "KI-Küchenassistent"
   },
   "home": {
-    "hero": "Was hast du im Kuehlschrank?",
-    "searchPlaceholder": "Zutaten einzeln hinzufuegen",
+    "hero": "Was hast du im Kühlschrank?",
+    "searchPlaceholder": "Zutaten einzeln hinzufügen",
     "suggestButton": "Rezepte vorschlagen",
     "takePhoto": "Foto machen",
     "scanSubtitle": "Vorrat scannen",
     "quickStart": "Schnellstart",
     "chefRecommended": "Chefkoch-Empfehlung",
-    "leafyGreens": "Blattgemuese",
+    "leafyGreens": "Blattgemüse",
     "leafyGreensCount": "12 schnelle Rezepte",
     "quickMeals": "15-Min-Gerichte",
-    "quickMealsDesc": "Fuer beschaeftigte Koeche"
+    "quickMealsDesc": "Für beschäftigte Köche"
   },
   "results": {
     "curatedResults": "Kuratierte Ergebnisse",
-    "recipesFor": "Rezepte fuer:",
-    "analysisNote": "Wir haben deinen Vorrat analysiert und 4 Rezepte ausgewaehlt, die den Geschmack maximieren.",
+    "recipesFor": "Rezepte für:",
+    "analysisNote": "Wir haben deinen Vorrat analysiert und 4 Rezepte ausgewählt, die den Geschmack maximieren.",
     "editorsChoice": "Redaktionstipp",
     "chefSecret": "Geheimtipp",
     "chefSecretTitle": "Geheimtipp: Das Brutzeln",
-    "chefSecretText": "Fuer das Beste aus deinen Zutaten: Pfanne richtig heiss werden lassen, bevor du das Fleisch reinlegst. So bekommst du die perfekte Kruste und der Geschmack wird noch intensiver."
+    "chefSecretText": "Für das Beste aus deinen Zutaten: Pfanne richtig heiß werden lassen, bevor du das Fleisch reinlegst. So bekommst du die perfekte Kruste und der Geschmack wird noch intensiver."
   },
   "detail": {
     "ingredients": "Zutaten",
     "cookingSteps": "Kochschritte",
     "chefsNote": "Tipp vom Chef",
     "chefsSelection": "Chefkoch-Auswahl",
-    "backToFeed": "Zurueck",
+    "backToFeed": "Zurück",
     "startCooking": "Loskochen",
     "save": "Speichern",
     "saved": "Gespeichert",
@@ -38,7 +38,7 @@
     "buy": "kaufen"
   },
   "bookmarks": {
-    "collection": "Persoenliche Sammlung",
+    "collection": "Persönliche Sammlung",
     "title": "Meine gespeicherten Rezepte",
     "allSaved": "Alle",
     "quickDinners": "Schnelle Gerichte",
@@ -47,14 +47,26 @@
     "cookNow": "Jetzt kochen",
     "editorialPick": "Redaktionstipp",
     "emptyTitle": "Noch keine Rezepte gespeichert.",
-    "emptyDescription": "Erstelle dein persoenliches Kochbuch, indem du unsere Rezeptsammlungen erkundest.",
+    "emptyDescription": "Erstelle dein persönliches Kochbuch, indem du unsere Rezeptsammlungen erkundest.",
     "emptyAction": "Loskochen!"
   },
   "filters": {
     "vegetarian": "Vegetarisch",
     "vegan": "Vegan",
     "glutenFree": "Glutenfrei",
-    "lowCholesterol": "Cholesterinarm"
+    "dairyFree": "Laktosefrei",
+    "lowCarb": "Low Carb",
+    "highProtein": "Proteinreich",
+    "lowCholesterol": "Cholesterinarm",
+    "quick": "Schnell",
+    "elaborate": "Aufwendig",
+    "budget": "Preiswert",
+    "gourmet": "Gourmet",
+    "kidFriendly": "Kinderfreundlich",
+    "dateNight": "Romantisch",
+    "comfort": "Soulfood",
+    "onePot": "One Pot",
+    "mealPrep": "Meal Prep"
   },
   "nav": {
     "discover": "Entdecken",
@@ -65,8 +77,8 @@
     "aiFailure": "Unser Koch macht gerade Pause. Bitte versuch's nochmal.",
     "rateLimit": "Zu viele Anfragen. Bitte warte kurz.",
     "invalidResponse": "Beim Rezept ist was schiefgelaufen. Wir versuchen's nochmal...",
-    "networkError": "Keine Verbindung zur Kueche. Pruef deine Internetverbindung.",
-    "noIngredients": "Fueg erst ein paar Zutaten hinzu!"
+    "networkError": "Keine Verbindung zur Küche. Prüf deine Internetverbindung.",
+    "noIngredients": "Füg erst ein paar Zutaten hinzu!"
   },
   "metrics": {
     "cook": "Kochen",

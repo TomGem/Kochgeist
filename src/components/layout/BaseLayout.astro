@@ -38,9 +38,14 @@ const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
       Alpine.store('ingredients', {
         items: [] as string[],
         add(name: string) {
-          const trimmed = name.trim();
-          if (trimmed && !this.items.includes(trimmed)) {
-            this.items.push(trimmed);
+          const parts = name.includes(',') ? name.split(',') : [name];
+          for (const part of parts) {
+            const trimmed = part.trim();
+            if (!trimmed) continue;
+            const capitalized = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+            if (!this.items.includes(capitalized)) {
+              this.items.push(capitalized);
+            }
           }
         },
         remove(index: number) {

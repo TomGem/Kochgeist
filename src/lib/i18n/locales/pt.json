@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "Kochgeist",
+    "tagline": "Assistente culinário IA"
+  },
+  "home": {
+    "hero": "O que tens no frigorífico?",
+    "searchPlaceholder": "Adiciona ingredientes um a um",
+    "suggestButton": "Sugerir receitas",
+    "takePhoto": "Tirar foto",
+    "scanSubtitle": "Escanear despensa",
+    "quickStart": "Início rápido",
+    "chefRecommended": "Recomendado pelo chef",
+    "leafyGreens": "Verduras de folha",
+    "leafyGreensCount": "12 receitas rápidas",
+    "quickMeals": "Refeições em 15 min",
+    "quickMealsDesc": "Para cozinheiros apressados"
+  },
+  "results": {
+    "curatedResults": "Resultados selecionados",
+    "recipesFor": "Receitas para:",
+    "analysisNote": "Analisámos a tua despensa e selecionámos 4 receitas que maximizam o sabor.",
+    "editorsChoice": "Escolha do editor",
+    "chefSecret": "Segredo do chef",
+    "chefSecretTitle": "Segredo do chef: O chiar",
+    "chefSecretText": "Para tirar o melhor dos teus ingredientes, certifica-te de que a frigideira está bem quente antes de adicionar a carne. Isso cria uma reação de Maillard que sela os sucos e intensifica o sabor."
+  },
+  "detail": {
+    "ingredients": "Ingredientes",
+    "cookingSteps": "Passos de preparação",
+    "chefsNote": "Nota do chef",
+    "chefsSelection": "Seleção do chef",
+    "backToFeed": "Voltar",
+    "startCooking": "Começar a cozinhar",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "share": "Partilhar",
+    "buy": "comprar"
+  },
+  "bookmarks": {
+    "collection": "Coleção pessoal",
+    "title": "As minhas receitas guardadas",
+    "allSaved": "Todas",
+    "quickDinners": "Jantares rápidos",
+    "vegetarian": "Vegetariano",
+    "desserts": "Sobremesas",
+    "cookNow": "Cozinhar agora",
+    "editorialPick": "Escolha do editor",
+    "emptyTitle": "Ainda não guardaste receitas.",
+    "emptyDescription": "Cria o teu livro de receitas pessoal explorando as nossas coleções.",
+    "emptyAction": "Vamos cozinhar!"
+  },
+  "filters": {
+    "vegetarian": "Vegetariano",
+    "vegan": "Vegano",
+    "glutenFree": "Sem glúten",
+    "dairyFree": "Sem lactose",
+    "lowCarb": "Low Carb",
+    "highProtein": "Rico em proteínas",
+    "lowCholesterol": "Baixo colesterol",
+    "quick": "Rápido",
+    "elaborate": "Elaborado",
+    "budget": "Económico",
+    "gourmet": "Gourmet",
+    "kidFriendly": "Para crianças",
+    "dateNight": "Jantar romântico",
+    "comfort": "Comfort Food",
+    "onePot": "One Pot",
+    "mealPrep": "Meal Prep"
+  },
+  "nav": {
+    "discover": "Descobrir",
+    "saved": "Guardado",
+    "scanner": "Scanner"
+  },
+  "errors": {
+    "aiFailure": "O nosso chef está a descansar. Tenta novamente.",
+    "rateLimit": "Demasiados pedidos. Aguarda um momento.",
+    "invalidResponse": "Algo correu mal com a receita. A tentar de novo...",
+    "networkError": "Não foi possível ligar à cozinha. Verifica a tua ligação.",
+    "noIngredients": "Adiciona primeiro alguns ingredientes!"
+  },
+  "metrics": {
+    "cook": "Cozedura",
+    "prep": "Preparação",
+    "easy": "Fácil",
+    "medium": "Médio",
+    "hard": "Difícil",
+    "servings": "Porções"
+  },
+  "loading": {
+    "crafting": "A criar as tuas receitas..."
+  }
+}

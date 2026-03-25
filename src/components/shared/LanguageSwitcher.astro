@@ -2,21 +2,48 @@
 import { type Locale } from '../../lib/i18n/index';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
+
+const languages: { code: Locale; label: string }[] = [
+  { code: 'en', label: 'EN' },
+  { code: 'de', label: 'DE' },
+  { code: 'fr', label: 'FR' },
+  { code: 'it', label: 'IT' },
+  { code: 'es', label: 'ES' },
+  { code: 'pt', label: 'PT' },
+];
+
+const currentLabel = languages.find(l => l.code === lang)?.label ?? 'EN';
 ---
 
-<div class="flex items-center gap-1" x-data={`{ lang: '${lang}' }`}>
+<div class="relative" x-data={`{ open: false, current: '${currentLabel}' }`} x-on:click.outside="open = false">
   <button
-    x-on:click="lang = 'en'; document.cookie = 'kochgeist-lang=en;path=/;max-age=31536000'; $store.ui.lang = 'en'; location.reload();"
-    x-bind:class="lang === 'en' ? 'bg-surface-container-high text-on-surface' : 'text-on-surface-variant'"
-    class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+    x-on:click="open = !open"
+    class="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors bg-surface-container-high text-on-surface"
   >
-    EN
+    <span class="material-symbols-outlined text-base">language</span>
+    <span x-text="current"></span>
+    <span class="material-symbols-outlined text-base transition-transform" x-bind:class="open && 'rotate-180'">expand_more</span>
   </button>
-  <button
-    x-on:click="lang = 'de'; document.cookie = 'kochgeist-lang=de;path=/;max-age=31536000'; $store.ui.lang = 'de'; location.reload();"
-    x-bind:class="lang === 'de' ? 'bg-surface-container-high text-on-surface' : 'text-on-surface-variant'"
-    class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors"
+  <div
+    x-show="open"
+    x-transition:enter="transition ease-out duration-150"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+    x-transition:leave="transition ease-in duration-100"
+    x-transition:leave-start="opacity-100 scale-100"
+    x-transition:leave-end="opacity-0 scale-95"
+    class="absolute right-0 mt-2 w-24 rounded-xl bg-surface-container-high shadow-lg ring-1 ring-outline-variant/10 overflow-hidden z-50"
   >
-    DE
-  </button>
+    {languages.map(({ code, label }) => (
+      <button
+        x-on:click={`current = '${label}'; open = false; document.cookie = 'kochgeist-lang=${code};path=/;max-age=31536000'; $store.ui.lang = '${code}'; location.reload();`}
+        class:list={[
+          'w-full px-4 py-2 text-xs font-bold uppercase tracking-wider text-left transition-colors hover:bg-surface-container-highest',
+          code === lang ? 'text-primary' : 'text-on-surface-variant',
+        ]}
+      >
+        {label}
+      </button>
+    ))}
+  </div>
 </div>

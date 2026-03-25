@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "Kochgeist",
+    "tagline": "Assistant culinaire IA"
+  },
+  "home": {
+    "hero": "Qu'as-tu dans ton frigo ?",
+    "searchPlaceholder": "Ajouter des ingrédients un par un",
+    "suggestButton": "Suggérer des recettes",
+    "takePhoto": "Prendre une photo",
+    "scanSubtitle": "Scanner le garde-manger",
+    "quickStart": "Démarrage rapide",
+    "chefRecommended": "Recommandé par le chef",
+    "leafyGreens": "Légumes verts",
+    "leafyGreensCount": "12 recettes rapides",
+    "quickMeals": "Repas en 15 min",
+    "quickMealsDesc": "Pour les cuisiniers pressés"
+  },
+  "results": {
+    "curatedResults": "Résultats sélectionnés",
+    "recipesFor": "Recettes pour :",
+    "analysisNote": "Nous avons analysé ton garde-manger et sélectionné 4 recettes qui maximisent les saveurs.",
+    "editorsChoice": "Coup de cœur",
+    "chefSecret": "Secret du chef",
+    "chefSecretTitle": "Secret du chef : Le grésillement",
+    "chefSecretText": "Pour tirer le meilleur de tes ingrédients, assure-toi que ta poêle est bien chaude avant d'ajouter la viande. Cela crée une réaction de Maillard qui emprisonne les jus et intensifie les saveurs."
+  },
+  "detail": {
+    "ingredients": "Ingrédients",
+    "cookingSteps": "Étapes de préparation",
+    "chefsNote": "Note du chef",
+    "chefsSelection": "Sélection du chef",
+    "backToFeed": "Retour",
+    "startCooking": "Commencer à cuisiner",
+    "save": "Enregistrer",
+    "saved": "Enregistré",
+    "share": "Partager",
+    "buy": "acheter"
+  },
+  "bookmarks": {
+    "collection": "Collection personnelle",
+    "title": "Mes recettes enregistrées",
+    "allSaved": "Toutes",
+    "quickDinners": "Dîners rapides",
+    "vegetarian": "Végétarien",
+    "desserts": "Desserts",
+    "cookNow": "Cuisiner maintenant",
+    "editorialPick": "Coup de cœur",
+    "emptyTitle": "Aucune recette enregistrée.",
+    "emptyDescription": "Crée ton livre de recettes personnel en explorant nos collections.",
+    "emptyAction": "C'est parti !"
+  },
+  "filters": {
+    "vegetarian": "Végétarien",
+    "vegan": "Végan",
+    "glutenFree": "Sans gluten",
+    "dairyFree": "Sans lactose",
+    "lowCarb": "Low Carb",
+    "highProtein": "Riche en protéines",
+    "lowCholesterol": "Faible en cholestérol",
+    "quick": "Rapide",
+    "elaborate": "Élaboré",
+    "budget": "Économique",
+    "gourmet": "Gourmet",
+    "kidFriendly": "Pour enfants",
+    "dateNight": "Dîner romantique",
+    "comfort": "Réconfortant",
+    "onePot": "One Pot",
+    "mealPrep": "Meal Prep"
+  },
+  "nav": {
+    "discover": "Découvrir",
+    "saved": "Enregistré",
+    "scanner": "Scanner"
+  },
+  "errors": {
+    "aiFailure": "Notre chef fait une pause. Réessaie plus tard.",
+    "rateLimit": "Trop de requêtes. Patiente un instant.",
+    "invalidResponse": "Un problème est survenu avec la recette. On réessaie...",
+    "networkError": "Impossible de joindre la cuisine. Vérifie ta connexion.",
+    "noIngredients": "Ajoute d'abord quelques ingrédients !"
+  },
+  "metrics": {
+    "cook": "Cuisson",
+    "prep": "Préparation",
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile",
+    "servings": "Portions"
+  },
+  "loading": {
+    "crafting": "Création de tes recettes..."
+  }
+}

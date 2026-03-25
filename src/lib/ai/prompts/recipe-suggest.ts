@@ -3,6 +3,10 @@ import type { Locale } from '../../i18n/index';
 const langName: Record<string, string> = {
   en: 'English',
   de: 'German',
+  fr: 'French',
+  it: 'Italian',
+  es: 'Spanish',
+  pt: 'Portuguese',
 };
 
 export function buildRecipeSystemPrompt(language: Locale): string {
@@ -11,6 +15,7 @@ export function buildRecipeSystemPrompt(language: Locale): string {
 IMPORTANT RULES:
 - Respond ONLY with a JSON object: { "recipes": [...] }. No markdown, no code fences, no explanation.
 - Use a casual, friendly tone in ${langName[language]}.
+- When responding in German, always use proper German umlauts (ä, ö, ü, ß) — never digraphs like ae, oe, ue, ss.
 - Every recipe must use as many of the provided ingredients as possible.
 - Mark ingredients the user already has as isExtra: false.
 - Mark any additional ingredients the user needs to buy as isExtra: true. Exclude very basic pantry staples (salt, pepper, water, oil) from the "extra" list.

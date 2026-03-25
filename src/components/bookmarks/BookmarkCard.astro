@@ -1,4 +1,6 @@
 ---
+import { t, type Locale } from '../../lib/i18n/index';
+
 interface Props {
   id: string;
   title: string;
@@ -11,6 +13,7 @@ interface Props {
 }
 
 const { id, title, description, cookTime, badge, badgeColor = 'secondary', imageUrl, tall = false } = Astro.props;
+const lang = (Astro.locals.lang ?? 'en') as Locale;
 
 const badgeClasses = {
   secondary: 'bg-secondary-container text-on-secondary-container',
@@ -61,9 +64,9 @@ const badgeClasses = {
     ]}>{title}</h3>
     <p class="text-on-surface-variant text-sm line-clamp-2 mb-4">{description}</p>
     <div class="flex items-center justify-between pt-4 border-t border-outline-variant/20">
-      <span class="text-xs font-bold text-on-surface-variant">EDITORIAL PICK</span>
+      <span class="text-xs font-bold text-on-surface-variant">{t('bookmarks.editorialPick', lang)}</span>
       <button class="text-primary font-bold text-xs uppercase tracking-widest flex items-center gap-1 group/btn">
-        Cook Now
+        {t('bookmarks.cookNow', lang)}
         <span class="material-symbols-outlined text-sm group-hover/btn:translate-x-1 transition-transform">arrow_forward</span>
       </button>
     </div>

@@ -1,0 +1,94 @@
+{
+  "app": {
+    "name": "Kochgeist",
+    "tagline": "Asistente culinario IA"
+  },
+  "home": {
+    "hero": "¿Qué tienes en la nevera?",
+    "searchPlaceholder": "Añade ingredientes uno a uno",
+    "suggestButton": "Sugerir recetas",
+    "takePhoto": "Tomar foto",
+    "scanSubtitle": "Escanear despensa",
+    "quickStart": "Inicio rápido",
+    "chefRecommended": "Recomendado por el chef",
+    "leafyGreens": "Verduras de hoja",
+    "leafyGreensCount": "12 recetas rápidas",
+    "quickMeals": "Platos en 15 min",
+    "quickMealsDesc": "Para cocineros con prisa"
+  },
+  "results": {
+    "curatedResults": "Resultados seleccionados",
+    "recipesFor": "Recetas para:",
+    "analysisNote": "Hemos analizado tu despensa y seleccionado 4 recetas que maximizan el sabor.",
+    "editorsChoice": "Selección del editor",
+    "chefSecret": "Secreto del chef",
+    "chefSecretTitle": "Secreto del chef: El chisporroteo",
+    "chefSecretText": "Para sacar lo mejor de tus ingredientes, asegúrate de que la sartén esté bien caliente antes de añadir la carne. Esto crea una reacción de Maillard que sella los jugos e intensifica el sabor."
+  },
+  "detail": {
+    "ingredients": "Ingredientes",
+    "cookingSteps": "Pasos de cocción",
+    "chefsNote": "Nota del chef",
+    "chefsSelection": "Selección del chef",
+    "backToFeed": "Volver",
+    "startCooking": "Empezar a cocinar",
+    "save": "Guardar",
+    "saved": "Guardado",
+    "share": "Compartir",
+    "buy": "comprar"
+  },
+  "bookmarks": {
+    "collection": "Colección personal",
+    "title": "Mis recetas guardadas",
+    "allSaved": "Todas",
+    "quickDinners": "Cenas rápidas",
+    "vegetarian": "Vegetariano",
+    "desserts": "Postres",
+    "cookNow": "Cocinar ahora",
+    "editorialPick": "Selección del editor",
+    "emptyTitle": "Aún no has guardado recetas.",
+    "emptyDescription": "Crea tu recetario personal explorando nuestras colecciones.",
+    "emptyAction": "¡A cocinar!"
+  },
+  "filters": {
+    "vegetarian": "Vegetariano",
+    "vegan": "Vegano",
+    "glutenFree": "Sin gluten",
+    "dairyFree": "Sin lactosa",
+    "lowCarb": "Low Carb",
+    "highProtein": "Alto en proteínas",
+    "lowCholesterol": "Bajo en colesterol",
+    "quick": "Rápido",
+    "elaborate": "Elaborado",
+    "budget": "Económico",
+    "gourmet": "Gourmet",
+    "kidFriendly": "Para niños",
+    "dateNight": "Cena romántica",
+    "comfort": "Comfort Food",
+    "onePot": "One Pot",
+    "mealPrep": "Meal Prep"
+  },
+  "nav": {
+    "discover": "Descubrir",
+    "saved": "Guardado",
+    "scanner": "Escáner"
+  },
+  "errors": {
+    "aiFailure": "Nuestro chef se tomó un descanso. Inténtalo de nuevo.",
+    "rateLimit": "Demasiadas solicitudes. Espera un momento.",
+    "invalidResponse": "Algo salió mal con la receta. Reintentando...",
+    "networkError": "No se puede conectar con la cocina. Revisa tu conexión.",
+    "noIngredients": "¡Añade primero algunos ingredientes!"
+  },
+  "metrics": {
+    "cook": "Cocción",
+    "prep": "Preparación",
+    "easy": "Fácil",
+    "medium": "Medio",
+    "hard": "Difícil",
+    "servings": "Porciones"
+  },
+  "loading": {
+    "crafting": "Creando tus recetas..."
+  }
+}

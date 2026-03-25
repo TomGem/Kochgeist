@@ -3,6 +3,10 @@ import type { Locale } from '../../i18n/index';
 const langName: Record<string, string> = {
   en: 'English',
   de: 'German',
+  fr: 'French',
+  it: 'Italian',
+  es: 'Spanish',
+  pt: 'Portuguese',
 };
 
 export function buildIngredientRecognitionPrompt(language: Locale): string {
@@ -11,6 +15,7 @@ export function buildIngredientRecognitionPrompt(language: Locale): string {
 Rules:
 - Return ONLY a JSON array of ingredient name strings.
 - Use ${langName[language]} for all ingredient names.
+- When responding in German, always use proper German umlauts (ä, ö, ü, ß) — never digraphs like ae, oe, ue, ss.
 - Be specific (e.g., "cherry tomatoes" not just "tomatoes").
 - Only include food items, not packaging, utensils, or surfaces.
 - No explanation, no markdown, just the JSON array.`;
