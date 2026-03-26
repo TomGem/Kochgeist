@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-Kochgeist — AI-powered recipe suggestion app. Users enter ingredients, an AI suggests 4 recipes with generated images. Multilingual (EN/DE/FR/IT/ES/PT). Located in `kochgeist/`.
+Kochgeist — AI-powered recipe suggestion app. Users enter ingredients, an AI suggests 4 recipes with generated images. Multilingual (EN/DE/FR/IT/ES/PT).
 
 ## Commands
 
-All commands run from `kochgeist/`:
+All commands run from the project root:
 
 ```sh
 npm run dev          # Dev server at localhost:4321
@@ -43,6 +43,10 @@ No test framework is configured.
 - Timer controls (start/pause/reset) with audio alarm + vibration on completion
 - Keyboard navigation (arrow keys, escape) and touch-optimized UI
 - Progress visualization with progress bar and circular indicators
+
+### Surprise Me & QuickStart
+- "Surprise Me" mode: if the user clicks suggest without entering ingredients, a confirmation modal appears; confirming sends `surpriseMe: 'true'` to `/api/recipes/suggest`, which generates random recipes without ingredient input
+- QuickStart cards (`src/components/home/QuickStart.astro`): 2 preset ingredient combinations per language; clicking a card auto-populates ingredients and triggers suggestion
 
 ### Shopping list & ingredient interaction
 - Interactive ingredient checkboxes in recipe detail — click to mark as done (green checkmark)
@@ -83,6 +87,18 @@ No test framework is configured.
 - Each image stores `model` and `generationTimeMs` in `imageCache` for provenance tracking
 - Async: recipes appear immediately with "Generating image" spinner placeholders; a plain JS polling script (in `suggest.ts`) fetches `/partials/image-slot` every 3s per recipe and swaps in the `<img>` via `outerHTML` when ready
 
+### Recipe cards (bento grid)
+- Recipe cards are generated as inline HTML strings in `src/pages/api/recipes/suggest.ts` via `renderResultsPartial()` — there are no separate card components
+- Layout: 1 Featured (8-col), 1 Vertical (4-col), 2 Horizontal (6-col each) on md+ screens
+- Selection algorithm picks the best-match recipe (lowest extra ingredient ratio) as featured
+
+### Recipe sharing
+- `src/lib/share.ts` — `getShareUrl()` builds shareable recipe URLs
+- `/recipe/[id]` page renders a standalone recipe view for shared links
+
+### Rate limiting
+- `src/lib/rate-limit.ts` — in-memory rate limiter (`isRateLimited`, `clearRateLimit`) with periodic cleanup of expired entries
+
 ### Caching
 - SHA-256 hash of normalized ingredients + language + dietary filters + provider + model (`src/lib/cache.ts`)
 - Cache stored in `recipe_cache` table; same ingredient combo with same provider/model returns cached recipes without AI call
@@ -118,12 +134,11 @@ No test framework is configured.
 
 ### Component organization
 Components in `src/components/` are grouped by page context:
-- `home/` — ingredient input, filters, search, camera button for scanner
-- `recipes/` — bento grid cards (featured, vertical, horizontal)
-- `detail/` — recipe modal content (interactive ingredient checkboxes, dietary tag pills, AI provenance metadata, cooking mode)
-- `bookmarks/` — saved recipes grid
-- `layout/` — header, bottom nav, base layout
-- `shared/` — language switcher, loading spinner, error toast
+- `home/` — HeroSearch, IngredientTags, DietaryFilters, SuggestButton, QuickStart, CameraButton
+- `detail/` — RecipeModal, CookingMode
+- `bookmarks/` — BookmarkCard, FilterPills, EmptyState
+- `layout/` — Header, BottomNav, BaseLayout
+- `shared/` — LanguageSwitcher, LoadingSpinner, ErrorToast
 
 ## Environment
 

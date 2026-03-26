@@ -6,7 +6,13 @@ AI-powered recipe suggestion app. Enter the ingredients you have on hand and Koc
 
 - **Ingredient-based recipe suggestions** -- type or photograph ingredients, get 4 curated recipes
 - **AI image generation** -- each recipe gets a food-photography-style image generated in the background
+- **Surprise Me** -- get random recipe inspiration without entering any ingredients
 - **Quick Start presets** -- one-tap ingredient combos (Leafy Greens, 15-Min Meals) for instant inspiration
+- **Ingredient scanner** -- photograph ingredients with your camera for automatic recognition
+- **Cooking mode** -- step-by-step fullscreen walkthrough with auto-detected timers, audio alarms, and keyboard/touch navigation
+- **Shopping list** -- interactive ingredient checkboxes with export via Web Share API or clipboard
+- **Recipe sharing** -- shareable recipe links at `/recipe/[id]`
+- **Badges & cooking tips** -- contextual badges (Pantry Perfect, Quick & Easy, etc.) and AI-generated "Chef's Secret" tips
 - **Bookmarks** -- save recipes for later
 - **Search history** -- revisit past ingredient searches
 - **Dietary & lifestyle filters** -- 16 filters across diet (vegetarian, vegan, gluten-free, dairy-free, low-carb, high-protein, low-cholesterol), time & budget (quick, elaborate, budget, gourmet), and occasion (kid-friendly, date night, comfort food, one-pot, meal prep)
@@ -14,7 +20,7 @@ AI-powered recipe suggestion app. Enter the ingredients you have on hand and Koc
 - **Multilingual** -- English, German, French, Italian, Spanish, and Portuguese with a dropdown language switcher
 - **Multi-provider AI** -- supports Azure AI, OpenAI, Anthropic, Ollama, and LM Studio
 - **Multi-user with auth** -- cookie-based sessions, invitation codes, email verification, password reset
-- **Admin panel** -- manage users, generate invitation codes with expiry and usage limits
+- **Admin panel** -- manage users, generate invitation codes, configure AI/image providers and models at runtime
 
 ## Tech Stack
 
@@ -92,10 +98,9 @@ npm run db:push      # Push schema changes to SQLite DB
 ```
 src/
   components/       # Astro components grouped by page context
-    home/           #   ingredient input, filters, quick start
-    recipes/        #   bento grid cards (featured, vertical, horizontal)
-    detail/         #   recipe modal
-    bookmarks/      #   saved recipes grid
+    home/           #   ingredient input, filters, quick start, camera button
+    detail/         #   recipe modal, cooking mode
+    bookmarks/      #   saved recipes grid, filter pills
     layout/         #   header, bottom nav, base layout
     shared/         #   language switcher, spinner, error toast
   pages/
@@ -107,6 +112,10 @@ src/
     images/         # Image generation provider system
     i18n/           # Translations (en, de, fr, it, es, pt)
     cache.ts        # Ingredient hash for recipe caching
+    badges.ts       # Contextual recipe badges
+    rate-limit.ts   # In-memory rate limiter
+    share.ts        # Recipe sharing URLs
+    settings.ts     # Runtime key-value settings (DB-backed)
   db/
     schema.ts       # Drizzle schema (users, sessions, recipes, bookmarks, cache, etc.)
     migrations/     # SQL migrations

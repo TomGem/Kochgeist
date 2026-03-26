@@ -25,9 +25,17 @@ If SMTP is not configured, the verification code is logged to the server console
 3. **Submit** -- the AI generates 4 recipe suggestions displayed in a bento grid layout
 4. **Images** -- recipe images generate in the background. You'll see a spinner that automatically updates when the image is ready.
 
+### Surprise Me
+
+Click the suggest button without entering any ingredients to get random recipe inspiration. A confirmation modal will appear -- confirm to let the AI surprise you.
+
 ### Quick Start Presets
 
 Below the ingredient input, preset buttons offer common ingredient combos for quick inspiration.
+
+### Ingredient Scanner
+
+Tap the camera button in the bottom navigation to open the ingredient scanner. Take a photo of your ingredients and the AI will recognize them automatically, populating the ingredient input.
 
 ### Caching
 
@@ -37,10 +45,29 @@ If you search the same ingredient combination (with the same language and filter
 
 Tap any recipe card to open the detail modal with:
 
-- Full ingredient list with quantities
+- Full ingredient list with interactive checkboxes (tap to mark as done)
 - Step-by-step instructions
-- Dietary tags
+- Dietary tags and contextual badge (Pantry Perfect, Quick & Easy, Chef's Challenge, or Homemade)
 - AI-generated food photo
+- AI provenance info (provider, model, generation time)
+- An AI-generated "Chef's Secret" cooking tip
+
+### Shopping List
+
+In the recipe detail, tap ingredients to check them off. Use the export button to share unchecked ingredients via the system share sheet (or clipboard on unsupported browsers).
+
+### Cooking Mode
+
+Tap the cooking mode button in the recipe detail to enter a fullscreen step-by-step walkthrough:
+
+- Navigate steps with arrow keys, swipe, or on-screen buttons
+- Timers are auto-detected from step text (e.g. "bake for 20 minutes")
+- Start, pause, and reset timers with audio alarm and vibration on completion
+- Progress bar and circular indicators show your position
+
+### Recipe Sharing
+
+Share a recipe via its permanent link at `/recipe/[id]`. The link is accessible to any authenticated user.
 
 ## Bookmarks
 
@@ -83,6 +110,19 @@ Admins can access the admin panel at `/admin` to:
 - View all registered users
 - Promote users to admin or demote admins
 - Manually verify unverified users
+
+### Configure AI & Image Providers
+
+- Select the text AI provider and model (Azure, OpenAI, Anthropic, Ollama, LM Studio)
+- Select the image generation provider and model (Azure, Placeholder)
+- Changes take effect immediately without restarting the server
+
+## User Settings
+
+Go to `/settings` to configure:
+
+- **Language preference** -- persisted per user
+- **Default dietary filters** -- pre-selected filters for every new search
 
 ## Password Reset
 

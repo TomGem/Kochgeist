@@ -1,21 +1,189 @@
 ---
 import { t, type Locale } from '../../lib/i18n/index';
+import { db } from '../../db/index';
+import { recipes } from '../../db/schema';
+import { sql } from 'drizzle-orm';
+import { getSetting } from '../../lib/settings';
 
 interface Props {
   lang?: Locale;
 }
 
 const lang = (Astro.props.lang ?? (Astro.locals.lang as Locale) ?? 'en') as Locale;
+
+// Query average generation time for the current AI provider + model
+const currentProvider = getSetting('ai_provider') || import.meta.env.AI_PROVIDER || 'azure';
+const currentModel = getSetting('ai_model') || null;
+
+let estimatedSeconds = 50; // default fallback for unknown models
+
+try {
+  const conditions = currentModel
+    ? sql`${recipes.aiProvider} = ${currentProvider} AND ${recipes.aiModel} = ${currentModel} AND ${recipes.aiGenerationTimeMs} IS NOT NULL`
+    : sql`${recipes.aiProvider} = ${currentProvider} AND ${recipes.aiGenerationTimeMs} IS NOT NULL`;
+
+  const result = db.select({
+    avgTime: sql<number>`AVG(${recipes.aiGenerationTimeMs})`,
+    count: sql<number>`COUNT(*)`,
+  }).from(recipes).where(conditions).get();
+
+  if (result && result.count >= 4 && result.avgTime) {
+    // Add a small buffer (10%) so the timer usually finishes just before results arrive
+    estimatedSeconds = Math.round((result.avgTime / 1000) * 1.1);
+  }
+} catch {
+  // Keep default
+}
 ---
 
 <div
-  x-data
+  x-data={`kochgeistTimer(${estimatedSeconds})`}
   x-show="$store.ui.loading"
+  x-effect="if ($store.ui.loading) start(); else reset();"
   class="fixed inset-0 z-[70] flex items-center justify-center recipe-modal-backdrop"
   style="display: none;"
 >
-  <div class="flex flex-col items-center gap-4">
-    <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-    <p class="font-headline font-bold text-on-surface">{t('loading.crafting', lang)}</p>
+  <div class="flex flex-col items-center">
+    <!-- Timer ring with pot icon -->
+    <div class="relative w-40 h-40 mb-5">
+      <!-- Background ring -->
+      <svg class="w-full h-full -rotate-90" viewBox="0 0 160 160">
+        <circle cx="80" cy="80" r="72" fill="none" stroke="var(--color-primary)" stroke-opacity="0.1" stroke-width="5" />
+        <circle
+          cx="80" cy="80" r="72"
+          fill="none"
+          stroke="url(#timer-gradient)"
+          stroke-width="5"
+          stroke-linecap="round"
+          :stroke-dasharray="circumference"
+          :stroke-dashoffset="dashOffset"
+          class="transition-[stroke-dashoffset] duration-1000 ease-linear"
+        />
+        <defs>
+          <linearGradient id="timer-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="var(--color-primary)" />
+            <stop offset="100%" stop-color="var(--color-tertiary)" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <!-- Pot icon centered -->
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div class="relative">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" class="w-20 h-20" aria-hidden="true">
+            <defs>
+              <linearGradient id="sp-pot" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.6"/>
+              </linearGradient>
+              <linearGradient id="sp-rim" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--color-primary)"/>
+                <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.8"/>
+              </linearGradient>
+              <linearGradient id="sp-steam" x1="0" y1="1" x2="0" y2="0">
+                <stop offset="0%" stop-color="var(--color-primary)" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="var(--color-primary)" stop-opacity="0.05"/>
+              </linearGradient>
+            </defs>
+            <!-- Handles -->
+            <rect x="14" y="78" width="18" height="7" rx="3.5" fill="var(--color-primary)" opacity="0.5"/>
+            <rect x="96" y="78" width="18" height="7" rx="3.5" fill="var(--color-primary)" opacity="0.5"/>
+            <!-- Rim -->
+            <rect x="26" y="74" width="76" height="9" rx="4.5" fill="url(#sp-rim)"/>
+            <!-- Pot body -->
+            <path d="M30 83h68v18c0 7.2-5.8 13-13 13H43c-7.2 0-13-5.8-13-13V83z" fill="url(#sp-pot)"/>
+            <!-- Pot highlight -->
+            <path d="M32 83h64v3c0 0-16 3-32 3s-32-3-32-3V83z" fill="var(--color-on-primary)" opacity="0.15"/>
+            <!-- Steam — animated -->
+            <g class="loading-steam">
+              <path class="steam-center" d="M64 18c-3.5 5-8 11-8 18 0 4 2.5 7 2.5 12s-3 8-3 12c0 5.5 4 9 8.5 9s8.5-3.5 8.5-9c0-4-3-8-3-12s2.5-8 2.5-12c0-7-4.5-13-8-18z" fill="url(#sp-steam)"/>
+              <path class="steam-left" d="M44 36c-2 3.5-5 7.5-5 12 0 2.5 1.5 5 1.5 8.5s-2 6-2 8.5c0 3.5 2.5 6 5.5 6s5.5-2.5 5.5-6c0-2.5-2-5-2-8.5s1.5-6 1.5-8.5c0-4.5-3-8.5-5-12z" fill="url(#sp-steam)" opacity="0.7"/>
+              <path class="steam-right" d="M84 36c-2 3.5-5 7.5-5 12 0 2.5 1.5 5 1.5 8.5s-2 6-2 8.5c0 3.5 2.5 6 5.5 6s5.5-2.5 5.5-6c0-2.5-2-5-2-8.5s1.5-6 1.5-8.5c0-4.5-3-8.5-5-12z" fill="url(#sp-steam)" opacity="0.7"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Countdown text -->
+    <p class="font-headline text-2xl font-extrabold text-on-surface tabular-nums mb-1" x-text="formatTime(remaining)"></p>
+    <p class="font-body text-sm text-on-surface-variant">{t('loading.crafting', lang)}</p>
   </div>
 </div>
+
+<style>
+  /* Steam animation */
+  .loading-steam {
+    animation: steam-bob 2.5s ease-in-out infinite;
+  }
+  .loading-steam .steam-center {
+    animation: steam-waver 2s ease-in-out infinite;
+    transform-origin: 64px 50px;
+  }
+  .loading-steam .steam-left {
+    animation: steam-waver 2.2s ease-in-out infinite 0.3s;
+    transform-origin: 44px 50px;
+  }
+  .loading-steam .steam-right {
+    animation: steam-waver 2.2s ease-in-out infinite 0.6s;
+    transform-origin: 84px 50px;
+  }
+
+  @keyframes steam-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes steam-waver {
+    0%, 100% { transform: scaleX(1) scaleY(1); opacity: 1; }
+    50% { transform: scaleX(1.08) scaleY(1.05); opacity: 0.7; }
+  }
+</style>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    window.Alpine.data('kochgeistTimer', (estimatedSec: number) => ({
+      total: estimatedSec,
+      remaining: estimatedSec,
+      circumference: 2 * Math.PI * 72,
+      _interval: null as ReturnType<typeof setInterval> | null,
+
+      get dashOffset() {
+        const progress = this.remaining / this.total;
+        return this.circumference * (1 - progress);
+      },
+
+      formatTime(sec: number) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return m > 0
+          ? `${m}:${String(s).padStart(2, '0')}`
+          : `0:${String(s).padStart(2, '0')}`;
+      },
+
+      start() {
+        this.remaining = this.total;
+        this.stop();
+        this._interval = setInterval(() => {
+          if (this.remaining > 0) {
+            this.remaining--;
+          } else {
+            this.stop();
+          }
+        }, 1000);
+      },
+
+      stop() {
+        if (this._interval) {
+          clearInterval(this._interval);
+          this._interval = null;
+        }
+      },
+
+      reset() {
+        this.stop();
+        this.remaining = this.total;
+      },
+    }));
+  });
+</script>

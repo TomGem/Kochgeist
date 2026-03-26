@@ -11,6 +11,8 @@ Browser
   |
   v
 Astro Middleware (src/middleware/index.ts)
+  |- Security headers  -> sets CSP, HSTS, etc.
+  |- CSRF protection   -> validates origin for non-safe methods
   |- Language detection -> sets context.locals.lang
   |- Auth validation    -> validates session cookie, sets context.locals.user
   |
@@ -21,7 +23,7 @@ Route Handler
   |- Partial routes -> return HTML fragments for htmx (src/pages/partials/)
 ```
 
-1. **Middleware** runs two handlers in sequence: language detection (sets `context.locals.lang` from cookie/header) and auth (validates session cookie, sets user context, enforces route protection).
+1. **Middleware** runs four handlers in sequence: security headers, CSRF protection (validates origin for non-safe methods), language detection (sets `context.locals.lang` from cookie/header), and auth (validates session cookie, sets user context, enforces route protection).
 2. If no users exist in the database, all routes redirect to `/register?setup=true` for first-user bootstrap.
 3. **Page routes** render full Astro components. Interactive sections use htmx attributes (`hx-get`, `hx-post`, `hx-swap`) targeting partial endpoints.
 4. **API routes** (`src/pages/api/`) handle recipe suggestions, bookmarks, history, image serving, auth, and admin operations.
@@ -61,7 +63,8 @@ Provider implementation (src/lib/ai/providers/)
   |- lmstudio.ts  -- LM Studio (local)
 ```
 
-- `AIProvider` interface (`src/lib/ai/provider.ts`): `generateRecipes()` and `recognizeIngredients()`
+- `AIProvider` interface (`src/lib/ai/provider.ts`): `generateRecipes()`, `recognizeIngredients()`, and `listModels()`
+- Provider selected via runtime settings (DB) or `AI_PROVIDER` env var fallback; cache is cleared when settings change
 - Shared prompt templates and Zod schema for structured output in `src/lib/ai/prompts/`
 - Response parsing is lenient: handles wrapped arrays, single objects, or direct arrays
 
@@ -106,8 +109,9 @@ SQLite via Drizzle ORM + better-sqlite3. Database file at `data/kochgeist.db`.
 | `bookmarks` | User-scoped saved recipes |
 | `searchHistory` | User-scoped search history |
 | `imageCache` | Image generation tracking |
+| `settings` | Runtime key-value config (AI/image provider, model, etc.) |
 
-JSON arrays (ingredients, instructions, dietary tags) are stored as TEXT columns.
+JSON arrays (ingredients, instructions, dietary tags) are stored as TEXT columns. The `settings` table is managed via `src/lib/settings.ts` and allows runtime configuration of providers and models from the admin panel.
 
 ## Internationalization
 
@@ -129,9 +133,10 @@ Components in `src/components/` are grouped by page context:
 
 | Directory | Contents |
 |-----------|----------|
-| `home/` | Ingredient input, dietary filters, quick start presets |
-| `recipes/` | Bento grid cards (featured, vertical, horizontal layouts) |
-| `detail/` | Recipe detail modal content |
-| `bookmarks/` | Saved recipes grid with filter pills |
-| `layout/` | Header, bottom navigation, base HTML layout |
-| `shared/` | Language switcher, loading spinner, error toast |
+| `home/` | HeroSearch, IngredientTags, DietaryFilters, SuggestButton, QuickStart, CameraButton |
+| `detail/` | RecipeModal, CookingMode |
+| `bookmarks/` | BookmarkCard, FilterPills, EmptyState |
+| `layout/` | Header, BottomNav, BaseLayout |
+| `shared/` | LanguageSwitcher, LoadingSpinner, ErrorToast |
+
+Note: Recipe bento grid cards (featured, vertical, horizontal layouts) are generated as inline HTML in `src/pages/api/recipes/suggest.ts` via `renderResultsPartial()`, not as separate components.
