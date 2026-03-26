@@ -4,12 +4,12 @@ import { RecipeArraySchema } from '../prompts/schema';
 
 export class OllamaProvider implements AIProvider {
   name = 'ollama';
+  model: string;
   private baseUrl: string;
-  private model: string;
 
-  constructor() {
+  constructor(modelOverride?: string) {
     this.baseUrl = import.meta.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-    this.model = import.meta.env.OLLAMA_MODEL || 'llama3.1';
+    this.model = modelOverride || import.meta.env.OLLAMA_MODEL || 'llama3.1';
   }
 
   async generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]> {
@@ -54,5 +54,12 @@ export class OllamaProvider implements AIProvider {
 
   async recognizeIngredients(_params: RecognizeIngredientsParams): Promise<string[]> {
     throw new Error('Image recognition not supported with this Ollama model. Use a multimodal model like llava.');
+  }
+
+  async listModels(): Promise<string[]> {
+    const response = await fetch(`${this.baseUrl}/api/tags`);
+    if (!response.ok) throw new Error(`Ollama error: ${response.statusText}`);
+    const data = await response.json();
+    return (data.models || []).map((m: { name: string }) => m.name).sort();
   }
 }

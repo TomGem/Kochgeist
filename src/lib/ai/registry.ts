@@ -1,41 +1,52 @@
 import type { AIProvider } from './provider';
+import { getSetting } from '../settings';
 
-let cachedProvider: AIProvider | null = null;
+const providerCache = new Map<string, AIProvider>();
 
 export async function getAIProvider(): Promise<AIProvider> {
-  if (cachedProvider) return cachedProvider;
+  const providerName = getSetting('ai_provider') || import.meta.env.AI_PROVIDER || 'azure';
+  const modelOverride = getSetting('ai_model') || undefined;
+  const cacheKey = `${providerName}:${modelOverride || 'default'}`;
 
-  const providerName = import.meta.env.AI_PROVIDER || 'azure';
+  const cached = providerCache.get(cacheKey);
+  if (cached) return cached;
+
+  let provider: AIProvider;
 
   switch (providerName) {
     case 'azure': {
       const { AzureAIProvider } = await import('./providers/azure');
-      cachedProvider = new AzureAIProvider();
+      provider = new AzureAIProvider(modelOverride);
       break;
     }
     case 'openai': {
       const { OpenAIProvider } = await import('./providers/openai');
-      cachedProvider = new OpenAIProvider();
+      provider = new OpenAIProvider(modelOverride);
       break;
     }
     case 'anthropic': {
       const { AnthropicProvider } = await import('./providers/anthropic');
-      cachedProvider = new AnthropicProvider();
+      provider = new AnthropicProvider(modelOverride);
       break;
     }
     case 'ollama': {
       const { OllamaProvider } = await import('./providers/ollama');
-      cachedProvider = new OllamaProvider();
+      provider = new OllamaProvider(modelOverride);
       break;
     }
     case 'lmstudio': {
       const { LMStudioProvider } = await import('./providers/lmstudio');
-      cachedProvider = new LMStudioProvider();
+      provider = new LMStudioProvider(modelOverride);
       break;
     }
     default:
       throw new Error(`Unknown AI provider: ${providerName}`);
   }
 
-  return cachedProvider!;
+  providerCache.set(cacheKey, provider);
+  return provider;
+}
+
+export function clearProviderCache(): void {
+  providerCache.clear();
 }

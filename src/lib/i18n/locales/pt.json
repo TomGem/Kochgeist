@@ -180,5 +180,9 @@
     "defaultFilters": "Filtros predefinidos",
     "defaultFiltersDescription": "Estes filtros serão pré-selecionados quando procurares receitas.",
     "filtersSaved": "Filtros guardados."
+  },
+  "meta": {
+    "generatedBy": "Gerado por",
+    "imageBy": "Imagem por"
   }
 }

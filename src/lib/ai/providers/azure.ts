@@ -5,14 +5,14 @@ import { RecipeArraySchema } from '../prompts/schema';
 
 export class AzureAIProvider implements AIProvider {
   name = 'azure';
+  model: string;
   private client: AzureOpenAI;
-  private deployment: string;
 
-  constructor() {
+  constructor(modelOverride?: string) {
     const endpoint = import.meta.env.AZURE_ENDPOINT;
     const apiKey = import.meta.env.AZURE_API_KEY;
     const apiVersion = import.meta.env.AZURE_API_VERSION || '2024-12-01-preview';
-    this.deployment = import.meta.env.AZURE_DEPLOYMENT || 'gpt-4o';
+    this.model = modelOverride || import.meta.env.AZURE_DEPLOYMENT || 'gpt-4o';
 
     if (!endpoint || !apiKey) {
       throw new Error('AZURE_ENDPOINT and AZURE_API_KEY must be set');
@@ -29,7 +29,7 @@ export class AzureAIProvider implements AIProvider {
     const { ingredients, language, dietaryFilters, count = 4 } = params;
 
     const response = await this.client.chat.completions.create({
-      model: this.deployment,
+      model: this.model,
       messages: [
         { role: 'system', content: buildRecipeSystemPrompt(language) },
         { role: 'user', content: buildRecipeUserPrompt(ingredients, language, dietaryFilters, count) },
@@ -75,7 +75,7 @@ export class AzureAIProvider implements AIProvider {
     const langName = language === 'de' ? 'German' : 'English';
 
     const response = await this.client.chat.completions.create({
-      model: this.deployment,
+      model: this.model,
       messages: [
         {
           role: 'system',
@@ -104,5 +104,11 @@ export class AzureAIProvider implements AIProvider {
         : null;
     if (!Array.isArray(arr)) throw new Error('Expected array of ingredient names');
     return arr.filter((item: unknown) => typeof item === 'string');
+  }
+
+  async listModels(): Promise<string[]> {
+    // Azure doesn't expose deployment listing via the data plane API —
+    // enter deployment names manually in the text field.
+    return [];
   }
 }

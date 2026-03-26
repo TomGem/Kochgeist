@@ -32,7 +32,7 @@ const lang = (Astro.locals.lang ?? 'en') as Locale;
       formData.append('image', $event.target.files[0]);
       formData.append('lang', $store.ui.lang);
       fetch('/api/ingredients/recognize', { method: 'POST', body: formData })
-        .then(r => r.json().catch(() => r.text()))
+        .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
         .then(data => {
           if (Array.isArray(data)) {
             data.forEach(name => $store.ingredients.add(name));

@@ -35,33 +35,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
       language: lang,
     });
 
-    // Return HTML tags that can be injected via htmx
-    const tagsHtml = ingredients
-      .map(
-        (name) => `
-      <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/20 py-2 px-4 rounded-full shadow-sm hover:shadow-md transition-shadow"
-           x-data x-init="$store.ingredients.add('${name.replace(/'/g, "\\'")}')">
-        <span class="text-sm font-medium">${escapeHtml(name)}</span>
-        <button x-on:click="$store.ingredients.remove($store.ingredients.items.indexOf('${name.replace(/'/g, "\\'")}'))"
-                class="text-outline hover:text-primary transition-colors">
-          <span class="material-symbols-outlined text-sm">close</span>
-        </button>
-      </div>`,
-      )
-      .join('');
-
-    return new Response(tagsHtml, {
-      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    return new Response(JSON.stringify(ingredients), {
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Ingredient recognition error:', error);
-    return new Response(
-      `<p class="text-error text-sm">Could not identify ingredients. Please try again.</p>`,
-      { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
-    );
+    return new Response(JSON.stringify({ error: 'Could not identify ingredients' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 };
-
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}

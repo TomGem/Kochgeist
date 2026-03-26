@@ -37,6 +37,8 @@ export interface RecognizeIngredientsParams {
 
 export interface AIProvider {
   name: string;
+  model: string;
   generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]>;
   recognizeIngredients(params: RecognizeIngredientsParams): Promise<string[]>;
+  listModels(): Promise<string[]>;
 }

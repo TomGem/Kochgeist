@@ -3,14 +3,14 @@ import type { ImageProvider, ImageGenerationResult } from '../provider';
 
 export class AzureImageProvider implements ImageProvider {
   name = 'azure-image';
+  model: string;
   private client: AzureOpenAI;
-  private deployment: string;
 
-  constructor() {
+  constructor(modelOverride?: string) {
     const endpoint = import.meta.env.AZURE_ENDPOINT;
     const apiKey = import.meta.env.AZURE_API_KEY;
     const apiVersion = import.meta.env.AZURE_API_VERSION || '2024-12-01-preview';
-    this.deployment = import.meta.env.AZURE_IMAGE_DEPLOYMENT || 'gpt-image-1';
+    this.model = modelOverride || import.meta.env.AZURE_IMAGE_DEPLOYMENT || 'gpt-image-1';
 
     if (!endpoint || !apiKey) {
       throw new Error('AZURE_ENDPOINT and AZURE_API_KEY must be set for image generation');
@@ -25,7 +25,7 @@ export class AzureImageProvider implements ImageProvider {
 
   async generateImage(prompt: string): Promise<ImageGenerationResult> {
     const response = await this.client.images.generate({
-      model: this.deployment,
+      model: this.model,
       prompt,
       n: 1,
       size: '1024x1024',
@@ -49,5 +49,9 @@ export class AzureImageProvider implements ImageProvider {
       imageData: Buffer.from(b64, 'base64'),
       contentType: 'image/png',
     };
+  }
+
+  async listModels(): Promise<string[]> {
+    return [];
   }
 }

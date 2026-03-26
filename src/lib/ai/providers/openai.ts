@@ -5,15 +5,15 @@ import { RecipeArraySchema } from '../prompts/schema';
 
 export class OpenAIProvider implements AIProvider {
   name = 'openai';
+  model: string;
   private client: OpenAI;
-  private model: string;
 
-  constructor() {
+  constructor(modelOverride?: string) {
     const apiKey = import.meta.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('OPENAI_API_KEY must be set');
 
     this.client = new OpenAI({ apiKey });
-    this.model = import.meta.env.OPENAI_MODEL || 'gpt-4o';
+    this.model = modelOverride || import.meta.env.OPENAI_MODEL || 'gpt-4o';
   }
 
   async generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]> {
@@ -78,5 +78,13 @@ export class OpenAIProvider implements AIProvider {
     if (!content) throw new Error('Empty response');
     const parsed = JSON.parse(content);
     return Array.isArray(parsed) ? parsed.filter((i: unknown) => typeof i === 'string') : [];
+  }
+
+  async listModels(): Promise<string[]> {
+    const models: string[] = [];
+    for await (const model of this.client.models.list()) {
+      models.push(model.id);
+    }
+    return models.sort();
   }
 }

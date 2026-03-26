@@ -6,18 +6,26 @@ import { t, type Locale } from '../lib/i18n/index';
 import { db } from '../db/index';
 import { users, invitations } from '../db/schema';
 import { desc } from 'drizzle-orm';
+import { getSetting } from '../lib/settings';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 
-const aiProvider = import.meta.env.AI_PROVIDER || 'azure';
-const imageProvider = import.meta.env.IMAGE_PROVIDER || 'azure';
+const aiProvider = getSetting('ai_provider') || import.meta.env.AI_PROVIDER || 'azure';
+const aiModel = getSetting('ai_model') || '';
+const imageProvider = getSetting('image_provider') || import.meta.env.IMAGE_PROVIDER || 'azure';
+const imageModel = getSetting('image_model') || '';
 
 const providers = [
-  { id: 'azure', name: 'Microsoft Azure AI', description: 'Azure OpenAI Service (GPT-4o)' },
-  { id: 'openai', name: 'OpenAI', description: 'GPT-4o direct' },
-  { id: 'anthropic', name: 'Anthropic', description: 'Claude Sonnet' },
-  { id: 'ollama', name: 'Ollama', description: 'Local model (free)' },
-  { id: 'lmstudio', name: 'LM Studio', description: 'Local model (free)' },
+  { id: 'azure', name: 'Microsoft Azure AI', description: 'Azure OpenAI Service', defaultModel: import.meta.env.AZURE_DEPLOYMENT || 'gpt-4o' },
+  { id: 'openai', name: 'OpenAI', description: 'OpenAI API', defaultModel: import.meta.env.OPENAI_MODEL || 'gpt-4o' },
+  { id: 'anthropic', name: 'Anthropic', description: 'Claude API', defaultModel: import.meta.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514' },
+  { id: 'ollama', name: 'Ollama', description: 'Local model (free)', defaultModel: import.meta.env.OLLAMA_MODEL || 'llama3.1' },
+  { id: 'lmstudio', name: 'LM Studio', description: 'Local model (free)', defaultModel: import.meta.env.LMSTUDIO_MODEL || 'local-model' },
+];
+
+const imageProviders = [
+  { id: 'azure', name: 'Azure AI', description: 'AI-generated food photography', defaultModel: import.meta.env.AZURE_IMAGE_DEPLOYMENT || 'gpt-image-1' },
+  { id: 'placeholder', name: 'Placeholder', description: 'No image generation (1x1 pixel)', defaultModel: 'placeholder' },
 ];
 
 const allUsers = db
@@ -54,6 +62,16 @@ const allInvitations = db
     generatedCode: '',
     showCopied: false,
     copiedId: null,
+    aiProvider: '${aiProvider}',
+    aiModel: '${aiModel}',
+    imageProvider: '${imageProvider}',
+    imageModel: '${imageModel}',
+    settingsSaved: false,
+    aiModels: [],
+    imageModels: [],
+    loadingAiModels: false,
+    loadingImageModels: false,
+    modelsError: '',
     async generateInvite() {
       const form = new FormData(document.getElementById('invite-form'));
       const res = await fetch('/api/admin/invitations', { method: 'POST', body: form });
@@ -82,6 +100,60 @@ const allInvitations = db
       form.set('action', action);
       await fetch('/api/admin/users', { method: 'PATCH', body: form });
       location.reload();
+    },
+    async saveSettings() {
+      const form = new FormData();
+      form.set('ai_provider', this.aiProvider);
+      form.set('ai_model', this.aiModel);
+      form.set('image_provider', this.imageProvider);
+      form.set('image_model', this.imageModel);
+      await fetch('/api/admin/settings', { method: 'PATCH', body: form });
+      this.settingsSaved = true;
+      setTimeout(() => this.settingsSaved = false, 2000);
+    },
+    getDefaultModel(providerId) {
+      const defaults = ${JSON.stringify(Object.fromEntries(providers.map(p => [p.id, p.defaultModel])))};
+      return defaults[providerId] || '';
+    },
+    getDefaultImageModel(providerId) {
+      const defaults = ${JSON.stringify(Object.fromEntries(imageProviders.map(p => [p.id, p.defaultModel])))};
+      return defaults[providerId] || '';
+    },
+    async fetchAiModels() {
+      this.loadingAiModels = true;
+      this.aiModels = [];
+      this.modelsError = '';
+      try {
+        const res = await fetch('/api/admin/models?type=ai');
+        const data = await res.json();
+        if (data.error) {
+          this.modelsError = data.error;
+        } else {
+          this.aiModels = data.models || [];
+          if (this.aiModels.length === 0) this.modelsError = 'Model listing not available for this provider. Enter the deployment/model name manually.';
+        }
+      } catch (e) {
+        this.modelsError = 'Failed to connect to provider.';
+      }
+      this.loadingAiModels = false;
+    },
+    async fetchImageModels() {
+      this.loadingImageModels = true;
+      this.imageModels = [];
+      this.modelsError = '';
+      try {
+        const res = await fetch('/api/admin/models?type=image');
+        const data = await res.json();
+        if (data.error) {
+          this.modelsError = data.error;
+        } else {
+          this.imageModels = data.models || [];
+          if (this.imageModels.length === 0) this.modelsError = 'Model listing not available for this provider. Enter the deployment/model name manually.';
+        }
+      } catch (e) {
+        this.modelsError = 'Failed to connect to provider.';
+      }
+      this.loadingImageModels = false;
     }
   }`}>
     <h2 class="font-headline font-bold text-4xl mb-2 tracking-tight text-on-surface">{t('admin.title', lang)}</h2>
@@ -266,25 +338,57 @@ const allInvitations = db
       </h3>
       <div class="space-y-3">
         {providers.map((p) => (
-          <div class:list={[
-            'p-4 rounded-xl transition-colors',
-            aiProvider === p.id ? 'bg-primary/10 border-2 border-primary/30' : 'bg-surface-container-low hover:bg-surface-container-high',
-          ]}>
+          <div
+            x-on:click={`aiProvider = '${p.id}'`}
+            x-bind:class={`aiProvider === '${p.id}' ? 'bg-primary/10 border-2 border-primary/30' : 'bg-surface-container-low hover:bg-surface-container-high border-2 border-transparent'`}
+            class="p-4 rounded-xl transition-colors cursor-pointer"
+          >
             <div class="flex items-center justify-between">
               <div>
                 <p class="font-headline font-bold text-on-surface">{p.name}</p>
                 <p class="text-sm text-on-surface-variant">{p.description}</p>
               </div>
-              {aiProvider === p.id && (
-                <span class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-1 rounded-full">Active</span>
-              )}
+              <span
+                x-show={`aiProvider === '${p.id}'`}
+                x-cloak
+                class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-1 rounded-full"
+              >Active</span>
             </div>
           </div>
         ))}
       </div>
-      <p class="text-xs text-on-surface-variant mt-4">
-        To change the active provider, set the <code class="bg-surface-container-high px-1 py-0.5 rounded">AI_PROVIDER</code> environment variable.
-      </p>
+
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-on-surface mb-2">Model</label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            x-model="aiModel"
+            x-bind:placeholder="'Default: ' + getDefaultModel(aiProvider)"
+            class="flex-1 bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono text-sm"
+          />
+          <button
+            x-on:click="fetchAiModels()"
+            x-bind:disabled="loadingAiModels"
+            class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest px-4 py-3 rounded-xl text-on-surface text-sm font-medium transition-colors disabled:opacity-50"
+          >
+            <span class="material-symbols-outlined text-sm" x-bind:class="loadingAiModels && 'animate-spin'" x-text="loadingAiModels ? 'progress_activity' : 'refresh'"></span>
+            <span>Fetch</span>
+          </button>
+        </div>
+        <div x-show="aiModels.length > 0" x-cloak class="mt-3 max-h-48 overflow-y-auto rounded-xl border border-outline-variant/20 bg-surface-container-lowest">
+          <template x-for="m in aiModels" x-bind:key="m">
+            <button
+              x-on:click="aiModel = m"
+              x-bind:class="aiModel === m ? 'bg-primary/10 text-primary font-semibold' : 'text-on-surface hover:bg-surface-container-high'"
+              class="w-full text-left px-4 py-2.5 text-sm font-mono transition-colors border-b border-outline-variant/10 last:border-b-0"
+              x-text="m"
+            ></button>
+          </template>
+        </div>
+        <p x-show="modelsError && !loadingAiModels && aiModels.length === 0" x-cloak class="text-xs text-error mt-2" x-text="modelsError"></p>
+        <p class="text-xs text-on-surface-variant mt-2">Select from available models or type a model name. Leave empty for the provider's default.</p>
+      </div>
     </section>
 
     <!-- Image Provider -->
@@ -293,21 +397,70 @@ const allInvitations = db
         <span class="material-symbols-outlined text-primary">image</span>
         Image Generation
       </h3>
-      <div class:list={[
-        'p-4 rounded-xl',
-        imageProvider === 'azure' ? 'bg-primary/10 border-2 border-primary/30' : 'bg-surface-container-low',
-      ]}>
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="font-headline font-bold text-on-surface">Azure AI (gpt-image-1)</p>
-            <p class="text-sm text-on-surface-variant">AI-generated food photography</p>
+      <div class="space-y-3">
+        {imageProviders.map((p) => (
+          <div
+            x-on:click={`imageProvider = '${p.id}'`}
+            x-bind:class={`imageProvider === '${p.id}' ? 'bg-primary/10 border-2 border-primary/30' : 'bg-surface-container-low hover:bg-surface-container-high border-2 border-transparent'`}
+            class="p-4 rounded-xl transition-colors cursor-pointer"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-headline font-bold text-on-surface">{p.name}</p>
+                <p class="text-sm text-on-surface-variant">{p.description}</p>
+              </div>
+              <span
+                x-show={`imageProvider === '${p.id}'`}
+                x-cloak
+                class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-1 rounded-full"
+              >Active</span>
+            </div>
           </div>
-          <span class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-1 rounded-full">Active</span>
-        </div>
+        ))}
       </div>
-      <p class="text-xs text-on-surface-variant mt-4">
-        Set <code class="bg-surface-container-high px-1 py-0.5 rounded">IMAGE_PROVIDER=placeholder</code> to disable image generation.
-      </p>
+
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-on-surface mb-2">Image Model</label>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            x-model="imageModel"
+            x-bind:placeholder="'Default: ' + getDefaultImageModel(imageProvider)"
+            class="flex-1 bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono text-sm"
+          />
+          <button
+            x-on:click="fetchImageModels()"
+            x-bind:disabled="loadingImageModels"
+            class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest px-4 py-3 rounded-xl text-on-surface text-sm font-medium transition-colors disabled:opacity-50"
+          >
+            <span class="material-symbols-outlined text-sm" x-bind:class="loadingImageModels && 'animate-spin'" x-text="loadingImageModels ? 'progress_activity' : 'refresh'"></span>
+            <span>Fetch</span>
+          </button>
+        </div>
+        <div x-show="imageModels.length > 0" x-cloak class="mt-3 max-h-48 overflow-y-auto rounded-xl border border-outline-variant/20 bg-surface-container-lowest">
+          <template x-for="m in imageModels" x-bind:key="m">
+            <button
+              x-on:click="imageModel = m"
+              x-bind:class="imageModel === m ? 'bg-primary/10 text-primary font-semibold' : 'text-on-surface hover:bg-surface-container-high'"
+              class="w-full text-left px-4 py-2.5 text-sm font-mono transition-colors border-b border-outline-variant/10 last:border-b-0"
+              x-text="m"
+            ></button>
+          </template>
+        </div>
+        <p x-show="modelsError && !loadingImageModels && imageModels.length === 0" x-cloak class="text-xs text-error mt-2" x-text="modelsError"></p>
+        <p class="text-xs text-on-surface-variant mt-2">Select from available models or type a model name. Leave empty for the provider's default.</p>
+      </div>
+    </section>
+
+    <!-- Save Settings Button -->
+    <section class="mb-16">
+      <button
+        x-on:click="saveSettings()"
+        class="editorial-gradient text-white font-headline font-bold px-8 py-3 rounded-full transition-all active:scale-[0.98] flex items-center gap-2"
+      >
+        <span class="material-symbols-outlined" x-text="settingsSaved ? 'check' : 'save'"></span>
+        <span x-text="settingsSaved ? 'Saved' : 'Save Provider Settings'"></span>
+      </button>
     </section>
 
     <!-- Environment Status -->

@@ -180,5 +180,9 @@
     "defaultFilters": "Standardfilter",
     "defaultFiltersDescription": "Diese Filter werden bei der Rezeptsuche automatisch vorausgewählt.",
     "filtersSaved": "Filter gespeichert."
+  },
+  "meta": {
+    "generatedBy": "Erstellt mit",
+    "imageBy": "Bild von"
   }
 }

@@ -2,6 +2,7 @@ import type { ImageProvider, ImageGenerationResult } from '../provider';
 
 export class PlaceholderImageProvider implements ImageProvider {
   name = 'placeholder';
+  model = 'placeholder';
 
   async generateImage(_prompt: string): Promise<ImageGenerationResult> {
     // Return a 1x1 transparent PNG as fallback
@@ -10,5 +11,9 @@ export class PlaceholderImageProvider implements ImageProvider {
       'base64',
     );
     return { imageData: pixel, contentType: 'image/png' };
+  }
+
+  async listModels(): Promise<string[]> {
+    return ['placeholder'];
   }
 }

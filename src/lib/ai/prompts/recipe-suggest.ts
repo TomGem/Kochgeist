@@ -44,7 +44,7 @@ Return exactly ${count} recipes as a JSON object: { "recipes": [...] }. Each rec
   "difficulty": "Easy" | "Medium" | "Hard",
   "servings": "string (e.g. '4 Servings')",
   "ingredients": [{ "name": "string", "amount": "string", "isExtra": boolean }],
-  "instructions": [{ "step": number, "title": "string", "description": "string" }],
+  "instructions": [{ "step": number, "title": "string", "description": "string" }] (as many steps as the recipe naturally needs),
   "imagePrompt": "string (food photography description)"
 }
 

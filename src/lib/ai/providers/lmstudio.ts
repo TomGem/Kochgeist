@@ -5,12 +5,12 @@ import { RecipeArraySchema } from '../prompts/schema';
 
 export class LMStudioProvider implements AIProvider {
   name = 'lmstudio';
+  model: string;
   private client: OpenAI;
-  private model: string;
 
-  constructor() {
+  constructor(modelOverride?: string) {
     const baseUrl = import.meta.env.LMSTUDIO_BASE_URL || 'http://localhost:1234/v1';
-    this.model = import.meta.env.LMSTUDIO_MODEL || 'local-model';
+    this.model = modelOverride || import.meta.env.LMSTUDIO_MODEL || 'local-model';
 
     this.client = new OpenAI({ baseURL: baseUrl, apiKey: 'lm-studio' });
   }
@@ -53,5 +53,13 @@ export class LMStudioProvider implements AIProvider {
 
   async recognizeIngredients(_params: RecognizeIngredientsParams): Promise<string[]> {
     throw new Error('Image recognition not supported with LM Studio');
+  }
+
+  async listModels(): Promise<string[]> {
+    const models: string[] = [];
+    for await (const model of this.client.models.list()) {
+      models.push(model.id);
+    }
+    return models.sort();
   }
 }

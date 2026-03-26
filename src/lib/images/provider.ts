@@ -5,5 +5,7 @@ export interface ImageGenerationResult {
 
 export interface ImageProvider {
   name: string;
+  model: string;
   generateImage(prompt: string): Promise<ImageGenerationResult>;
+  listModels(): Promise<string[]>;
 }

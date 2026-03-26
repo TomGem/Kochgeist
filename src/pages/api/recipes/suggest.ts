@@ -26,8 +26,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return new Response('No ingredients provided', { status: 400 });
     }
 
-    // Check cache
-    const hash = computeIngredientHash(ingredients, lang, filters);
+    // Resolve provider before cache check (needed for cache key)
+    const provider = await getAIProvider();
+
+    // Check cache (includes provider+model so switching models produces fresh results)
+    const hash = computeIngredientHash(ingredients, lang, filters, provider.name, provider.model);
     const cached = db.select().from(recipeCache).where(eq(recipeCache.ingredientHash, hash)).get();
 
     let recipeIds: string[];
@@ -35,13 +38,14 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (cached) {
       recipeIds = JSON.parse(cached.recipeIds);
     } else {
-      // Call AI
-      const provider = await getAIProvider();
+      // Call AI with timing
+      const start = Date.now();
       const aiRecipes = await provider.generateRecipes({
         ingredients,
         language: lang,
         dietaryFilters: filters,
       });
+      const aiGenerationTimeMs = Date.now() - start;
 
       // Store recipes in DB
       recipeIds = [];
@@ -64,6 +68,9 @@ export const POST: APIRoute = async ({ request, locals }) => {
           ),
           imageUrl: null,
           imageStatus: 'pending',
+          aiProvider: provider.name,
+          aiModel: provider.model,
+          aiGenerationTimeMs,
         }).run();
       }
 

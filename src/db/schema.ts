@@ -65,6 +65,16 @@ export const emailVerifications = sqliteTable('email_verifications', {
     .$defaultFn(() => new Date()),
 });
 
+// ── Settings table ───────────────────────────────────────────
+
+export const settings = sqliteTable('settings', {
+  key: text('key').primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
 // ── Recipe tables ────────────────────────────────────────────
 
 export const recipes = sqliteTable('recipes', {
@@ -81,6 +91,9 @@ export const recipes = sqliteTable('recipes', {
   extraIngredients: text('extra_ingredients'), // JSON array
   imageUrl: text('image_url'),
   imageStatus: text('image_status').default('pending'),
+  aiProvider: text('ai_provider'),
+  aiModel: text('ai_model'),
+  aiGenerationTimeMs: integer('ai_generation_time_ms'),
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
@@ -129,8 +142,10 @@ export const imageCache = sqliteTable('image_cache', {
   recipeId: text('recipe_id').notNull().references(() => recipes.id),
   prompt: text('prompt').notNull(),
   provider: text('provider').notNull(),
+  model: text('model'),
   filePath: text('file_path'),
   status: text('status').notNull().default('pending'),
+  generationTimeMs: integer('generation_time_ms'),
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),

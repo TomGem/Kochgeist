@@ -5,15 +5,15 @@ import { RecipeArraySchema } from '../prompts/schema';
 
 export class AnthropicProvider implements AIProvider {
   name = 'anthropic';
+  model: string;
   private client: Anthropic;
-  private model: string;
 
-  constructor() {
+  constructor(modelOverride?: string) {
     const apiKey = import.meta.env.ANTHROPIC_API_KEY;
     if (!apiKey) throw new Error('ANTHROPIC_API_KEY must be set');
 
     this.client = new Anthropic({ apiKey });
-    this.model = import.meta.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
+    this.model = modelOverride || import.meta.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
   }
 
   async generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]> {
@@ -80,5 +80,13 @@ export class AnthropicProvider implements AIProvider {
     const jsonStr = content.text.replace(/```json?\n?/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(jsonStr);
     return Array.isArray(parsed) ? parsed.filter((i: unknown) => typeof i === 'string') : [];
+  }
+
+  async listModels(): Promise<string[]> {
+    const models: string[] = [];
+    for await (const model of this.client.models.list()) {
+      models.push(model.id);
+    }
+    return models.sort();
   }
 }

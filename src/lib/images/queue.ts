@@ -3,29 +3,13 @@ import { join } from 'path';
 import { db } from '../../db/index';
 import { recipes, imageCache } from '../../db/schema';
 import { eq } from 'drizzle-orm';
-import type { ImageProvider } from './provider';
+import { getImageProvider } from './registry';
 
 const IMAGE_DIR = './data/images';
 
 function ensureImageDir() {
   if (!existsSync(IMAGE_DIR)) {
     mkdirSync(IMAGE_DIR, { recursive: true });
-  }
-}
-
-async function getImageProvider(): Promise<ImageProvider> {
-  const provider = import.meta.env.IMAGE_PROVIDER || 'azure';
-
-  switch (provider) {
-    case 'azure': {
-      const { AzureImageProvider } = await import('./providers/azure-image');
-      return new AzureImageProvider();
-    }
-    case 'placeholder':
-    default: {
-      const { PlaceholderImageProvider } = await import('./providers/placeholder');
-      return new PlaceholderImageProvider();
-    }
   }
 }
 
@@ -37,27 +21,31 @@ export async function generateImageForRecipe(recipeId: string): Promise<void> {
   const existing = db.select().from(imageCache).where(eq(imageCache.recipeId, recipeId)).get();
   if (existing && (existing.status === 'ready' || existing.status === 'generating')) return;
 
+  const provider = await getImageProvider();
+
   // Parse instructions to extract image prompt if stored, otherwise generate from title
   let imagePrompt = `Editorial food photography of ${recipe.title}. ${recipe.description}. Soft natural light, rustic ceramic plate, shallow depth of field, high-end culinary magazine style.`;
 
   // Mark as generating
   if (existing) {
     db.update(imageCache)
-      .set({ status: 'generating', prompt: imagePrompt })
+      .set({ status: 'generating', prompt: imagePrompt, provider: provider.name, model: provider.model })
       .where(eq(imageCache.recipeId, recipeId))
       .run();
   } else {
     db.insert(imageCache).values({
       recipeId,
       prompt: imagePrompt,
-      provider: import.meta.env.IMAGE_PROVIDER || 'azure',
+      provider: provider.name,
+      model: provider.model,
       status: 'generating',
     }).run();
   }
 
   try {
-    const provider = await getImageProvider();
+    const start = Date.now();
     const result = await provider.generateImage(imagePrompt);
+    const generationTimeMs = Date.now() - start;
 
     ensureImageDir();
     const ext = result.contentType === 'image/png' ? 'png' : 'webp';
@@ -70,7 +58,7 @@ export async function generateImageForRecipe(recipeId: string): Promise<void> {
 
     // Update image cache
     db.update(imageCache)
-      .set({ status: 'ready', filePath })
+      .set({ status: 'ready', filePath, generationTimeMs })
       .where(eq(imageCache.recipeId, recipeId))
       .run();
 

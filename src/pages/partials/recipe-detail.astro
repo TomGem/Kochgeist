@@ -1,6 +1,6 @@
 ---
 import { db } from '../../db/index';
-import { recipes, bookmarks } from '../../db/schema';
+import { recipes, bookmarks, imageCache } from '../../db/schema';
 import { eq, and } from 'drizzle-orm';
 import { t, type Locale } from '../../lib/i18n/index';
 
@@ -15,6 +15,8 @@ const user = Astro.locals.user;
 const isBookmarked = user
   ? !!db.select().from(bookmarks).where(and(eq(bookmarks.recipeId, id), eq(bookmarks.userId, user.id))).get()
   : false;
+
+const imageEntry = db.select().from(imageCache).where(eq(imageCache.recipeId, id)).get();
 
 const ingredientsList = JSON.parse(recipe.ingredients) as Array<{ name: string; amount: string; isExtra: boolean }>;
 const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title: string; description: string }>;
@@ -97,6 +99,26 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
                 </span>
               );
             })}
+          </div>
+        )}
+        {recipe.aiProvider && (
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-5 text-[11px] text-on-surface-variant/50">
+            <div class="flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-xs">smart_toy</span>
+              <span>{t('meta.generatedBy', lang)} {recipe.aiProvider} / {recipe.aiModel}</span>
+              {recipe.aiGenerationTimeMs && (
+                <span class="text-on-surface-variant/35">({(recipe.aiGenerationTimeMs / 1000).toFixed(1)}s)</span>
+              )}
+            </div>
+            {imageEntry?.model && imageEntry.model !== 'placeholder' && (
+              <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-xs">image</span>
+                <span>{t('meta.imageBy', lang)} {imageEntry.provider} / {imageEntry.model}</span>
+                {imageEntry.generationTimeMs && (
+                  <span class="text-on-surface-variant/35">({(imageEntry.generationTimeMs / 1000).toFixed(1)}s)</span>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>
