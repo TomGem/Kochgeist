@@ -63,7 +63,7 @@ const authMiddleware = defineMiddleware((context, next) => {
   context.locals.session = null;
 
   // Skip auth for static assets
-  if (pathname.startsWith('/_astro/') || pathname.startsWith('/favicon')) {
+  if (pathname.startsWith('/_astro/') || pathname.startsWith('/favicon') || pathname === '/apple-touch-icon.png' || pathname.startsWith('/icon-') || pathname === '/site.webmanifest') {
     return next();
   }
 
