@@ -34,7 +34,10 @@
     "save": "Speichern",
     "saved": "Gespeichert",
     "share": "Teilen",
-    "buy": "kaufen"
+    "exportList": "Einkaufsliste exportieren",
+    "exportEmpty": "Alle Zutaten abgehakt!",
+    "copied": "In die Zwischenablage kopiert",
+    "shoppingListFor": "Einkaufsliste für"
   },
   "bookmarks": {
     "collection": "Persönliche Sammlung",

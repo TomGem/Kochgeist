@@ -128,33 +128,56 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
     <!-- Recipe Content -->
     <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-16">
       <!-- Ingredients -->
-      <aside class="md:col-span-1">
+      <aside class="md:col-span-1" x-data={`{
+        items: ${JSON.stringify(ingredientsList.map(i => ({ text: i.amount + ' ' + i.name, done: false }))).replace(/</g, '\\u003c')},
+        exportLabel: ${JSON.stringify(t('detail.exportList', lang))},
+        emptyLabel: ${JSON.stringify(t('detail.exportEmpty', lang))},
+        copiedLabel: ${JSON.stringify(t('detail.copied', lang))},
+        titleLabel: ${JSON.stringify(t('detail.shoppingListFor', lang) + ' ' + recipe.title)},
+        feedback: '',
+        async exportList() {
+          const needed = this.items.filter(i => !i.done);
+          if (!needed.length) { this.showFeedback(this.emptyLabel); return; }
+          const lines = needed.map(i => '- ' + i.text);
+          const text = this.titleLabel + '\\n\\n' + lines.join('\\n');
+          if (navigator.share) {
+            try { await navigator.share({ title: this.titleLabel, text }); return; } catch {}
+          }
+          try { await navigator.clipboard.writeText(text); this.showFeedback(this.copiedLabel); } catch {}
+        },
+        showFeedback(msg) { this.feedback = msg; setTimeout(() => this.feedback = '', 2000); }
+      }`}>
         <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">{t('detail.ingredients', lang)}</h2>
         <ul class="space-y-4">
-          {ingredientsList.map((item) => (
+          <template x-for="(item, idx) in items" :key="idx">
             <li
-              x-data="{ done: false }"
-              x-on:click="done = !done"
-              :class="done && 'opacity-50'"
+              x-on:click="item.done = !item.done"
+              :class="item.done && 'opacity-50'"
               class="flex items-start justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors cursor-pointer select-none"
             >
               <div class="flex items-center gap-2">
-                <span class="text-sm font-medium" :class="done && 'line-through'">{item.amount} {item.name}</span>
-                {item.isExtra && (
-                  <span class="text-[9px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">{t('detail.buy', lang)}</span>
-                )}
+                <span class="text-sm font-medium" :class="item.done && 'line-through'" x-text="item.text"></span>
               </div>
               <span
                 class="material-symbols-outlined transition-colors text-lg"
-                :class="done ? 'text-primary' : 'text-outline-variant group-hover:text-primary'"
-                :style="done && `font-variation-settings: 'FILL' 1`"
+                :class="item.done ? 'text-green-600' : 'text-outline-variant group-hover:text-green-600'"
+                :style="item.done && `font-variation-settings: 'FILL' 1`"
               >check_circle</span>
             </li>
-          ))}
+          </template>
         </ul>
 
+        <!-- Export Shopping List -->
+        <button
+          x-on:click="exportList()"
+          class="mt-6 w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-on-surface text-sm font-medium transition-colors cursor-pointer"
+        >
+          <span class="material-symbols-outlined text-lg">share</span>
+          <span x-text="feedback || exportLabel"></span>
+        </button>
+
         <!-- Chef's Note -->
-        <div class="mt-12 p-6 bg-tertiary-fixed rounded-xl border-l-4 border-on-tertiary-fixed-variant">
+        <div class="mt-8 p-6 bg-tertiary-fixed rounded-xl border-l-4 border-on-tertiary-fixed-variant">
           <div class="flex items-center gap-2 mb-2">
             <span class="material-symbols-outlined text-on-tertiary-fixed text-lg">lightbulb</span>
             <h4 class="font-headline font-bold text-sm text-on-tertiary-fixed">{t('detail.chefsNote', lang)}</h4>

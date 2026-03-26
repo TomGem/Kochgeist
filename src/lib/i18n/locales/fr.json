@@ -34,7 +34,10 @@
     "save": "Enregistrer",
     "saved": "Enregistré",
     "share": "Partager",
-    "buy": "acheter"
+    "exportList": "Exporter la liste de courses",
+    "exportEmpty": "Tous les ingrédients cochés !",
+    "copied": "Copié dans le presse-papiers",
+    "shoppingListFor": "Liste de courses pour"
   },
   "bookmarks": {
     "collection": "Collection personnelle",

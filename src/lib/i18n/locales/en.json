@@ -34,7 +34,10 @@
     "save": "Save",
     "saved": "Saved",
     "share": "Share",
-    "buy": "buy"
+    "exportList": "Export shopping list",
+    "exportEmpty": "All ingredients checked off!",
+    "copied": "Copied to clipboard",
+    "shoppingListFor": "Shopping list for"
   },
   "bookmarks": {
     "collection": "Personal Collection",
