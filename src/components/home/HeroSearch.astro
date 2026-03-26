@@ -8,17 +8,24 @@ const lang = (Astro.locals.lang ?? 'en') as Locale;
   <h2 class="font-headline font-bold text-4xl mb-6 tracking-tight leading-tight text-on-surface">
     {t('home.hero', lang)}
   </h2>
-  <div class="relative group" x-data="{ input: '' }">
-    <div class="flex items-center gap-3 bg-surface-container-low px-4 py-4 rounded-xl focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-      <span class="material-symbols-outlined text-outline">search</span>
+  <div class="relative group" x-data="{ input: '', focused: false }">
+    <div
+      class="flex items-center gap-3 bg-white/80 px-5 py-4.5 rounded-2xl border border-outline/15 shadow-sm transition-all duration-200"
+      :class="focused && 'ring-2 ring-primary/30 border-primary/30 shadow-md'"
+    >
+      <span
+        class="material-symbols-outlined text-xl transition-colors duration-200"
+        :class="focused ? 'text-primary' : 'text-outline'"
+      >search</span>
       <input
         x-model="input"
         x-on:keydown.enter.prevent="if (input.trim()) { $store.ingredients.add(input); input = ''; }"
-        class="w-full bg-transparent border-none focus:ring-0 text-on-surface placeholder:text-outline p-0 font-body"
+        x-on:focus="focused = true"
+        x-on:blur="focused = false"
+        class="w-full bg-transparent border-none focus:ring-0 focus:outline-none text-on-surface placeholder:text-outline/70 p-0 font-body text-base"
         placeholder={t('home.searchPlaceholder', lang)}
         type="text"
       />
     </div>
-    <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary scale-x-0 group-focus-within:scale-x-100 transition-transform duration-300 origin-left"></div>
   </div>
 </section>

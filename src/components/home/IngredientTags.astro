@@ -1,15 +1,15 @@
 ---
 ---
 
-<div class="flex flex-wrap gap-2 mt-6" x-data>
+<div class="flex flex-wrap gap-2 mt-4 mb-4" x-data>
   <template x-for="(item, index) in $store.ingredients.items" :key="index">
-    <div class="inline-flex items-center gap-2 bg-surface-container-lowest border border-outline-variant/20 py-2 px-4 rounded-full shadow-sm hover:shadow-md transition-shadow">
-      <span class="text-sm font-medium" x-text="item"></span>
+    <div class="inline-flex items-center gap-1.5 bg-tertiary-container text-on-tertiary-container py-1.5 px-3.5 rounded-full text-sm font-semibold shadow-sm hover:shadow-md transition-all">
+      <span x-text="item"></span>
       <button
         x-on:click="$store.ingredients.remove(index)"
-        class="text-outline hover:text-primary transition-colors"
+        class="text-on-tertiary-container/60 hover:text-on-tertiary-container transition-colors -mr-1"
       >
-        <span class="material-symbols-outlined text-sm">close</span>
+        <span class="material-symbols-outlined text-[16px]">close</span>
       </button>
     </div>
   </template>
