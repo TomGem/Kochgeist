@@ -130,10 +130,10 @@ const allInvitations = db
           this.modelsError = data.error;
         } else {
           this.aiModels = data.models || [];
-          if (this.aiModels.length === 0) this.modelsError = 'Model listing not available for this provider. Enter the deployment/model name manually.';
+          if (this.aiModels.length === 0) this.modelsError = '${t('admin.modelListingUnavailable', lang)}';
         }
       } catch (e) {
-        this.modelsError = 'Failed to connect to provider.';
+        this.modelsError = '${t('admin.connectionFailed', lang)}';
       }
       this.loadingAiModels = false;
     },
@@ -148,10 +148,10 @@ const allInvitations = db
           this.modelsError = data.error;
         } else {
           this.imageModels = data.models || [];
-          if (this.imageModels.length === 0) this.modelsError = 'Model listing not available for this provider. Enter the deployment/model name manually.';
+          if (this.imageModels.length === 0) this.modelsError = '${t('admin.modelListingUnavailable', lang)}';
         }
       } catch (e) {
-        this.modelsError = 'Failed to connect to provider.';
+        this.modelsError = '${t('admin.connectionFailed', lang)}';
       }
       this.loadingImageModels = false;
     }
@@ -284,7 +284,7 @@ const allInvitations = db
                 <div class="flex items-center gap-2">
                   <p class="font-medium text-on-surface truncate">{u.displayName || u.email}</p>
                   {u.role === 'admin' && (
-                    <span class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-0.5 rounded-full">Admin</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-0.5 rounded-full">{t('admin.title', lang)}</span>
                   )}
                   {!u.isVerified && (
                     <span class="text-[10px] font-bold uppercase tracking-wider bg-error-container text-on-error-container px-2 py-0.5 rounded-full">{t('admin.unverified', lang)}</span>
@@ -334,7 +334,7 @@ const allInvitations = db
     <section class="mb-16">
       <h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
         <span class="material-symbols-outlined text-primary">smart_toy</span>
-        Recipe AI Provider
+        {t('admin.recipeProvider', lang)}
       </h3>
       <div class="space-y-3">
         {providers.map((p) => (
@@ -352,14 +352,14 @@ const allInvitations = db
                 x-show={`aiProvider === '${p.id}'`}
                 x-cloak
                 class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-1 rounded-full"
-              >Active</span>
+              >{t('admin.active', lang)}</span>
             </div>
           </div>
         ))}
       </div>
 
       <div class="mt-4">
-        <label class="block text-sm font-medium text-on-surface mb-2">Model</label>
+        <label class="block text-sm font-medium text-on-surface mb-2">{t('admin.model', lang)}</label>
         <div class="flex gap-2">
           <input
             type="text"
@@ -373,7 +373,7 @@ const allInvitations = db
             class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest px-4 py-3 rounded-xl text-on-surface text-sm font-medium transition-colors disabled:opacity-50"
           >
             <span class="material-symbols-outlined text-sm" x-bind:class="loadingAiModels && 'animate-spin'" x-text="loadingAiModels ? 'progress_activity' : 'refresh'"></span>
-            <span>Fetch</span>
+            <span>{t('admin.fetch', lang)}</span>
           </button>
         </div>
         <div x-show="aiModels.length > 0" x-cloak class="mt-3 max-h-48 overflow-y-auto rounded-xl border border-outline-variant/20 bg-surface-container-lowest">
@@ -387,7 +387,7 @@ const allInvitations = db
           </template>
         </div>
         <p x-show="modelsError && !loadingAiModels && aiModels.length === 0" x-cloak class="text-xs text-error mt-2" x-text="modelsError"></p>
-        <p class="text-xs text-on-surface-variant mt-2">Select from available models or type a model name. Leave empty for the provider's default.</p>
+        <p class="text-xs text-on-surface-variant mt-2">{t('admin.modelHint', lang)}</p>
       </div>
     </section>
 
@@ -395,7 +395,7 @@ const allInvitations = db
     <section class="mb-16">
       <h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
         <span class="material-symbols-outlined text-primary">image</span>
-        Image Generation
+        {t('admin.imageGeneration', lang)}
       </h3>
       <div class="space-y-3">
         {imageProviders.map((p) => (
@@ -413,14 +413,14 @@ const allInvitations = db
                 x-show={`imageProvider === '${p.id}'`}
                 x-cloak
                 class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-1 rounded-full"
-              >Active</span>
+              >{t('admin.active', lang)}</span>
             </div>
           </div>
         ))}
       </div>
 
       <div class="mt-4">
-        <label class="block text-sm font-medium text-on-surface mb-2">Image Model</label>
+        <label class="block text-sm font-medium text-on-surface mb-2">{t('admin.imageModel', lang)}</label>
         <div class="flex gap-2">
           <input
             type="text"
@@ -434,7 +434,7 @@ const allInvitations = db
             class="flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest px-4 py-3 rounded-xl text-on-surface text-sm font-medium transition-colors disabled:opacity-50"
           >
             <span class="material-symbols-outlined text-sm" x-bind:class="loadingImageModels && 'animate-spin'" x-text="loadingImageModels ? 'progress_activity' : 'refresh'"></span>
-            <span>Fetch</span>
+            <span>{t('admin.fetch', lang)}</span>
           </button>
         </div>
         <div x-show="imageModels.length > 0" x-cloak class="mt-3 max-h-48 overflow-y-auto rounded-xl border border-outline-variant/20 bg-surface-container-lowest">
@@ -448,7 +448,7 @@ const allInvitations = db
           </template>
         </div>
         <p x-show="modelsError && !loadingImageModels && imageModels.length === 0" x-cloak class="text-xs text-error mt-2" x-text="modelsError"></p>
-        <p class="text-xs text-on-surface-variant mt-2">Select from available models or type a model name. Leave empty for the provider's default.</p>
+        <p class="text-xs text-on-surface-variant mt-2">{t('admin.modelHint', lang)}</p>
       </div>
     </section>
 
@@ -459,7 +459,7 @@ const allInvitations = db
         class="editorial-gradient text-white font-headline font-bold px-8 py-3 rounded-full transition-all active:scale-[0.98] flex items-center gap-2"
       >
         <span class="material-symbols-outlined" x-text="settingsSaved ? 'check' : 'save'"></span>
-        <span x-text="settingsSaved ? 'Saved' : 'Save Provider Settings'"></span>
+        <span x-text={`settingsSaved ? '${t('admin.saved', lang)}' : '${t('admin.saveProviderSettings', lang)}'`}></span>
       </button>
     </section>
 
@@ -467,19 +467,19 @@ const allInvitations = db
     <section class="mb-16">
       <h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
         <span class="material-symbols-outlined text-primary">dns</span>
-        Environment
+        {t('admin.environment', lang)}
       </h3>
       <div class="space-y-3">
         <div class="flex justify-between p-4 bg-surface-container-low rounded-xl">
           <span class="text-sm font-medium">AZURE_ENDPOINT</span>
-          <span class="text-sm text-on-surface-variant">{import.meta.env.AZURE_ENDPOINT ? 'Set' : 'Not set'}</span>
+          <span class="text-sm text-on-surface-variant">{import.meta.env.AZURE_ENDPOINT ? t('admin.set', lang) : t('admin.notSet', lang)}</span>
         </div>
         <div class="flex justify-between p-4 bg-surface-container-low rounded-xl">
           <span class="text-sm font-medium">AZURE_API_KEY</span>
-          <span class="text-sm text-on-surface-variant">{import.meta.env.AZURE_API_KEY ? 'Set' : 'Not set'}</span>
+          <span class="text-sm text-on-surface-variant">{import.meta.env.AZURE_API_KEY ? t('admin.set', lang) : t('admin.notSet', lang)}</span>
         </div>
         <div class="flex justify-between p-4 bg-surface-container-low rounded-xl">
-          <span class="text-sm font-medium">Language</span>
+          <span class="text-sm font-medium">{t('admin.language', lang)}</span>
           <span class="text-sm text-on-surface-variant">{lang.toUpperCase()}</span>
         </div>
       </div>

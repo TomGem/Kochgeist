@@ -140,15 +140,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch (error) {
     console.error('Recipe suggest error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
+    const errorLang = lang || 'en';
     return new Response(
       `<div class="flex flex-col items-center justify-center py-24 text-center">
         <div class="w-16 h-16 bg-error-container/20 rounded-full flex items-center justify-center mb-4">
           <span class="material-symbols-outlined text-error text-3xl">error</span>
         </div>
-        <h3 class="font-headline text-xl font-bold text-on-surface mb-2">Something went wrong</h3>
+        <h3 class="font-headline text-xl font-bold text-on-surface mb-2">${escapeHtml(t('errors.somethingWentWrong', errorLang as Locale))}</h3>
         <p class="text-on-surface-variant mb-4 max-w-md">${escapeHtml(message)}</p>
         <button onclick="history.back()" class="editorial-gradient text-on-primary px-6 py-3 rounded-full font-bold">
-          Try Again
+          ${escapeHtml(t('errors.tryAgain', errorLang as Locale))}
         </button>
       </div>`,
       { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } },
@@ -203,7 +204,7 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
       <span class="material-symbols-outlined text-4xl text-primary/20 animate-pulse">${icon}</span>
       <div class="flex items-center gap-2 text-on-surface-variant/50">
         <span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-        <span class="text-[10px] font-bold uppercase tracking-widest">Generating image</span>
+        <span class="text-[10px] font-bold uppercase tracking-widest">${escapeHtml(t('loading.generatingImage', lang as Locale))}</span>
       </div>
     </div>`;
   }

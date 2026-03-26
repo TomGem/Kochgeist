@@ -1,4 +1,11 @@
 ---
+import { t, type Locale } from '../../lib/i18n/index';
+
+interface Props {
+  lang?: Locale;
+}
+
+const lang = (Astro.props.lang ?? (Astro.locals.lang as Locale) ?? 'en') as Locale;
 ---
 
 <div
@@ -9,6 +16,6 @@
 >
   <div class="flex flex-col items-center gap-4">
     <div class="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
-    <p class="font-headline font-bold text-on-surface">Crafting your recipes...</p>
+    <p class="font-headline font-bold text-on-surface">{t('loading.crafting', lang)}</p>
   </div>
 </div>

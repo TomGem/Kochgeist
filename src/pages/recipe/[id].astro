@@ -130,7 +130,7 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
       <button
         class="flex items-center gap-3 bg-surface-container-highest px-6 py-3 rounded-full text-on-surface font-bold text-sm transition-all active:scale-95"
         x-data
-        x-on:click={`navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = 'Link copied!'; setTimeout(() => $store.ui.toastMessage = null, 2000); })`}
+        x-on:click={`navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = '${t('detail.copied', lang)}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })`}
       >
         <span class="material-symbols-outlined">share</span>
         {t('detail.share', lang)}

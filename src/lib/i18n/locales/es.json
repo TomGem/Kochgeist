@@ -97,7 +97,10 @@
     "rateLimit": "Demasiadas solicitudes. Espera un momento.",
     "invalidResponse": "Algo salió mal con la receta. Reintentando...",
     "networkError": "No se puede conectar con la cocina. Revisa tu conexión.",
-    "noIngredients": "¡Añade primero algunos ingredientes!"
+    "noIngredients": "¡Añade primero algunos ingredientes!",
+    "somethingWentWrong": "Algo salió mal",
+    "tryAgain": "Reintentar",
+    "scanFailed": "No se pudo escanear la imagen"
   },
   "metrics": {
     "cook": "Cocción",
@@ -108,7 +111,9 @@
     "servings": "Porciones"
   },
   "loading": {
-    "crafting": "Creando tus recetas..."
+    "crafting": "Creando tus recetas...",
+    "scanning": "Escaneando...",
+    "generatingImage": "Generando imagen"
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -190,7 +195,21 @@
     "promoteAdmin": "Hacer admin",
     "demoteUser": "Quitar admin",
     "verifyUser": "Verificar",
-    "unverified": "Sin verificar"
+    "unverified": "Sin verificar",
+    "recipeProvider": "Proveedor de IA para recetas",
+    "imageGeneration": "Generación de imágenes",
+    "model": "Modelo",
+    "imageModel": "Modelo de imagen",
+    "fetch": "Cargar",
+    "modelHint": "Selecciona entre los modelos disponibles o escribe un nombre de modelo. Deja vacío para el modelo por defecto del proveedor.",
+    "saved": "Guardado",
+    "saveProviderSettings": "Guardar configuración del proveedor",
+    "environment": "Entorno",
+    "language": "Idioma",
+    "set": "Configurado",
+    "notSet": "No configurado",
+    "modelListingUnavailable": "Lista de modelos no disponible para este proveedor. Introduce el nombre del modelo manualmente.",
+    "connectionFailed": "Error al conectar con el proveedor."
   },
   "settings": {
     "subtitle": "Configura tus preferencias y proveedores de IA.",

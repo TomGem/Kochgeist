@@ -97,7 +97,10 @@
     "rateLimit": "Zu viele Anfragen. Bitte warte kurz.",
     "invalidResponse": "Beim Rezept ist was schiefgelaufen. Wir versuchen's nochmal...",
     "networkError": "Keine Verbindung zur Küche. Prüf deine Internetverbindung.",
-    "noIngredients": "Füg erst ein paar Zutaten hinzu!"
+    "noIngredients": "Füg erst ein paar Zutaten hinzu!",
+    "somethingWentWrong": "Etwas ist schiefgelaufen",
+    "tryAgain": "Nochmal versuchen",
+    "scanFailed": "Bild konnte nicht gescannt werden"
   },
   "metrics": {
     "cook": "Kochen",
@@ -108,7 +111,9 @@
     "servings": "Portionen"
   },
   "loading": {
-    "crafting": "Deine Rezepte werden kreiert..."
+    "crafting": "Deine Rezepte werden kreiert...",
+    "scanning": "Wird gescannt...",
+    "generatingImage": "Bild wird erstellt"
   },
   "auth": {
     "login": "Anmelden",
@@ -190,7 +195,21 @@
     "promoteAdmin": "Zum Admin machen",
     "demoteUser": "Admin entfernen",
     "verifyUser": "Bestätigen",
-    "unverified": "Unbestätigt"
+    "unverified": "Unbestätigt",
+    "recipeProvider": "Rezept-KI-Anbieter",
+    "imageGeneration": "Bilderzeugung",
+    "model": "Modell",
+    "imageModel": "Bildmodell",
+    "fetch": "Abrufen",
+    "modelHint": "Aus verfügbaren Modellen auswählen oder Modellnamen eingeben. Leer lassen für den Standard des Anbieters.",
+    "saved": "Gespeichert",
+    "saveProviderSettings": "Anbieter-Einstellungen speichern",
+    "environment": "Umgebung",
+    "language": "Sprache",
+    "set": "Gesetzt",
+    "notSet": "Nicht gesetzt",
+    "modelListingUnavailable": "Modellliste für diesen Anbieter nicht verfügbar. Gib den Modellnamen manuell ein.",
+    "connectionFailed": "Verbindung zum Anbieter fehlgeschlagen."
   },
   "settings": {
     "subtitle": "Konfiguriere deine Einstellungen und KI-Anbieter.",

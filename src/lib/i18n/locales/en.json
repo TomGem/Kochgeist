@@ -97,7 +97,10 @@
     "rateLimit": "Too many requests. Please wait a moment.",
     "invalidResponse": "Something went wrong with the recipe. Trying again...",
     "networkError": "Can't reach the kitchen. Check your connection.",
-    "noIngredients": "Add some ingredients first!"
+    "noIngredients": "Add some ingredients first!",
+    "somethingWentWrong": "Something went wrong",
+    "tryAgain": "Try Again",
+    "scanFailed": "Could not scan image"
   },
   "metrics": {
     "cook": "Cook",
@@ -108,7 +111,9 @@
     "servings": "Servings"
   },
   "loading": {
-    "crafting": "Crafting your recipes..."
+    "crafting": "Crafting your recipes...",
+    "scanning": "Scanning...",
+    "generatingImage": "Generating image"
   },
   "auth": {
     "login": "Sign In",
@@ -190,7 +195,21 @@
     "promoteAdmin": "Make Admin",
     "demoteUser": "Remove Admin",
     "verifyUser": "Verify",
-    "unverified": "Unverified"
+    "unverified": "Unverified",
+    "recipeProvider": "Recipe AI Provider",
+    "imageGeneration": "Image Generation",
+    "model": "Model",
+    "imageModel": "Image Model",
+    "fetch": "Fetch",
+    "modelHint": "Select from available models or type a model name. Leave empty for the provider's default.",
+    "saved": "Saved",
+    "saveProviderSettings": "Save Provider Settings",
+    "environment": "Environment",
+    "language": "Language",
+    "set": "Set",
+    "notSet": "Not set",
+    "modelListingUnavailable": "Model listing not available for this provider. Enter the deployment/model name manually.",
+    "connectionFailed": "Failed to connect to provider."
   },
   "settings": {
     "subtitle": "Configure your preferences and AI providers.",

@@ -2,7 +2,9 @@
 import { db } from '../../db/index';
 import { recipes } from '../../db/schema';
 import { eq } from 'drizzle-orm';
+import { t, type Locale } from '../../lib/i18n/index';
 
+const lang = (Astro.locals.lang ?? 'en') as Locale;
 const recipeId = Astro.url.searchParams.get('recipeId');
 if (!recipeId) return new Response('Missing recipeId', { status: 400 });
 
@@ -24,7 +26,7 @@ const imageReady = recipe?.imageStatus === 'ready' && recipe?.imageUrl;
     <span class="material-symbols-outlined text-4xl text-primary/20 animate-pulse">restaurant</span>
     <div class="flex items-center gap-2 text-on-surface-variant/50">
       <span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
-      <span class="text-[10px] font-bold uppercase tracking-widest">Generating image</span>
+      <span class="text-[10px] font-bold uppercase tracking-widest">{t('loading.generatingImage', lang)}</span>
     </div>
   </div>
 )}
