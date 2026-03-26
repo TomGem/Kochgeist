@@ -37,7 +37,17 @@
     "exportList": "Esporta lista della spesa",
     "exportEmpty": "Tutti gli ingredienti spuntati!",
     "copied": "Copiato negli appunti",
-    "shoppingListFor": "Lista della spesa per"
+    "shoppingListFor": "Lista della spesa per",
+    "step": "Passo",
+    "of": "di",
+    "next": "Avanti",
+    "previous": "Indietro",
+    "finish": "Fine",
+    "timesUp": "Tempo scaduto!",
+    "exitCooking": "Esci",
+    "startTimer": "Avvia",
+    "pauseTimer": "Pausa",
+    "resetTimer": "Ripristina"
   },
   "bookmarks": {
     "collection": "Collezione personale",

@@ -37,7 +37,17 @@
     "exportList": "Export shopping list",
     "exportEmpty": "All ingredients checked off!",
     "copied": "Copied to clipboard",
-    "shoppingListFor": "Shopping list for"
+    "shoppingListFor": "Shopping list for",
+    "step": "Step",
+    "of": "of",
+    "next": "Next",
+    "previous": "Previous",
+    "finish": "Finish",
+    "timesUp": "Time's up!",
+    "exitCooking": "Exit",
+    "startTimer": "Start",
+    "pauseTimer": "Pause",
+    "resetTimer": "Reset"
   },
   "bookmarks": {
     "collection": "Personal Collection",

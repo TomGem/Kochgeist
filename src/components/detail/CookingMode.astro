@@ -1,0 +1,288 @@
+---
+import { t, type Locale } from '../../lib/i18n/index';
+
+interface Props {
+  steps: Array<{ step: number; title: string; description: string }>;
+  recipeTitle: string;
+  lang: Locale;
+}
+
+const { steps, recipeTitle, lang } = Astro.props;
+
+const labels = {
+  step: t('detail.step', lang),
+  of: t('detail.of', lang),
+  next: t('detail.next', lang),
+  previous: t('detail.previous', lang),
+  finish: t('detail.finish', lang),
+  timesUp: t('detail.timesUp', lang),
+  exit: t('detail.exitCooking', lang),
+  start: t('detail.startTimer', lang),
+  pause: t('detail.pauseTimer', lang),
+  reset: t('detail.resetTimer', lang),
+};
+---
+
+<div
+  id="cooking-mode"
+  x-data={`{
+    open: false,
+    current: 0,
+    steps: ${JSON.stringify(steps).replace(/</g, '\\u003c')},
+    labels: ${JSON.stringify(labels)},
+    timer: 0,
+    timerMax: 0,
+    timerRunning: false,
+    timerDone: false,
+    _interval: null,
+    _audioCtx: null,
+
+    get step() { return this.steps[this.current]; },
+    get total() { return this.steps.length; },
+    get hasTimer() { return this.extractTime(this.step.description) > 0; },
+    get timerDisplay() {
+      const h = Math.floor(this.timer / 3600);
+      const m = Math.floor((this.timer % 3600) / 60);
+      const s = this.timer % 60;
+      if (h > 0) return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+      return String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    },
+    get progress() {
+      if (this.timerMax === 0) return 0;
+      return ((this.timerMax - this.timer) / this.timerMax) * 100;
+    },
+
+    extractTime(text) {
+      const m = text.match(/(\\d+)\\s*[-–]?\\s*(?:\\d+\\s*)?(?:minutes?|mins?|minuten?|minutos?|minuti?|seconds?|secs?|sekunden?|segundos?|secondes?|secondi?|hours?|hrs?|stunden?|std\\.?|heures?|horas?|ore)/i);
+      if (!m) return 0;
+      const n = parseInt(m[1]);
+      const u = m[0].replace(/[\\d\\s\\-–]/g, '').toLowerCase();
+      if (/^(h|std|ore)/.test(u)) return n * 3600;
+      if (/^(s)/.test(u)) return n;
+      return n * 60;
+    },
+
+    start() {
+      this.open = true;
+      this.current = 0;
+      this.initTimer();
+    },
+    goTo(idx) {
+      if (idx < 0 || idx >= this.total) return;
+      this.stopTimer();
+      this.current = idx;
+      this.initTimer();
+    },
+    initTimer() {
+      this.stopTimer();
+      const t = this.extractTime(this.step.description);
+      this.timer = t;
+      this.timerMax = t;
+      this.timerDone = false;
+    },
+    startTimer() {
+      if (this.timerRunning || this.timer <= 0) return;
+      if (!this._audioCtx) {
+        try { this._audioCtx = new AudioContext(); } catch {}
+      }
+      this.timerRunning = true;
+      this.timerDone = false;
+      this._interval = setInterval(() => {
+        this.timer--;
+        if (this.timer <= 0) {
+          this.timer = 0;
+          this.stopTimer();
+          this.timerDone = true;
+          this.playAlarm();
+          if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+        }
+      }, 1000);
+    },
+    pauseTimer() {
+      this.timerRunning = false;
+      if (this._interval) { clearInterval(this._interval); this._interval = null; }
+    },
+    resetTimer() {
+      this.pauseTimer();
+      this.timer = this.timerMax;
+      this.timerDone = false;
+    },
+    stopTimer() {
+      this.pauseTimer();
+    },
+    playAlarm() {
+      try {
+        const ctx = this._audioCtx;
+        if (!ctx) return;
+        if (ctx.state === 'suspended') ctx.resume();
+        const pattern = [830, 1050, 830, 1050];
+        const notes = [...pattern, 0, ...pattern, 0, ...pattern];
+        notes.forEach((freq, i) => {
+          if (freq === 0) return;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          const t = ctx.currentTime + i * 0.2;
+          gain.gain.setValueAtTime(0.3, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
+          osc.start(t);
+          osc.stop(t + 0.18);
+        });
+      } catch {}
+    },
+    exitCooking() {
+      this.stopTimer();
+      this.open = false;
+    }
+  }`}
+  x-show="open"
+  x-cloak
+  x-init="document.body.appendChild($el)"
+  x-on:start-cooking.window="start()"
+  x-on:keydown.escape.window="if (open) exitCooking()"
+  x-on:keydown.right.window="if (open) goTo(current + 1)"
+  x-on:keydown.left.window="if (open) goTo(current - 1)"
+  x-transition:enter="transition ease-out duration-300"
+  x-transition:enter-start="opacity-0 translate-y-8"
+  x-transition:enter-end="opacity-100 translate-y-0"
+  x-transition:leave="transition ease-in duration-200"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  class="fixed inset-0 z-[100] bg-surface flex flex-col"
+  style="display: none;"
+>
+  <!-- Top bar -->
+  <nav class="flex items-center justify-between px-6 h-16 border-b border-outline-variant/20">
+    <div class="flex items-center gap-2 text-sm font-semibold text-on-surface">
+      <span x-text="labels.step"></span>
+      <span x-text="(current + 1)"></span>
+      <span x-text="labels.of"></span>
+      <span x-text="total"></span>
+    </div>
+    <button x-on:click="exitCooking()" class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors">
+      <span class="text-xs uppercase tracking-widest font-label font-semibold" x-text="labels.exit"></span>
+      <span class="material-symbols-outlined text-xl">close</span>
+    </button>
+  </nav>
+
+  <!-- Progress bar -->
+  <div class="h-1 bg-surface-container-high">
+    <div
+      class="h-full bg-primary transition-all duration-300 ease-out"
+      :style="`width: ${((current + 1) / total) * 100}%`"
+    ></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="flex-1 overflow-y-auto overscroll-contain px-6 py-8 max-w-2xl mx-auto w-full">
+    <!-- Step number -->
+    <div class="flex items-center gap-4 mb-8">
+      <span class="font-headline text-7xl font-black text-primary/20" x-text="String(step.step).padStart(2, '0')"></span>
+    </div>
+
+    <!-- Step title -->
+    <h2 class="font-headline font-extrabold text-3xl md:text-4xl text-on-surface leading-tight tracking-tight mb-6" x-text="step.title"></h2>
+
+    <!-- Step description -->
+    <p class="text-on-surface-variant text-lg leading-relaxed" x-text="step.description"></p>
+
+    <!-- Timer -->
+    <template x-if="hasTimer">
+      <div class="mt-10 p-6 rounded-2xl bg-surface-container-low border border-outline-variant/20">
+        <!-- Timer display -->
+        <div class="text-center mb-6">
+          <div
+            class="inline-flex items-center justify-center font-headline font-black text-5xl md:text-6xl tracking-tight tabular-nums transition-colors"
+            :class="timerDone ? 'text-tertiary animate-pulse' : (timerRunning ? 'text-primary' : 'text-on-surface')"
+            x-text="timerDone ? labels.timesUp : timerDisplay"
+          ></div>
+
+          <!-- Progress ring -->
+          <div class="mt-4 h-1.5 rounded-full bg-surface-container-high overflow-hidden">
+            <div
+              class="h-full rounded-full transition-all duration-1000 ease-linear"
+              :class="timerDone ? 'bg-tertiary' : 'bg-primary'"
+              :style="`width: ${progress}%`"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Timer controls -->
+        <div class="flex items-center justify-center gap-4">
+          <button
+            x-show="!timerRunning && timer > 0 && !timerDone"
+            x-on:click="startTimer()"
+            class="flex items-center gap-2 editorial-gradient px-6 py-3 rounded-full text-on-primary font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all"
+          >
+            <span class="material-symbols-outlined text-lg">play_arrow</span>
+            <span x-text="labels.start"></span>
+          </button>
+
+          <button
+            x-show="timerRunning"
+            x-on:click="pauseTimer()"
+            class="flex items-center gap-2 bg-surface-container-highest px-6 py-3 rounded-full text-on-surface font-bold text-sm active:scale-95 transition-all"
+          >
+            <span class="material-symbols-outlined text-lg">pause</span>
+            <span x-text="labels.pause"></span>
+          </button>
+
+          <button
+            x-show="timer !== timerMax || timerDone"
+            x-on:click="resetTimer()"
+            class="flex items-center gap-2 bg-surface-container-high px-5 py-3 rounded-full text-on-surface-variant font-semibold text-sm active:scale-95 transition-all"
+          >
+            <span class="material-symbols-outlined text-lg">replay</span>
+            <span x-text="labels.reset"></span>
+          </button>
+        </div>
+      </div>
+    </template>
+  </div>
+
+  <!-- Bottom navigation -->
+  <div class="border-t border-outline-variant/20 px-6 py-4 flex items-center justify-between glass-nav">
+    <button
+      x-on:click="goTo(current - 1)"
+      :disabled="current === 0"
+      :class="current === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-surface-container-high active:scale-95'"
+      class="flex items-center gap-2 px-5 py-3 rounded-full text-on-surface font-semibold text-sm transition-all"
+    >
+      <span class="material-symbols-outlined text-lg">arrow_back</span>
+      <span x-text="labels.previous"></span>
+    </button>
+
+    <!-- Step dots -->
+    <div class="flex items-center gap-2">
+      <template x-for="(s, i) in steps" :key="i">
+        <button
+          x-on:click="goTo(i)"
+          class="w-2.5 h-2.5 rounded-full transition-all duration-200"
+          :class="i === current ? 'bg-primary scale-125' : (i < current ? 'bg-primary/40' : 'bg-outline-variant/30')"
+        ></button>
+      </template>
+    </div>
+
+    <template x-if="current < total - 1">
+      <button
+        x-on:click="goTo(current + 1)"
+        class="flex items-center gap-2 editorial-gradient px-5 py-3 rounded-full text-on-primary font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all"
+      >
+        <span x-text="labels.next"></span>
+        <span class="material-symbols-outlined text-lg">arrow_forward</span>
+      </button>
+    </template>
+    <template x-if="current === total - 1">
+      <button
+        x-on:click="exitCooking()"
+        class="flex items-center gap-2 editorial-gradient px-5 py-3 rounded-full text-on-primary font-bold text-sm shadow-lg shadow-primary/20 active:scale-95 transition-all"
+      >
+        <span class="material-symbols-outlined text-lg">check</span>
+        <span x-text="labels.finish"></span>
+      </button>
+    </template>
+  </div>
+</div>

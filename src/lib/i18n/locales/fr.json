@@ -37,7 +37,17 @@
     "exportList": "Exporter la liste de courses",
     "exportEmpty": "Tous les ingrédients cochés !",
     "copied": "Copié dans le presse-papiers",
-    "shoppingListFor": "Liste de courses pour"
+    "shoppingListFor": "Liste de courses pour",
+    "step": "Étape",
+    "of": "sur",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "finish": "Terminer",
+    "timesUp": "C'est prêt !",
+    "exitCooking": "Quitter",
+    "startTimer": "Démarrer",
+    "pauseTimer": "Pause",
+    "resetTimer": "Réinitialiser"
   },
   "bookmarks": {
     "collection": "Collection personnelle",

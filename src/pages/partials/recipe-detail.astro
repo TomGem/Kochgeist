@@ -4,6 +4,7 @@ import { recipes, bookmarks, imageCache } from '../../db/schema';
 import { eq, and } from 'drizzle-orm';
 import { t, type Locale } from '../../lib/i18n/index';
 import { computeDetailBadge } from '../../lib/badges';
+import CookingMode from '../../components/detail/CookingMode.astro';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 const id = Astro.url.searchParams.get('id');
@@ -227,10 +228,14 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
         <span class="material-symbols-outlined" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
         {isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}
       </button>
-      <button class="flex items-center gap-3 editorial-gradient px-8 py-3 rounded-full text-on-primary font-bold text-sm shadow-xl shadow-primary/20 transition-all active:scale-95">
+      <button
+        x-on:click="$dispatch('start-cooking')"
+        class="flex items-center gap-3 editorial-gradient px-8 py-3 rounded-full text-on-primary font-bold text-sm shadow-xl shadow-primary/20 transition-all active:scale-95"
+      >
         <span class="material-symbols-outlined">restaurant</span>
         {t('detail.startCooking', lang)}
       </button>
     </div>
   </div>
+  <CookingMode steps={stepsList} recipeTitle={recipe.title} lang={lang} />
 </div>

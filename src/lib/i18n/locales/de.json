@@ -37,7 +37,17 @@
     "exportList": "Einkaufsliste exportieren",
     "exportEmpty": "Alle Zutaten abgehakt!",
     "copied": "In die Zwischenablage kopiert",
-    "shoppingListFor": "Einkaufsliste für"
+    "shoppingListFor": "Einkaufsliste für",
+    "step": "Schritt",
+    "of": "von",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "finish": "Fertig",
+    "timesUp": "Zeit abgelaufen!",
+    "exitCooking": "Beenden",
+    "startTimer": "Start",
+    "pauseTimer": "Pause",
+    "resetTimer": "Zurücksetzen"
   },
   "bookmarks": {
     "collection": "Persönliche Sammlung",
