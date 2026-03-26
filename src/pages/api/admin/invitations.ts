@@ -38,9 +38,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   const code = generateInviteCode();
   // Accept a date string; fall back to 7 days from now
-  const expiresAt = expiresAtRaw
-    ? new Date(expiresAtRaw + 'T23:59:59')
-    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  let expiresAt: Date;
+  if (expiresAtRaw) {
+    const parsed = new Date(expiresAtRaw + 'T23:59:59');
+    if (isNaN(parsed.getTime())) {
+      return new Response('Invalid expiration date', { status: 400 });
+    }
+    expiresAt = parsed;
+  } else {
+    expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  }
 
   db.insert(invitations).values({
     code,

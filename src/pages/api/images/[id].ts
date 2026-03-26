@@ -22,7 +22,7 @@ export const GET: APIRoute = async ({ params }) => {
     );
   }
 
-  // Validate file path is within expected directory
+  // Validate file path is within expected directory before checking existence
   const resolvedPath = resolve(normalize(cached.filePath));
   if (!resolvedPath.startsWith(IMAGE_DIR)) {
     return new Response('Invalid image path', { status: 403 });

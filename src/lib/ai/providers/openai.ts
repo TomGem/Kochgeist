@@ -78,9 +78,10 @@ export class OpenAIProvider implements AIProvider {
     });
 
     const content = response.choices[0]?.message?.content;
-    if (!content) throw new Error('Empty response');
+    if (!content) throw new Error('Empty response from OpenAI');
     const parsed = JSON.parse(content);
-    return Array.isArray(parsed) ? parsed.filter((i: unknown) => typeof i === 'string') : [];
+    if (!Array.isArray(parsed)) throw new Error('Expected JSON array of ingredients from OpenAI');
+    return parsed.filter((i: unknown) => typeof i === 'string');
   }
 
   async listModels(): Promise<string[]> {

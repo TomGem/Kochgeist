@@ -8,13 +8,21 @@ import type { CookingTip } from '../../../lib/ai/provider';
 import { computeIngredientHash } from '../../../lib/cache';
 import { generateImageForRecipe } from '../../../lib/images/queue';
 import { t, type Locale } from '../../../lib/i18n/index';
+import { isRateLimited } from '../../../lib/rate-limit';
 
 export const POST: APIRoute = async ({ request, locals }) => {
+  let lang: Locale = 'en';
   try {
+    // Rate limit: 20 recipe suggestions per 15 minutes per user
+    const userId = locals.user?.id || 'anon';
+    if (isRateLimited(`suggest:${userId}`, 20, 15 * 60 * 1000)) {
+      return new Response('Rate limit exceeded. Please wait before generating more recipes.', { status: 429 });
+    }
+
     const formData = await request.formData();
     const ingredientsRaw = formData.get('ingredients') as string;
     const filtersRaw = formData.get('filters') as string;
-    const lang = (formData.get('lang') as Locale) || 'en';
+    lang = (formData.get('lang') as Locale) || 'en';
 
     const surpriseMe = formData.get('surpriseMe') === 'true';
 
@@ -140,7 +148,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   } catch (error) {
     console.error('Recipe suggest error:', error);
     const message = error instanceof Error ? error.message : 'Unknown error';
-    const errorLang = lang || 'en';
+    const errorLang = lang;
     return new Response(
       `<div class="flex flex-col items-center justify-center py-24 text-center">
         <div class="w-16 h-16 bg-error-container/20 rounded-full flex items-center justify-center mb-4">

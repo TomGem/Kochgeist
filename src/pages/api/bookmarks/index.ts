@@ -31,7 +31,7 @@ export const GET: APIRoute = async ({ locals }) => {
   });
 };
 
-export const POST: APIRoute = async ({ request, locals, url }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   if (!locals.user) {
     return new Response('Unauthorized', { status: 401 });
   }
