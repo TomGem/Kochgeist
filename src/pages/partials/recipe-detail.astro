@@ -2,7 +2,9 @@
 import { db } from '../../db/index';
 import { recipes, bookmarks } from '../../db/schema';
 import { eq, and } from 'drizzle-orm';
+import { t, type Locale } from '../../lib/i18n/index';
 
+const lang = (Astro.locals.lang ?? 'en') as Locale;
 const id = Astro.url.searchParams.get('id');
 if (!id) return new Response('Missing recipe ID', { status: 400 });
 
@@ -42,7 +44,7 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
         )}
       </div>
       <div class="lg:col-span-5 pb-4">
-        <span class="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">Chef's Selection</span>
+        <span class="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">{t('detail.chefsSelection', lang)}</span>
         <h1 class="font-headline font-extrabold text-5xl md:text-6xl text-on-surface leading-[1.1] tracking-tighter mb-6">{recipe.title}</h1>
         <div class="flex flex-wrap gap-3">
           <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full">
@@ -67,14 +69,14 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
     <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-16">
       <!-- Ingredients -->
       <aside class="md:col-span-1">
-        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">Ingredients</h2>
+        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">{t('detail.ingredients', lang)}</h2>
         <ul class="space-y-4">
           {ingredientsList.map((item) => (
             <li class="flex items-start justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors">
               <div class="flex items-center gap-2">
                 <span class="text-sm font-medium">{item.amount} {item.name}</span>
                 {item.isExtra && (
-                  <span class="text-[9px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">buy</span>
+                  <span class="text-[9px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">{t('detail.buy', lang)}</span>
                 )}
               </div>
               <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors text-lg">check_circle</span>
@@ -86,7 +88,7 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
         <div class="mt-12 p-6 bg-tertiary-fixed rounded-xl border-l-4 border-on-tertiary-fixed-variant">
           <div class="flex items-center gap-2 mb-2">
             <span class="material-symbols-outlined text-on-tertiary-fixed text-lg">lightbulb</span>
-            <h4 class="font-headline font-bold text-sm text-on-tertiary-fixed">Chef's Note</h4>
+            <h4 class="font-headline font-bold text-sm text-on-tertiary-fixed">{t('detail.chefsNote', lang)}</h4>
           </div>
           <p class="text-xs text-on-tertiary-fixed leading-relaxed">{recipe.description}</p>
         </div>
@@ -94,7 +96,7 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
 
       <!-- Instructions -->
       <article class="md:col-span-2">
-        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">Cooking Steps</h2>
+        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">{t('detail.cookingSteps', lang)}</h2>
         <div class="space-y-12">
           {stepsList.map((step) => (
             <div class="flex gap-6 group">
@@ -119,7 +121,7 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
       x-on:click="$store.ui.modalOpen = false"
     >
       <span class="material-symbols-outlined">arrow_back</span>
-      <span class="text-xs uppercase tracking-widest font-label">Back to Feed</span>
+      <span class="text-xs uppercase tracking-widest font-label">{t('detail.backToFeed', lang)}</span>
     </button>
     <div class="flex gap-4">
       <button
@@ -131,11 +133,11 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
         hx-swap="outerHTML"
       >
         <span class="material-symbols-outlined" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
-        {isBookmarked ? 'Saved' : 'Save'}
+        {isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}
       </button>
       <button class="flex items-center gap-3 editorial-gradient px-8 py-3 rounded-full text-on-primary font-bold text-sm shadow-xl shadow-primary/20 transition-all active:scale-95">
         <span class="material-symbols-outlined">restaurant</span>
-        Start Cooking
+        {t('detail.startCooking', lang)}
       </button>
     </div>
   </div>

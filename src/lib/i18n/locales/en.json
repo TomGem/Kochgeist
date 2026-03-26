@@ -5,7 +5,7 @@
   },
   "home": {
     "hero": "What's in your pantry?",
-    "searchPlaceholder": "Add ingredients one by one",
+    "searchPlaceholder": "Add ingredients, e.g. eggs, flour, milk",
     "suggestButton": "Suggest Recipes",
     "takePhoto": "Take Photo",
     "scanSubtitle": "Scan Pantry Items",

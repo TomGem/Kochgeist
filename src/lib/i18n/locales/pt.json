@@ -5,7 +5,7 @@
   },
   "home": {
     "hero": "O que tens no frigorífico?",
-    "searchPlaceholder": "Adiciona ingredientes um a um",
+    "searchPlaceholder": "Adiciona ingredientes, p. ex. ovos, farinha, leite",
     "suggestButton": "Sugerir receitas",
     "takePhoto": "Tirar foto",
     "scanSubtitle": "Escanear despensa",

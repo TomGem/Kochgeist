@@ -5,7 +5,7 @@
   },
   "home": {
     "hero": "Qu'as-tu dans ton frigo ?",
-    "searchPlaceholder": "Ajouter des ingrédients un par un",
+    "searchPlaceholder": "Ajouter des ingrédients, p. ex. œufs, farine, lait",
     "suggestButton": "Suggérer des recettes",
     "takePhoto": "Prendre une photo",
     "scanSubtitle": "Scanner le garde-manger",

@@ -5,10 +5,11 @@ interface Props {
 }
 
 const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
+const lang = (Astro.locals.lang as string) ?? 'en';
 ---
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang={lang}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,6 +25,7 @@ const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
 <body
   class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
   hx-boost="true"
+  data-lang={lang}
 >
   <slot />
 
@@ -79,7 +81,7 @@ const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
       });
 
       Alpine.store('ui', {
-        lang: 'en',
+        lang: document.body.dataset.lang || 'en',
         modalOpen: false,
         modalRecipeId: null as string | null,
         loading: false,

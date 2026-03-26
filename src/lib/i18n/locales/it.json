@@ -5,7 +5,7 @@
   },
   "home": {
     "hero": "Cosa hai in frigo?",
-    "searchPlaceholder": "Aggiungi ingredienti uno alla volta",
+    "searchPlaceholder": "Aggiungi ingredienti, es. uova, farina, latte",
     "suggestButton": "Suggerisci ricette",
     "takePhoto": "Scatta una foto",
     "scanSubtitle": "Scansiona la dispensa",

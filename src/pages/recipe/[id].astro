@@ -5,7 +5,9 @@ import BottomNav from '../../components/layout/BottomNav.astro';
 import { db } from '../../db/index';
 import { recipes, bookmarks } from '../../db/schema';
 import { eq } from 'drizzle-orm';
+import { t, type Locale } from '../../lib/i18n/index';
 
+const lang = (Astro.locals.lang ?? 'en') as Locale;
 const { id } = Astro.params;
 if (!id) return Astro.redirect('/');
 
@@ -47,7 +49,7 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
         )}
       </div>
       <div class="lg:col-span-5 pb-4">
-        <span class="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">Chef's Selection</span>
+        <span class="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">{t('detail.chefsSelection', lang)}</span>
         <h1 class="font-headline font-extrabold text-5xl md:text-6xl text-on-surface leading-[1.1] tracking-tighter mb-6">{recipe.title}</h1>
         <div class="flex flex-wrap gap-3">
           <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full">
@@ -72,14 +74,14 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
     <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-16">
       <!-- Ingredients -->
       <aside class="md:col-span-1">
-        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">Ingredients</h2>
+        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">{t('detail.ingredients', lang)}</h2>
         <ul class="space-y-4">
           {ingredientsList.map((item) => (
             <li class="flex items-start justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors">
               <div class="flex items-center gap-2">
                 <span class="text-sm font-medium">{item.amount} {item.name}</span>
                 {item.isExtra && (
-                  <span class="text-[9px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">buy</span>
+                  <span class="text-[9px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">{t('detail.buy', lang)}</span>
                 )}
               </div>
               <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors text-lg">check_circle</span>
@@ -90,7 +92,7 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
 
       <!-- Instructions -->
       <article class="md:col-span-2">
-        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">Cooking Steps</h2>
+        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">{t('detail.cookingSteps', lang)}</h2>
         <div class="space-y-12">
           {stepsList.map((step) => (
             <div class="flex gap-6 group">
@@ -112,7 +114,7 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
   <div class="fixed bottom-0 left-0 w-full flex justify-between items-center h-24 px-8 pb-4 glass-nav border-t border-outline-variant/20 z-50">
     <a href="/" class="flex items-center gap-2 text-on-surface font-semibold hover:opacity-70 transition-opacity">
       <span class="material-symbols-outlined">arrow_back</span>
-      <span class="text-xs uppercase tracking-widest font-label">Back to Feed</span>
+      <span class="text-xs uppercase tracking-widest font-label">{t('detail.backToFeed', lang)}</span>
     </a>
     <div class="flex gap-4">
       <button
@@ -124,7 +126,7 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
         hx-swap="outerHTML"
       >
         <span class="material-symbols-outlined" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
-        {isBookmarked ? 'Saved' : 'Save'}
+        {isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}
       </button>
       <button
         class="flex items-center gap-3 bg-surface-container-highest px-6 py-3 rounded-full text-on-surface font-bold text-sm transition-all active:scale-95"
@@ -132,11 +134,11 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
         x-on:click={`navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = 'Link copied!'; setTimeout(() => $store.ui.toastMessage = null, 2000); })`}
       >
         <span class="material-symbols-outlined">share</span>
-        Share
+        {t('detail.share', lang)}
       </button>
       <button class="flex items-center gap-3 editorial-gradient px-8 py-3 rounded-full text-on-primary font-bold text-sm shadow-xl shadow-primary/20 transition-all active:scale-95">
         <span class="material-symbols-outlined">restaurant</span>
-        Start Cooking
+        {t('detail.startCooking', lang)}
       </button>
     </div>
   </div>

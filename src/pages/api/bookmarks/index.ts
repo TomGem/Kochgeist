@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { db } from '../../../db/index';
 import { bookmarks, recipes } from '../../../db/schema';
 import { eq, and } from 'drizzle-orm';
+import { t, type Locale } from '../../../lib/i18n/index';
 
 export const GET: APIRoute = async ({ locals }) => {
   if (!locals.user) {
@@ -30,7 +31,7 @@ export const GET: APIRoute = async ({ locals }) => {
   });
 };
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request, locals, url }) => {
   if (!locals.user) {
     return new Response('Unauthorized', { status: 401 });
   }
@@ -43,6 +44,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   }
 
   const userId = locals.user.id;
+  const lang = (locals.lang ?? 'en') as Locale;
 
   // Toggle: if already bookmarked by this user, remove it; otherwise add it
   const existing = db.select().from(bookmarks).where(and(eq(bookmarks.recipeId, recipeId), eq(bookmarks.userId, userId))).get();
@@ -59,7 +61,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         hx-swap="outerHTML"
       >
         <span class="material-symbols-outlined">bookmark</span>
-        Save
+        ${t('detail.save', lang)}
       </button>`,
       { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
     );
@@ -75,7 +77,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         hx-swap="outerHTML"
       >
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bookmark</span>
-        Saved
+        ${t('detail.saved', lang)}
       </button>`,
       { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
     );
