@@ -1,0 +1,13 @@
+services:
+  kochgeist:
+    build: .
+    ports:
+      - "4321:4321"
+    volumes:
+      - kochgeist-data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped
+
+volumes:
+  kochgeist-data:
