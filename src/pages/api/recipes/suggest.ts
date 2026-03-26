@@ -8,7 +8,7 @@ import { computeIngredientHash } from '../../../lib/cache';
 import { generateImageForRecipe } from '../../../lib/images/queue';
 import type { Locale } from '../../../lib/i18n/index';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
   try {
     const formData = await request.formData();
     const ingredientsRaw = formData.get('ingredients') as string;
@@ -84,13 +84,16 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
-    // Save to search history
-    db.insert(searchHistory).values({
-      ingredients: JSON.stringify(ingredients),
-      ingredientHash: hash,
-      language: lang,
-      dietaryFilters: filters.length > 0 ? JSON.stringify(filters) : null,
-    }).run();
+    // Save to search history (only for authenticated users)
+    if (locals.user) {
+      db.insert(searchHistory).values({
+        ingredients: JSON.stringify(ingredients),
+        ingredientHash: hash,
+        userId: locals.user.id,
+        language: lang,
+        dietaryFilters: filters.length > 0 ? JSON.stringify(filters) : null,
+      }).run();
+    }
 
     // Fetch recipes from DB
     const recipeRows = recipeIds.map((id) =>

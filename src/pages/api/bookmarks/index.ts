@@ -1,9 +1,13 @@
 import type { APIRoute } from 'astro';
 import { db } from '../../../db/index';
 import { bookmarks, recipes } from '../../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
-export const GET: APIRoute = async () => {
+export const GET: APIRoute = async ({ locals }) => {
+  if (!locals.user) {
+    return new Response('[]', { headers: { 'Content-Type': 'application/json' } });
+  }
+
   const allBookmarks = db
     .select({
       bookmarkId: bookmarks.id,
@@ -18,6 +22,7 @@ export const GET: APIRoute = async () => {
     })
     .from(bookmarks)
     .innerJoin(recipes, eq(bookmarks.recipeId, recipes.id))
+    .where(eq(bookmarks.userId, locals.user.id))
     .all();
 
   return new Response(JSON.stringify(allBookmarks), {
@@ -25,7 +30,11 @@ export const GET: APIRoute = async () => {
   });
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
+  if (!locals.user) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   const formData = await request.formData();
   const recipeId = formData.get('recipeId') as string;
 
@@ -33,12 +42,13 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response('Missing recipeId', { status: 400 });
   }
 
-  // Toggle: if already bookmarked, remove it; otherwise add it
-  const existing = db.select().from(bookmarks).where(eq(bookmarks.recipeId, recipeId)).get();
+  const userId = locals.user.id;
+
+  // Toggle: if already bookmarked by this user, remove it; otherwise add it
+  const existing = db.select().from(bookmarks).where(and(eq(bookmarks.recipeId, recipeId), eq(bookmarks.userId, userId))).get();
 
   if (existing) {
-    db.delete(bookmarks).where(eq(bookmarks.recipeId, recipeId)).run();
-    // Return unbookmarked button
+    db.delete(bookmarks).where(and(eq(bookmarks.recipeId, recipeId), eq(bookmarks.userId, userId))).run();
     return new Response(
       `<button
         id="bookmark-${recipeId}"
@@ -54,8 +64,7 @@ export const POST: APIRoute = async ({ request }) => {
       { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
     );
   } else {
-    db.insert(bookmarks).values({ recipeId }).run();
-    // Return bookmarked button
+    db.insert(bookmarks).values({ recipeId, userId }).run();
     return new Response(
       `<button
         id="bookmark-${recipeId}"

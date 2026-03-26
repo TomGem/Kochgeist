@@ -1,0 +1,221 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import { t, type Locale } from '../lib/i18n/index';
+import { db } from '../db/index';
+import { users, invitations, emailVerifications } from '../db/schema';
+import { eq, and, gt, sql } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
+import { hashPassword } from '../lib/auth/password';
+import { generateVerificationCode, VERIFICATION_EXPIRY_MS } from '../lib/auth/tokens';
+import { sendVerificationEmail } from '../lib/auth/email';
+import { isFirstUser } from '../lib/auth/setup';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+let error = '';
+
+const isSetup = Astro.url.searchParams.get('setup') === 'true';
+
+// Setup mode only valid if no users exist
+if (isSetup && !isFirstUser()) {
+  return Astro.redirect('/login');
+}
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const email = (formData.get('email') as string || '').trim().toLowerCase();
+  const displayName = (formData.get('displayName') as string || '').trim();
+  const password = formData.get('password') as string || '';
+  const confirmPassword = formData.get('confirmPassword') as string || '';
+  const inviteCode = (formData.get('inviteCode') as string || '').trim().toUpperCase();
+
+  if (!email || !password || (!isSetup && !inviteCode)) {
+    error = t('auth.fillAllFields', lang);
+  } else if (password.length < 8) {
+    error = t('auth.passwordTooShort', lang);
+  } else if (password !== confirmPassword) {
+    error = t('auth.passwordMismatch', lang);
+  } else {
+    // Validate invite code (skip for first-user setup)
+    let invitation: typeof invitations.$inferSelect | undefined;
+    if (!isSetup) {
+      invitation = db
+        .select()
+        .from(invitations)
+        .where(and(
+          eq(invitations.code, inviteCode),
+          gt(invitations.expiresAt, new Date()),
+        ))
+        .get();
+
+      if (!invitation || invitation.useCount >= invitation.maxUses) {
+        error = t('auth.invalidInviteCode', lang);
+      }
+    }
+
+    if (!error) {
+      // Check if email already registered
+      const existing = db.select().from(users).where(eq(users.email, email)).get();
+      if (existing) {
+        error = t('auth.emailTaken', lang);
+      } else {
+        const userId = nanoid();
+        const passwordHash = await hashPassword(password);
+        const role = isSetup ? 'admin' : 'user';
+
+        db.insert(users).values({
+          id: userId,
+          email,
+          passwordHash,
+          displayName: displayName || null,
+          role,
+          language: lang,
+        }).run();
+
+        // Increment invitation use count
+        if (invitation) {
+          db.update(invitations)
+            .set({ useCount: sql`${invitations.useCount} + 1` })
+            .where(eq(invitations.id, invitation.id))
+            .run();
+        }
+
+        // Generate verification code and send email
+        const code = generateVerificationCode();
+        db.insert(emailVerifications).values({
+          userId,
+          code,
+          expiresAt: new Date(Date.now() + VERIFICATION_EXPIRY_MS),
+        }).run();
+
+        await sendVerificationEmail(email, code, lang);
+
+        return Astro.redirect(`/register/verify?userId=${userId}`);
+      }
+    }
+  }
+}
+---
+
+<BaseLayout title="Kochgeist - Register">
+  <main class="min-h-screen flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-10">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-primary text-4xl">restaurant_menu</span>
+          <h1 class="font-headline font-extrabold text-3xl tracking-tighter text-primary">Kochgeist</h1>
+        </div>
+        <p class="text-on-surface-variant">
+          {isSetup ? t('auth.welcomeSetup', lang) : t('auth.registerSubtitle', lang)}
+        </p>
+      </div>
+
+      <form method="POST" class="bg-surface-container-low rounded-2xl p-8 space-y-6">
+        {error && (
+          <div class="bg-error-container text-on-error-container text-sm p-4 rounded-xl flex items-center gap-3">
+            <span class="material-symbols-outlined text-error">error</span>
+            {error}
+          </div>
+        )}
+
+        {!isSetup && (
+          <div>
+            <label for="inviteCode" class="block text-sm font-medium text-on-surface mb-2">{t('auth.inviteCode', lang)}</label>
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">confirmation_number</span>
+              <input
+                type="text"
+                id="inviteCode"
+                name="inviteCode"
+                required
+                autocomplete="off"
+                class="w-full bg-surface-container-highest rounded-xl py-3 pl-12 pr-4 text-on-surface font-mono uppercase tracking-wider placeholder:text-on-surface-variant/50 placeholder:font-body placeholder:normal-case placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-primary/30"
+                placeholder={t('auth.inviteCodePlaceholder', lang)}
+              />
+            </div>
+          </div>
+        )}
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-on-surface mb-2">{t('auth.email', lang)}</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              autocomplete="email"
+              class="w-full bg-surface-container-highest rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="you@example.com"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="displayName" class="block text-sm font-medium text-on-surface mb-2">{t('auth.displayName', lang)}</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">person</span>
+            <input
+              type="text"
+              id="displayName"
+              name="displayName"
+              autocomplete="name"
+              class="w-full bg-surface-container-highest rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder={t('auth.displayNamePlaceholder', lang)}
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-on-surface mb-2">{t('auth.password', lang)}</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              minlength="8"
+              autocomplete="new-password"
+              class="w-full bg-surface-container-highest rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="••••••••"
+            />
+          </div>
+          <p class="text-xs text-on-surface-variant mt-1">{t('auth.passwordMinLength', lang)}</p>
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-on-surface mb-2">{t('auth.confirmPassword', lang)}</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              required
+              minlength="8"
+              autocomplete="new-password"
+              class="w-full bg-surface-container-highest rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="••••••••"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full editorial-gradient text-white font-headline font-bold py-3 rounded-full transition-all active:scale-[0.98]"
+        >
+          {t('auth.register', lang)}
+        </button>
+
+        {!isSetup && (
+          <div class="text-center">
+            <a href="/login" class="text-sm text-primary hover:underline">
+              {t('auth.alreadyHaveAccount', lang)}
+            </a>
+          </div>
+        )}
+      </form>
+    </div>
+  </main>
+</BaseLayout>

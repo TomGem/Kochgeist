@@ -10,24 +10,28 @@ import LoadingSpinner from '../components/shared/LoadingSpinner.astro';
 import ErrorToast from '../components/shared/ErrorToast.astro';
 import { db } from '../db/index';
 import { bookmarks, recipes } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { t, type Locale } from '../lib/i18n/index';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
+const user = Astro.locals.user;
 
-const savedRecipes = db
-  .select({
-    recipeId: recipes.id,
-    title: recipes.title,
-    description: recipes.description,
-    cookTime: recipes.cookTime,
-    difficulty: recipes.difficulty,
-    imageUrl: recipes.imageUrl,
-    dietaryTags: recipes.dietaryTags,
-  })
-  .from(bookmarks)
-  .innerJoin(recipes, eq(bookmarks.recipeId, recipes.id))
-  .all();
+const savedRecipes = user
+  ? db
+      .select({
+        recipeId: recipes.id,
+        title: recipes.title,
+        description: recipes.description,
+        cookTime: recipes.cookTime,
+        difficulty: recipes.difficulty,
+        imageUrl: recipes.imageUrl,
+        dietaryTags: recipes.dietaryTags,
+      })
+      .from(bookmarks)
+      .innerJoin(recipes, eq(bookmarks.recipeId, recipes.id))
+      .where(eq(bookmarks.userId, user.id))
+      .all()
+  : [];
 ---
 
 <BaseLayout title={`Kochgeist - ${t('bookmarks.title', lang)}`} activePage="saved">

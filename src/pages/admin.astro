@@ -1,0 +1,252 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import BottomNav from '../components/layout/BottomNav.astro';
+import { t, type Locale } from '../lib/i18n/index';
+import { db } from '../db/index';
+import { users, invitations } from '../db/schema';
+import { desc } from 'drizzle-orm';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+
+const allUsers = db
+  .select({
+    id: users.id,
+    email: users.email,
+    displayName: users.displayName,
+    role: users.role,
+    isVerified: users.isVerified,
+    createdAt: users.createdAt,
+  })
+  .from(users)
+  .orderBy(desc(users.createdAt))
+  .all();
+
+const allInvitations = db
+  .select()
+  .from(invitations)
+  .orderBy(desc(invitations.createdAt))
+  .all()
+  .map((inv) => {
+    const now = new Date();
+    const exhausted = inv.useCount >= inv.maxUses;
+    const expired = inv.expiresAt < now;
+    const status = exhausted ? 'exhausted' : expired ? 'expired' : 'active';
+    return { ...inv, status };
+  });
+---
+
+<BaseLayout title={`Kochgeist - ${t('admin.title', lang)}`}>
+  <Header showBack={true} />
+
+  <main class="pt-24 pb-32 px-6 max-w-4xl mx-auto min-h-screen" x-data={`{
+    generatedCode: '',
+    showCopied: false,
+    copiedId: null,
+    async generateInvite() {
+      const form = new FormData(document.getElementById('invite-form'));
+      const res = await fetch('/api/admin/invitations', { method: 'POST', body: form });
+      const data = await res.json();
+      this.generatedCode = data.code;
+    },
+    async copyCode(code, id) {
+      await navigator.clipboard.writeText(code || this.generatedCode);
+      if (id) {
+        this.copiedId = id;
+        setTimeout(() => this.copiedId = null, 2000);
+      } else {
+        this.showCopied = true;
+        setTimeout(() => this.showCopied = false, 2000);
+      }
+    },
+    async deleteInvite(id) {
+      const form = new FormData();
+      form.set('id', id);
+      await fetch('/api/admin/invitations', { method: 'DELETE', body: form });
+      location.reload();
+    },
+    async updateUser(userId, action) {
+      const form = new FormData();
+      form.set('userId', userId);
+      form.set('action', action);
+      await fetch('/api/admin/users', { method: 'PATCH', body: form });
+      location.reload();
+    }
+  }`}>
+    <h2 class="font-headline font-bold text-4xl mb-2 tracking-tight text-on-surface">{t('admin.title', lang)}</h2>
+    <p class="text-on-surface-variant mb-12">{t('admin.subtitle', lang)}</p>
+
+    <!-- Invitation Management -->
+    <section class="mb-16">
+      <h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">confirmation_number</span>
+        {t('admin.invitations', lang)}
+      </h3>
+
+      <!-- Generate form -->
+      <form id="invite-form" x-on:submit.prevent="generateInvite()" class="p-6 bg-surface-container-low rounded-2xl mb-8 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="expiresAt" class="block text-sm font-medium text-on-surface mb-2">{t('admin.validUntil', lang)}</label>
+            <input
+              type="date"
+              id="expiresAt"
+              name="expiresAt"
+              required
+              min={new Date(Date.now() + 86400000).toISOString().split('T')[0]}
+              value={new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]}
+              class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+          <div>
+            <label for="maxUses" class="block text-sm font-medium text-on-surface mb-2">{t('admin.maxUses', lang)}</label>
+            <input
+              type="number"
+              id="maxUses"
+              name="maxUses"
+              min="1"
+              value="1"
+              class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+          </div>
+        </div>
+        <button
+          type="submit"
+          class="editorial-gradient text-white font-headline font-bold px-6 py-3 rounded-full transition-all active:scale-[0.98] flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined">add</span>
+          {t('admin.generateInvite', lang)}
+        </button>
+      </form>
+
+      <!-- Generated code display -->
+      <div x-show="generatedCode" x-cloak class="mb-8 p-5 bg-secondary-container/30 rounded-xl">
+        <p class="text-sm font-medium text-on-surface mb-3">{t('admin.inviteCode', lang)}</p>
+        <div class="flex items-center gap-4">
+          <code
+            x-text="generatedCode"
+            class="text-2xl font-bold font-mono tracking-[0.15em] text-primary bg-surface-container-highest px-6 py-3 rounded-xl"
+          ></code>
+          <button
+            x-on:click="copyCode(generatedCode)"
+            class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95"
+          >
+            <span class="material-symbols-outlined text-sm" x-text="showCopied ? 'check' : 'content_copy'"></span>
+            <span x-text={`showCopied ? '${t('admin.copied', lang)}' : '${t('admin.copyCode', lang)}'`}></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Invitations list -->
+      {allInvitations.length === 0 ? (
+        <p class="text-on-surface-variant text-sm py-8 text-center">{t('admin.noInvitations', lang)}</p>
+      ) : (
+        <div class="space-y-3">
+          {allInvitations.map((inv) => (
+            <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 mb-1">
+                  <code class="text-sm font-mono font-bold tracking-wider text-on-surface">{inv.code}</code>
+                  <span class:list={[
+                    'text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full',
+                    inv.status === 'active' && 'bg-secondary-container text-on-secondary-container',
+                    inv.status === 'exhausted' && 'bg-tertiary-container text-on-tertiary-container',
+                    inv.status === 'expired' && 'bg-error-container text-on-error-container',
+                  ]}>
+                    {t(`admin.${inv.status}`, lang)}
+                  </span>
+                </div>
+                <p class="text-xs text-on-surface-variant">
+                  {t('admin.uses', lang)}: {inv.useCount}/{inv.maxUses}
+                  &nbsp;&middot;&nbsp;
+                  {t('admin.expires', lang)}: {inv.expiresAt.toLocaleDateString()}
+                </p>
+              </div>
+              <div class="flex items-center gap-1 ml-4">
+                <button
+                  x-on:click={`copyCode('${inv.code}', ${inv.id})`}
+                  class="p-2 rounded-full hover:bg-surface-container-high transition-colors"
+                  title={t('admin.copyCode', lang)}
+                >
+                  <span class="material-symbols-outlined text-sm" x-text={`copiedId === ${inv.id} ? 'check' : 'content_copy'`}></span>
+                </button>
+                <button
+                  x-on:click={`deleteInvite(${inv.id})`}
+                  class="p-2 rounded-full hover:bg-error-container/20 transition-colors"
+                >
+                  <span class="material-symbols-outlined text-error text-sm">delete</span>
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <!-- User Management -->
+    <section class="mb-16">
+      <h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary">group</span>
+        {t('admin.users', lang)}
+      </h3>
+
+      <div class="space-y-3">
+        {allUsers.map((u) => (
+          <div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+            <div class="flex items-center gap-4 flex-1 min-w-0">
+              <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-primary text-sm">person</span>
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-2">
+                  <p class="font-medium text-on-surface truncate">{u.displayName || u.email}</p>
+                  {u.role === 'admin' && (
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-primary text-on-primary px-2 py-0.5 rounded-full">Admin</span>
+                  )}
+                  {!u.isVerified && (
+                    <span class="text-[10px] font-bold uppercase tracking-wider bg-error-container text-on-error-container px-2 py-0.5 rounded-full">{t('admin.unverified', lang)}</span>
+                  )}
+                </div>
+                <p class="text-xs text-on-surface-variant truncate">{u.email}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 ml-4">
+              {u.id !== Astro.locals.user!.id && (
+                <>
+                  {u.role === 'user' ? (
+                    <button
+                      x-on:click={`updateUser('${u.id}', 'promote')`}
+                      class="text-xs font-medium text-primary hover:underline"
+                      title={t('admin.promoteAdmin', lang)}
+                    >
+                      <span class="material-symbols-outlined text-sm">arrow_upward</span>
+                    </button>
+                  ) : (
+                    <button
+                      x-on:click={`updateUser('${u.id}', 'demote')`}
+                      class="text-xs font-medium text-on-surface-variant hover:underline"
+                      title={t('admin.demoteUser', lang)}
+                    >
+                      <span class="material-symbols-outlined text-sm">arrow_downward</span>
+                    </button>
+                  )}
+                  {!u.isVerified && (
+                    <button
+                      x-on:click={`updateUser('${u.id}', 'verify')`}
+                      class="text-xs font-medium text-secondary hover:underline"
+                      title={t('admin.verifyUser', lang)}
+                    >
+                      <span class="material-symbols-outlined text-sm">verified</span>
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </main>
+
+  <BottomNav />
+</BaseLayout>

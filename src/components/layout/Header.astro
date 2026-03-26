@@ -1,11 +1,14 @@
 ---
 import LanguageSwitcher from '../shared/LanguageSwitcher.astro';
+import { t, type Locale } from '../../lib/i18n/index';
 
 interface Props {
   showBack?: boolean;
 }
 
 const { showBack = false } = Astro.props;
+const user = Astro.locals.user;
+const lang = (Astro.locals.lang ?? 'en') as Locale;
 ---
 
 <header class="fixed top-0 w-full z-50 glass-header">
@@ -24,9 +27,58 @@ const { showBack = false } = Astro.props;
     </div>
     <div class="flex items-center gap-3">
       <LanguageSwitcher />
-      <a href="/settings" class="w-10 h-10 rounded-full flex items-center justify-center hover:opacity-80 transition-opacity active:scale-95 duration-200">
-        <span class="material-symbols-outlined text-on-surface">settings</span>
-      </a>
+      {user ? (
+        <div class="relative" x-data="{ open: false }">
+          <button
+            x-on:click="open = !open"
+            class="w-10 h-10 rounded-full flex items-center justify-center bg-primary/10 hover:bg-primary/20 transition-colors active:scale-95 duration-200"
+          >
+            <span class="material-symbols-outlined text-primary">account_circle</span>
+          </button>
+          <div
+            x-show="open"
+            x-on:click.outside="open = false"
+            x-transition:enter="transition ease-out duration-100"
+            x-transition:enter-start="opacity-0 scale-95"
+            x-transition:enter-end="opacity-100 scale-100"
+            x-transition:leave="transition ease-in duration-75"
+            x-transition:leave-start="opacity-100 scale-100"
+            x-transition:leave-end="opacity-0 scale-95"
+            x-cloak
+            class="absolute right-0 mt-2 w-56 bg-surface-container-lowest rounded-xl shadow-xl border border-outline-variant/10 overflow-hidden z-50"
+          >
+            <div class="px-4 py-3 border-b border-outline-variant/10">
+              <p class="text-sm font-medium text-on-surface truncate">{user.displayName || user.email}</p>
+              {user.displayName && <p class="text-xs text-on-surface-variant truncate">{user.email}</p>}
+            </div>
+            <div class="py-1">
+              <a href="/settings" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors">
+                <span class="material-symbols-outlined text-sm">settings</span>
+                {t('auth.settings', lang)}
+              </a>
+              {user.role === 'admin' && (
+                <a href="/admin" class="flex items-center gap-3 px-4 py-2.5 text-sm text-on-surface hover:bg-surface-container-high transition-colors">
+                  <span class="material-symbols-outlined text-sm">admin_panel_settings</span>
+                  {t('admin.title', lang)}
+                </a>
+              )}
+            </div>
+            <div class="border-t border-outline-variant/10 py-1">
+              <form action="/api/auth/logout" method="POST">
+                <button type="submit" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-error hover:bg-error-container/10 transition-colors">
+                  <span class="material-symbols-outlined text-sm">logout</span>
+                  {t('auth.logout', lang)}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <a href="/login" class="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 hover:bg-primary/20 text-primary text-sm font-medium transition-colors active:scale-95 duration-200">
+          <span class="material-symbols-outlined text-sm">login</span>
+          {t('auth.login', lang)}
+        </a>
+      )}
     </div>
   </div>
 </header>

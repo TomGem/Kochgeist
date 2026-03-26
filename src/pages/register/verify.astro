@@ -1,0 +1,148 @@
+---
+import BaseLayout from '../../components/layout/BaseLayout.astro';
+import { t, type Locale } from '../../lib/i18n/index';
+import { db } from '../../db/index';
+import { users, emailVerifications } from '../../db/schema';
+import { eq, and, isNull, desc } from 'drizzle-orm';
+import { createSession, setSessionCookie } from '../../lib/auth/session';
+import { generateVerificationCode, VERIFICATION_EXPIRY_MS } from '../../lib/auth/tokens';
+import { sendVerificationEmail } from '../../lib/auth/email';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+let error = '';
+let resent = false;
+
+const userId = Astro.url.searchParams.get('userId') || '';
+if (!userId) {
+  return Astro.redirect('/login');
+}
+
+const user = db.select().from(users).where(eq(users.id, userId)).get();
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+// Already verified
+if (user.isVerified) {
+  return Astro.redirect('/login');
+}
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const action = formData.get('action') as string;
+
+  if (action === 'resend') {
+    // Rate limit: check last verification created
+    const last = db
+      .select()
+      .from(emailVerifications)
+      .where(eq(emailVerifications.userId, userId))
+      .orderBy(desc(emailVerifications.createdAt))
+      .get();
+
+    const cooldown = last ? Date.now() - last.createdAt.getTime() : Infinity;
+    if (cooldown < 60000) {
+      error = t('auth.resendCooldown', lang);
+    } else {
+      const code = generateVerificationCode();
+      db.insert(emailVerifications).values({
+        userId,
+        code,
+        expiresAt: new Date(Date.now() + VERIFICATION_EXPIRY_MS),
+      }).run();
+      await sendVerificationEmail(user.email, code, lang);
+      resent = true;
+    }
+  } else {
+    // Verify code
+    const code = (formData.get('code') as string || '').trim();
+    if (!code || code.length !== 6) {
+      error = t('auth.invalidCode', lang);
+    } else {
+      const verification = db
+        .select()
+        .from(emailVerifications)
+        .where(and(eq(emailVerifications.userId, userId), eq(emailVerifications.code, code), isNull(emailVerifications.usedAt)))
+        .orderBy(desc(emailVerifications.createdAt))
+        .get();
+
+      if (!verification || verification.expiresAt < new Date()) {
+        error = t('auth.invalidCode', lang);
+      } else {
+        // Mark as used and verify user
+        db.update(emailVerifications).set({ usedAt: new Date() }).where(eq(emailVerifications.id, verification.id)).run();
+        db.update(users).set({ isVerified: 1 }).where(eq(users.id, userId)).run();
+
+        // Create session and log in
+        const sessionId = createSession(userId);
+        setSessionCookie(Astro.cookies, sessionId);
+        return Astro.redirect('/');
+      }
+    }
+  }
+}
+---
+
+<BaseLayout title="Kochgeist - Verify Email">
+  <main class="min-h-screen flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-10">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-primary text-4xl">restaurant_menu</span>
+          <h1 class="font-headline font-extrabold text-3xl tracking-tighter text-primary">Kochgeist</h1>
+        </div>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+          <span class="material-symbols-outlined text-primary text-3xl">mark_email_read</span>
+        </div>
+        <h2 class="font-headline font-bold text-2xl text-on-surface mb-2">{t('auth.verifyEmail', lang)}</h2>
+        <p class="text-on-surface-variant">{t('auth.verificationSent', lang)}</p>
+        <p class="text-sm text-on-surface-variant mt-1 font-medium">{user.email}</p>
+      </div>
+
+      <form method="POST" class="bg-surface-container-low rounded-2xl p-8 space-y-6">
+        {error && (
+          <div class="bg-error-container text-on-error-container text-sm p-4 rounded-xl flex items-center gap-3">
+            <span class="material-symbols-outlined text-error">error</span>
+            {error}
+          </div>
+        )}
+        {resent && (
+          <div class="bg-secondary-container text-on-secondary-container text-sm p-4 rounded-xl flex items-center gap-3">
+            <span class="material-symbols-outlined">check_circle</span>
+            {t('auth.codeSent', lang)}
+          </div>
+        )}
+
+        <div>
+          <label for="code" class="block text-sm font-medium text-on-surface mb-2">{t('auth.verificationCode', lang)}</label>
+          <input
+            type="text"
+            id="code"
+            name="code"
+            required
+            maxlength="6"
+            pattern="[0-9]{6}"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            class="w-full bg-surface-container-highest rounded-xl py-4 px-4 text-center text-2xl font-bold tracking-[0.5em] text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+            placeholder="000000"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full editorial-gradient text-white font-headline font-bold py-3 rounded-full transition-all active:scale-[0.98]"
+        >
+          {t('auth.verify', lang)}
+        </button>
+      </form>
+
+      <form method="POST" class="text-center mt-6">
+        <input type="hidden" name="action" value="resend" />
+        <button type="submit" class="text-sm text-primary hover:underline">
+          {t('auth.resendCode', lang)}
+        </button>
+      </form>
+    </div>
+  </main>
+</BaseLayout>

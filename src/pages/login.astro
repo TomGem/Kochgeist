@@ -1,0 +1,109 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import { t, type Locale } from '../lib/i18n/index';
+import { db } from '../db/index';
+import { users } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { verifyPassword } from '../lib/auth/password';
+import { createSession, setSessionCookie } from '../lib/auth/session';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+let error = '';
+
+// Already logged in? Redirect to home
+if (Astro.locals.user) {
+  return Astro.redirect('/');
+}
+
+if (Astro.request.method === 'POST') {
+  const formData = await Astro.request.formData();
+  const email = (formData.get('email') as string || '').trim().toLowerCase();
+  const password = formData.get('password') as string || '';
+
+  if (!email || !password) {
+    error = t('auth.invalidCredentials', lang);
+  } else {
+    const user = db.select().from(users).where(eq(users.email, email)).get();
+    if (!user || !(await verifyPassword(password, user.passwordHash))) {
+      error = t('auth.invalidCredentials', lang);
+    } else if (!user.isVerified) {
+      return Astro.redirect(`/register/verify?userId=${user.id}`);
+    } else {
+      const sessionId = createSession(user.id);
+      setSessionCookie(Astro.cookies, sessionId);
+      return Astro.redirect('/');
+    }
+  }
+}
+---
+
+<BaseLayout title="Kochgeist - Sign In">
+  <main class="min-h-screen flex items-center justify-center px-6 py-12">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-10">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-primary text-4xl">restaurant_menu</span>
+          <h1 class="font-headline font-extrabold text-3xl tracking-tighter text-primary">Kochgeist</h1>
+        </div>
+        <p class="text-on-surface-variant">{t('auth.loginSubtitle', lang)}</p>
+      </div>
+
+      <form method="POST" class="bg-surface-container-low rounded-2xl p-8 space-y-6">
+        {error && (
+          <div class="bg-error-container text-on-error-container text-sm p-4 rounded-xl flex items-center gap-3">
+            <span class="material-symbols-outlined text-error">error</span>
+            {error}
+          </div>
+        )}
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-on-surface mb-2">{t('auth.email', lang)}</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              autocomplete="email"
+              class="w-full bg-surface-container-highest rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="you@example.com"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-on-surface mb-2">{t('auth.password', lang)}</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              required
+              autocomplete="current-password"
+              class="w-full bg-surface-container-highest rounded-xl py-3 pl-12 pr-4 text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="••••••••"
+            />
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="w-full editorial-gradient text-white font-headline font-bold py-3 rounded-full transition-all active:scale-[0.98]"
+        >
+          {t('auth.login', lang)}
+        </button>
+
+        <div class="text-center space-y-2">
+          <a href="/forgot-password" class="block text-sm text-primary hover:underline">
+            {t('auth.forgotPassword', lang)}
+          </a>
+          <a href="/register" class="block text-sm text-primary hover:underline">
+            {t('auth.noAccountYet', lang)}
+          </a>
+        </div>
+      </form>
+    </div>
+  </main>
+</BaseLayout>

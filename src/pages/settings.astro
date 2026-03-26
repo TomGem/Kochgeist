@@ -5,6 +5,7 @@ import BottomNav from '../components/layout/BottomNav.astro';
 import { t, type Locale } from '../lib/i18n/index';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
+const user = Astro.locals.user;
 
 const aiProvider = import.meta.env.AI_PROVIDER || 'azure';
 const imageProvider = import.meta.env.IMAGE_PROVIDER || 'azure';
@@ -16,14 +17,158 @@ const providers = [
   { id: 'ollama', name: 'Ollama', description: 'Local model (free)' },
   { id: 'lmstudio', name: 'LM Studio', description: 'Local model (free)' },
 ];
+
+const locales = [
+  { code: 'en', name: 'English' },
+  { code: 'de', name: 'Deutsch' },
+  { code: 'fr', name: 'Français' },
+  { code: 'it', name: 'Italiano' },
+  { code: 'es', name: 'Español' },
+  { code: 'pt', name: 'Português' },
+];
 ---
 
 <BaseLayout title="Kochgeist - Settings">
   <Header showBack={true} />
 
-  <main class="pt-24 pb-32 px-6 max-w-2xl mx-auto min-h-screen">
-    <h2 class="font-headline font-bold text-4xl mb-2 tracking-tight text-on-surface">Settings</h2>
-    <p class="text-on-surface-variant mb-12">Configure your AI providers and preferences.</p>
+  <main class="pt-24 pb-32 px-6 max-w-2xl mx-auto min-h-screen" x-data={`{
+    profileMsg: '',
+    passwordMsg: '',
+    passwordError: '',
+    async saveProfile() {
+      const form = new FormData(document.getElementById('profile-form'));
+      const res = await fetch('/api/auth/profile', { method: 'PATCH', body: form });
+      this.profileMsg = res.ok ? '${t('auth.profileUpdated', lang)}' : 'Error';
+      setTimeout(() => this.profileMsg = '', 3000);
+    },
+    async changePassword() {
+      this.passwordError = '';
+      const form = new FormData(document.getElementById('password-form'));
+      const newPw = form.get('newPassword');
+      const confirmPw = form.get('confirmPassword');
+      if (newPw !== confirmPw) {
+        this.passwordError = '${t('auth.passwordMismatch', lang)}';
+        return;
+      }
+      if (newPw.length < 8) {
+        this.passwordError = '${t('auth.passwordTooShort', lang)}';
+        return;
+      }
+      const res = await fetch('/api/auth/profile', { method: 'POST', body: form });
+      if (res.ok) {
+        this.passwordMsg = '${t('auth.passwordChanged', lang)}';
+        document.getElementById('password-form').reset();
+        setTimeout(() => this.passwordMsg = '', 3000);
+      } else {
+        this.passwordError = '${t('auth.invalidCurrentPassword', lang)}';
+      }
+    }
+  }`}>
+    <h2 class="font-headline font-bold text-4xl mb-2 tracking-tight text-on-surface">{t('nav.settings', lang)}</h2>
+    <p class="text-on-surface-variant mb-12">{t('settings.subtitle', lang)}</p>
+
+    {user && (
+      <>
+        <!-- Profile Section -->
+        <section class="mb-12">
+          <h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">person</span>
+            {t('auth.profileSettings', lang)}
+          </h3>
+          <form id="profile-form" x-on:submit.prevent="saveProfile()" class="space-y-4">
+            <div>
+              <label for="displayName" class="block text-sm font-medium text-on-surface mb-2">{t('auth.displayName', lang)}</label>
+              <input
+                type="text"
+                id="displayName"
+                name="displayName"
+                value={user.displayName || ''}
+                class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-on-surface mb-2">{t('auth.email', lang)}</label>
+              <input
+                type="email"
+                value={user.email}
+                disabled
+                class="w-full bg-surface-container-low rounded-xl py-3 px-4 text-on-surface-variant cursor-not-allowed"
+              />
+            </div>
+            <div>
+              <label for="language" class="block text-sm font-medium text-on-surface mb-2">{t('settings.preferredLanguage', lang)}</label>
+              <select
+                id="language"
+                name="language"
+                class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                {locales.map((l) => (
+                  <option value={l.code} selected={user.language === l.code}>{l.name}</option>
+                ))}
+              </select>
+            </div>
+            <div class="flex items-center gap-4">
+              <button type="submit" class="editorial-gradient text-white font-headline font-bold px-6 py-2.5 rounded-full transition-all active:scale-[0.98] text-sm">
+                {t('auth.save', lang)}
+              </button>
+              <span x-show="profileMsg" x-text="profileMsg" x-transition class="text-sm text-secondary font-medium"></span>
+            </div>
+          </form>
+        </section>
+
+        <!-- Change Password -->
+        <section class="mb-12">
+          <h3 class="font-headline font-bold text-xl mb-6 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">lock</span>
+            {t('auth.changePassword', lang)}
+          </h3>
+          <form id="password-form" x-on:submit.prevent="changePassword()" class="space-y-4">
+            <div>
+              <label for="currentPassword" class="block text-sm font-medium text-on-surface mb-2">{t('auth.currentPassword', lang)}</label>
+              <input
+                type="password"
+                id="currentPassword"
+                name="currentPassword"
+                required
+                class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div>
+              <label for="newPassword" class="block text-sm font-medium text-on-surface mb-2">{t('auth.newPassword', lang)}</label>
+              <input
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                required
+                minlength="8"
+                class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div>
+              <label for="confirmPassword" class="block text-sm font-medium text-on-surface mb-2">{t('auth.confirmPassword', lang)}</label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                required
+                minlength="8"
+                class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+            <div x-show="passwordError" class="bg-error-container text-on-error-container text-sm p-3 rounded-xl flex items-center gap-2" x-transition>
+              <span class="material-symbols-outlined text-error text-sm">error</span>
+              <span x-text="passwordError"></span>
+            </div>
+            <div class="flex items-center gap-4">
+              <button type="submit" class="editorial-gradient text-white font-headline font-bold px-6 py-2.5 rounded-full transition-all active:scale-[0.98] text-sm">
+                {t('auth.changePassword', lang)}
+              </button>
+              <span x-show="passwordMsg" x-text="passwordMsg" x-transition class="text-sm text-secondary font-medium"></span>
+            </div>
+          </form>
+        </section>
+      </>
+    )}
 
     <!-- AI Text Provider -->
     <section class="mb-12">

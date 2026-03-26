@@ -6,20 +6,24 @@ import BookmarkCard from '../../components/bookmarks/BookmarkCard.astro';
 import EmptyState from '../../components/bookmarks/EmptyState.astro';
 
 const filter = Astro.url.searchParams.get('filter') || 'all';
+const user = Astro.locals.user;
 
-const allBookmarks = db
-  .select({
-    recipeId: recipes.id,
-    title: recipes.title,
-    description: recipes.description,
-    cookTime: recipes.cookTime,
-    difficulty: recipes.difficulty,
-    imageUrl: recipes.imageUrl,
-    dietaryTags: recipes.dietaryTags,
-  })
-  .from(bookmarks)
-  .innerJoin(recipes, eq(bookmarks.recipeId, recipes.id))
-  .all();
+const allBookmarks = user
+  ? db
+      .select({
+        recipeId: recipes.id,
+        title: recipes.title,
+        description: recipes.description,
+        cookTime: recipes.cookTime,
+        difficulty: recipes.difficulty,
+        imageUrl: recipes.imageUrl,
+        dietaryTags: recipes.dietaryTags,
+      })
+      .from(bookmarks)
+      .innerJoin(recipes, eq(bookmarks.recipeId, recipes.id))
+      .where(eq(bookmarks.userId, user.id))
+      .all()
+  : [];
 
 // Filter by category if needed
 const filtered = filter === 'all'

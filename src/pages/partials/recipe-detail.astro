@@ -1,7 +1,7 @@
 ---
 import { db } from '../../db/index';
 import { recipes, bookmarks } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 const id = Astro.url.searchParams.get('id');
 if (!id) return new Response('Missing recipe ID', { status: 400 });
@@ -9,7 +9,10 @@ if (!id) return new Response('Missing recipe ID', { status: 400 });
 const recipe = db.select().from(recipes).where(eq(recipes.id, id)).get();
 if (!recipe) return new Response('Recipe not found', { status: 404 });
 
-const isBookmarked = !!db.select().from(bookmarks).where(eq(bookmarks.recipeId, id)).get();
+const user = Astro.locals.user;
+const isBookmarked = user
+  ? !!db.select().from(bookmarks).where(and(eq(bookmarks.recipeId, id), eq(bookmarks.userId, user.id))).get()
+  : false;
 
 const ingredientsList = JSON.parse(recipe.ingredients) as Array<{ name: string; amount: string; isExtra: boolean }>;
 const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title: string; description: string }>;
