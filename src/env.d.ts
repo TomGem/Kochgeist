@@ -10,6 +10,7 @@ declare namespace App {
       role: 'admin' | 'user';
       isVerified: number;
       language: string | null;
+      defaultFilters: string | null;
     } | null;
     session: {
       id: string;

@@ -13,10 +13,12 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
   const formData = await request.formData();
   const displayName = formData.get('displayName') as string | null;
   const language = formData.get('language') as string | null;
+  const defaultFilters = formData.get('defaultFilters') as string | null;
 
   const updates: Record<string, unknown> = { updatedAt: new Date() };
   if (displayName !== null) updates.displayName = displayName.trim() || null;
   if (language !== null) updates.language = language;
+  if (defaultFilters !== null) updates.defaultFilters = defaultFilters;
 
   db.update(users).set(updates).where(eq(users.id, locals.user.id)).run();
 

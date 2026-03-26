@@ -6,6 +6,7 @@ interface Props {
 
 const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
 const lang = (Astro.locals.lang as string) ?? 'en';
+const defaultFilters = Astro.locals.user?.defaultFilters ?? '[]';
 ---
 
 <!DOCTYPE html>
@@ -26,6 +27,7 @@ const lang = (Astro.locals.lang as string) ?? 'en';
   class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
   hx-boost="true"
   data-lang={lang}
+  data-default-filters={defaultFilters}
 >
   <slot />
 
@@ -65,8 +67,9 @@ const lang = (Astro.locals.lang as string) ?? 'en';
         },
       });
 
+      const defaultFilters = JSON.parse(document.body.dataset.defaultFilters || '[]');
       Alpine.store('filters', {
-        active: [] as string[],
+        active: [...defaultFilters] as string[],
         toggle(filter: string) {
           const idx = this.active.indexOf(filter);
           if (idx === -1) {

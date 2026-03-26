@@ -176,6 +176,9 @@
   },
   "settings": {
     "subtitle": "Configure your preferences and AI providers.",
-    "preferredLanguage": "Preferred Language"
+    "preferredLanguage": "Preferred Language",
+    "defaultFilters": "Default Filters",
+    "defaultFiltersDescription": "These filters will be preselected when you search for recipes.",
+    "filtersSaved": "Filters saved."
   }
 }

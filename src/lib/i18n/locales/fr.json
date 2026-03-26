@@ -176,6 +176,9 @@
   },
   "settings": {
     "subtitle": "Configure tes préférences et fournisseurs d'IA.",
-    "preferredLanguage": "Langue préférée"
+    "preferredLanguage": "Langue préférée",
+    "defaultFilters": "Filtres par défaut",
+    "defaultFiltersDescription": "Ces filtres seront présélectionnés lors de la recherche de recettes.",
+    "filtersSaved": "Filtres enregistrés."
   }
 }

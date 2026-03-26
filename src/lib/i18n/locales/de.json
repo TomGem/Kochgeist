@@ -176,6 +176,9 @@
   },
   "settings": {
     "subtitle": "Konfiguriere deine Einstellungen und KI-Anbieter.",
-    "preferredLanguage": "Bevorzugte Sprache"
+    "preferredLanguage": "Bevorzugte Sprache",
+    "defaultFilters": "Standardfilter",
+    "defaultFiltersDescription": "Diese Filter werden bei der Rezeptsuche automatisch vorausgewählt.",
+    "filtersSaved": "Filter gespeichert."
   }
 }

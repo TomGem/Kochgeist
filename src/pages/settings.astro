@@ -6,6 +6,29 @@ import { t, type Locale } from '../lib/i18n/index';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 const user = Astro.locals.user;
+const savedFilters: string[] = user?.defaultFilters ? JSON.parse(user.defaultFilters) : [];
+
+const filters = [
+  // Diet
+  { id: 'vegetarian', labelKey: 'filters.vegetarian', icon: 'eco' },
+  { id: 'vegan', labelKey: 'filters.vegan', icon: 'spa' },
+  { id: 'gluten-free', labelKey: 'filters.glutenFree', icon: 'grain' },
+  { id: 'dairy-free', labelKey: 'filters.dairyFree', icon: 'water_drop' },
+  { id: 'low-carb', labelKey: 'filters.lowCarb', icon: 'trending_down' },
+  { id: 'high-protein', labelKey: 'filters.highProtein', icon: 'fitness_center' },
+  { id: 'low-cholesterol', labelKey: 'filters.lowCholesterol', icon: 'favorite' },
+  // Time & Budget
+  { id: 'quick', labelKey: 'filters.quick', icon: 'timer' },
+  { id: 'elaborate', labelKey: 'filters.elaborate', icon: 'menu_book' },
+  { id: 'budget', labelKey: 'filters.budget', icon: 'savings' },
+  { id: 'gourmet', labelKey: 'filters.gourmet', icon: 'star' },
+  // Occasion
+  { id: 'kid-friendly', labelKey: 'filters.kidFriendly', icon: 'child_care' },
+  { id: 'date-night', labelKey: 'filters.dateNight', icon: 'local_dining' },
+  { id: 'comfort', labelKey: 'filters.comfort', icon: 'cottage' },
+  { id: 'one-pot', labelKey: 'filters.onePot', icon: 'soup_kitchen' },
+  { id: 'meal-prep', labelKey: 'filters.mealPrep', icon: 'kitchen' },
+];
 
 const locales = [
   { code: 'en', name: 'English' },
@@ -24,6 +47,20 @@ const locales = [
     profileMsg: '',
     passwordMsg: '',
     passwordError: '',
+    filtersMsg: '',
+    selectedFilters: ${JSON.stringify(savedFilters)},
+    toggleFilter(id) {
+      const idx = this.selectedFilters.indexOf(id);
+      if (idx === -1) { this.selectedFilters.push(id); } else { this.selectedFilters.splice(idx, 1); }
+    },
+    isFilterActive(id) { return this.selectedFilters.includes(id); },
+    async saveFilters() {
+      const form = new FormData();
+      form.set('defaultFilters', JSON.stringify(this.selectedFilters));
+      const res = await fetch('/api/auth/profile', { method: 'PATCH', body: form });
+      this.filtersMsg = res.ok ? '${t('settings.filtersSaved', lang)}' : 'Error';
+      setTimeout(() => this.filtersMsg = '', 3000);
+    },
     async saveProfile() {
       const form = new FormData(document.getElementById('profile-form'));
       const res = await fetch('/api/auth/profile', { method: 'PATCH', body: form });
@@ -103,6 +140,34 @@ const locales = [
               <span x-show="profileMsg" x-text="profileMsg" x-transition class="text-sm text-secondary font-medium"></span>
             </div>
           </form>
+        </section>
+
+        <!-- Default Filters -->
+        <section class="mb-12">
+          <h3 class="font-headline font-bold text-xl mb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">tune</span>
+            {t('settings.defaultFilters', lang)}
+          </h3>
+          <p class="text-on-surface-variant text-sm mb-6">{t('settings.defaultFiltersDescription', lang)}</p>
+          <div class="flex flex-wrap gap-2 mb-6">
+            {filters.map((filter) => (
+              <button
+                type="button"
+                x-on:click={`toggleFilter('${filter.id}')`}
+                x-bind:class={`isFilterActive('${filter.id}') ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-low text-on-surface-variant'`}
+                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-colors hover:bg-surface-container-high"
+              >
+                <span class="material-symbols-outlined text-base">{filter.icon}</span>
+                {t(filter.labelKey, lang)}
+              </button>
+            ))}
+          </div>
+          <div class="flex items-center gap-4">
+            <button type="button" x-on:click="saveFilters()" class="editorial-gradient text-white font-headline font-bold px-6 py-2.5 rounded-full transition-all active:scale-[0.98] text-sm">
+              {t('auth.save', lang)}
+            </button>
+            <span x-show="filtersMsg" x-text="filtersMsg" x-transition class="text-sm text-secondary font-medium"></span>
+          </div>
         </section>
 
         <!-- Change Password -->
