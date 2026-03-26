@@ -18,6 +18,26 @@ const isBookmarked = user
 
 const ingredientsList = JSON.parse(recipe.ingredients) as Array<{ name: string; amount: string; isExtra: boolean }>;
 const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title: string; description: string }>;
+const dietaryTags: string[] = recipe.dietaryTags ? JSON.parse(recipe.dietaryTags) : [];
+
+const tagMeta: Record<string, { labelKey: string; icon: string }> = {
+  'vegetarian': { labelKey: 'filters.vegetarian', icon: 'eco' },
+  'vegan': { labelKey: 'filters.vegan', icon: 'spa' },
+  'gluten-free': { labelKey: 'filters.glutenFree', icon: 'grain' },
+  'dairy-free': { labelKey: 'filters.dairyFree', icon: 'water_drop' },
+  'low-carb': { labelKey: 'filters.lowCarb', icon: 'trending_down' },
+  'high-protein': { labelKey: 'filters.highProtein', icon: 'fitness_center' },
+  'low-cholesterol': { labelKey: 'filters.lowCholesterol', icon: 'favorite' },
+  'quick': { labelKey: 'filters.quick', icon: 'timer' },
+  'elaborate': { labelKey: 'filters.elaborate', icon: 'menu_book' },
+  'budget': { labelKey: 'filters.budget', icon: 'savings' },
+  'gourmet': { labelKey: 'filters.gourmet', icon: 'star' },
+  'kid-friendly': { labelKey: 'filters.kidFriendly', icon: 'child_care' },
+  'date-night': { labelKey: 'filters.dateNight', icon: 'local_dining' },
+  'comfort': { labelKey: 'filters.comfort', icon: 'cottage' },
+  'one-pot': { labelKey: 'filters.onePot', icon: 'soup_kitchen' },
+  'meal-prep': { labelKey: 'filters.mealPrep', icon: 'kitchen' },
+};
 ---
 
 <div class="bg-surface min-h-screen" x-data x-init="$store.ui.modalOpen = true" x-on:click.self="$store.ui.modalOpen = false">
@@ -62,6 +82,23 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
             </div>
           )}
         </div>
+        {dietaryTags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-4">
+            {dietaryTags.map((tag) => {
+              const meta = tagMeta[tag];
+              return meta ? (
+                <span class="inline-flex items-center gap-1.5 bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-[11px] font-semibold">
+                  <span class="material-symbols-outlined text-sm">{meta.icon}</span>
+                  {t(meta.labelKey, lang)}
+                </span>
+              ) : (
+                <span class="inline-flex items-center bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-[11px] font-semibold">
+                  {tag}
+                </span>
+              );
+            })}
+          </div>
+        )}
       </div>
     </section>
 
@@ -72,14 +109,23 @@ const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title
         <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">{t('detail.ingredients', lang)}</h2>
         <ul class="space-y-4">
           {ingredientsList.map((item) => (
-            <li class="flex items-start justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors">
+            <li
+              x-data="{ done: false }"
+              x-on:click="done = !done"
+              :class="done && 'opacity-50'"
+              class="flex items-start justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors cursor-pointer select-none"
+            >
               <div class="flex items-center gap-2">
-                <span class="text-sm font-medium">{item.amount} {item.name}</span>
+                <span class="text-sm font-medium" :class="done && 'line-through'">{item.amount} {item.name}</span>
                 {item.isExtra && (
                   <span class="text-[9px] font-bold uppercase tracking-wider bg-tertiary-container text-on-tertiary-container px-1.5 py-0.5 rounded-full">{t('detail.buy', lang)}</span>
                 )}
               </div>
-              <span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors text-lg">check_circle</span>
+              <span
+                class="material-symbols-outlined transition-colors text-lg"
+                :class="done ? 'text-primary' : 'text-outline-variant group-hover:text-primary'"
+                :style="done && `font-variation-settings: 'FILL' 1`"
+              >check_circle</span>
             </li>
           ))}
         </ul>
