@@ -25,12 +25,12 @@ No test framework is configured.
 **Astro SSR** with Node adapter (`output: 'server'`). No SPA framework — uses **htmx** for server interactions and **Alpine.js** for client-side state.
 
 ### Request flow
-1. Middleware (`src/middleware/index.ts`) runs two middleware in sequence: language detection (sets `context.locals.lang`) then auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection)
+1. Middleware (`src/middleware/index.ts`) runs four middleware in sequence: security headers, CSRF protection (validates origin for non-safe methods), language detection (sets `context.locals.lang`), then auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection)
 2. If no users exist in DB, middleware redirects all routes to `/register?setup=true` (first-user bootstrap)
 3. Pages render Astro components; interactive parts use htmx (`hx-get`, `hx-post`, `hx-swap`) targeting partials
 4. API routes in `src/pages/api/` handle recipe suggestion, bookmarks, history, image generation, auth, and admin operations
-4. htmx partials in `src/pages/partials/` return HTML fragments (recipe detail, bookmark grid, image slots)
-5. Recipe detail modal is opened via Alpine `x-init="$store.ui.modalOpen = true"` inside the partial itself (not via afterSwap events)
+5. htmx partials in `src/pages/partials/` return HTML fragments (recipe detail, bookmark grid, image slots)
+6. Recipe detail modal is opened via Alpine `x-init="$store.ui.modalOpen = true"` inside the partial itself (not via afterSwap events)
 
 ### Authentication & multi-user
 - Cookie-based sessions stored in SQLite (`sessions` table), 30-day expiry
@@ -41,34 +41,38 @@ No test framework is configured.
 - Password reset via email token link
 - Route protection in middleware: only auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) are public; all other routes require authentication; admin routes (`/admin`, `/api/admin/*`) require admin role
 - Bookmarks and search history are user-scoped (`userId` column); recipe cache and recipes are shared across all users
-- Admin panel at `/admin`: generate invitation codes (with expiry date picker and max uses), manage users (promote/demote, verify)
+- Admin panel at `/admin`: generate invitation codes (with expiry date picker and max uses), manage users (promote/demote, verify), configure AI/image providers and models at runtime
 - Auth pages: `/login`, `/register`, `/register/verify`, `/forgot-password`, `/reset-password`
+- User settings at `/settings`: language preference, default dietary filters
 - SMTP config in `.env` for emails; falls back to console logging in dev
 
 ### AI provider system
-- `src/lib/ai/provider.ts` — `AIProvider` interface with `generateRecipes()` and `recognizeIngredients()`
-- `src/lib/ai/registry.ts` — lazy-loads provider based on `AI_PROVIDER` env var (azure/openai/anthropic/ollama/lmstudio)
+- `src/lib/ai/provider.ts` — `AIProvider` interface with `generateRecipes()`, `recognizeIngredients()`, and `listModels()`
+- `src/lib/ai/registry.ts` — lazy-loads provider based on runtime settings (DB) or `AI_PROVIDER` env var fallback (azure/openai/anthropic/ollama/lmstudio); cache is cleared when settings change
 - `src/lib/ai/providers/` — one implementation per provider
 - `src/lib/ai/prompts/` — shared prompt templates and Zod schema for structured AI output
 - AI response parsing is lenient: handles `{ "recipes": [...] }`, any object wrapping an array of recipe objects, or a single recipe object. All providers share this logic.
 - Azure provider uses `max_completion_tokens` (not `max_tokens`) for newer models (gpt-5.4+)
+- Each recipe stores `aiProvider`, `aiModel`, and `aiGenerationTimeMs` for provenance tracking; displayed in recipe detail
 
 ### Image generation
-- Separate provider system: `src/lib/images/provider.ts` (interface), `src/lib/images/queue.ts` (generation + DB writes)
-- `IMAGE_PROVIDER` env var selects provider (azure/placeholder)
+- Separate provider system: `src/lib/images/provider.ts` (interface with `listModels()`), `src/lib/images/queue.ts` (generation + DB writes)
+- Provider selected via runtime settings (DB) or `IMAGE_PROVIDER` env var fallback (azure/placeholder)
 - Images saved to `data/images/`, served via `/api/images/[id]`
-- Azure image provider does not send `response_format` (newer models like gpt-image-1.5 reject it); handles both `b64_json` and `url` responses
+- Azure image provider (`name: 'azure-image'`) does not send `response_format` (newer models like gpt-image-1.5 reject it); handles both `b64_json` and `url` responses
+- Each image stores `model` and `generationTimeMs` in `imageCache` for provenance tracking
 - Async: recipes appear immediately with "Generating image" spinner placeholders; a plain JS polling script (in `suggest.ts`) fetches `/partials/image-slot` every 3s per recipe and swaps in the `<img>` via `outerHTML` when ready
 
 ### Caching
-- SHA-256 hash of normalized ingredients + language + dietary filters (`src/lib/cache.ts`)
-- Cache stored in `recipe_cache` table; same ingredient combo returns cached recipes without AI call
+- SHA-256 hash of normalized ingredients + language + dietary filters + provider + model (`src/lib/cache.ts`)
+- Cache stored in `recipe_cache` table; same ingredient combo with same provider/model returns cached recipes without AI call
 
 ### Database
 - SQLite at `data/kochgeist.db` via Drizzle ORM + better-sqlite3
-- Schema in `src/db/schema.ts`: `users`, `sessions`, `invitations`, `passwordResets`, `emailVerifications`, `recipes`, `recipeCache`, `bookmarks`, `searchHistory`, `imageCache`
+- Schema in `src/db/schema.ts`: `users`, `sessions`, `invitations`, `passwordResets`, `emailVerifications`, `recipes`, `recipeCache`, `bookmarks`, `searchHistory`, `imageCache`, `settings`
 - Migrations in `src/db/migrations/`
-- JSON arrays stored as TEXT columns (ingredients, instructions, dietary tags)
+- JSON arrays stored as TEXT columns (ingredients, instructions, dietary tags, default filters)
+- `settings` table stores runtime key-value config (e.g. `ai_provider`, `ai_model`, `image_provider`, `image_model`); managed via `src/lib/settings.ts`
 
 ### i18n
 - `src/lib/i18n/index.ts` — `t(key, locale)` function with dot-notation keys, `detectLocale()` for request-based detection
@@ -95,7 +99,7 @@ No test framework is configured.
 Components in `src/components/` are grouped by page context:
 - `home/` — ingredient input, filters, search
 - `recipes/` — bento grid cards (featured, vertical, horizontal)
-- `detail/` — recipe modal content
+- `detail/` — recipe modal content (interactive ingredient checkboxes, dietary tag pills, AI provenance metadata)
 - `bookmarks/` — saved recipes grid
 - `layout/` — header, bottom nav, base layout
 - `shared/` — language switcher, loading spinner, error toast

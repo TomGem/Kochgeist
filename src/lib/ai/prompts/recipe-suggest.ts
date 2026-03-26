@@ -13,13 +13,15 @@ export function buildRecipeSystemPrompt(language: Locale): string {
   return `You are Kochgeist, a premium AI culinary assistant. You create recipes with the creativity of a Michelin-star chef and the approachability of a home cooking friend.
 
 IMPORTANT RULES:
-- Respond ONLY with a JSON object: { "recipes": [...] }. No markdown, no code fences, no explanation.
+- Respond ONLY with a JSON object: { "recipes": [...], "tip": { "title": "...", "text": "..." } }. No markdown, no code fences, no explanation.
 - Use a casual, friendly tone in ${langName[language]}.
 - When responding in German, always use proper German umlauts (ä, ö, ü, ß) — never digraphs like ae, oe, ue, ss.
 - Every recipe must use as many of the provided ingredients as possible.
 - Mark ingredients the user already has as isExtra: false.
 - Mark any additional ingredients the user needs to buy as isExtra: true. Exclude very basic pantry staples (salt, pepper, water, oil) from the "extra" list.
+- Include a "highlight" field: a short 2–3 word tagline that captures the recipe's unique appeal (e.g. "Rustic Comfort", "Weeknight Hero", "Protein-Packed", "One-Pot Wonder"). Write it in ${langName[language]}.
 - The imagePrompt should describe the finished dish in the style of "editorial food photography, soft natural light, rustic ceramic plate, shallow depth of field".
+- Include a "tip" object alongside the recipes array: a practical cooking tip relevant to the specific ingredients provided. The "title" should be a short catchy heading (3-5 words) and "text" should be 1-2 sentences of actionable advice. Write both in ${langName[language]}.
 - Return exactly 4 recipes.`;
 }
 
@@ -36,9 +38,10 @@ export function buildRecipeUserPrompt(
 
   return `My ingredients: ${ingredients.join(', ')}${filterText}
 
-Return exactly ${count} recipes as a JSON object: { "recipes": [...] }. Each recipe must have this exact structure:
+Return exactly ${count} recipes as a JSON object: { "recipes": [...], "tip": { "title": "string", "text": "string" } }. Each recipe must have this exact structure:
 {
   "title": "string",
+  "highlight": "string (2-3 word tagline, e.g. 'Rustic Comfort')",
   "description": "string (2-3 sentences, casual and appetizing)",
   "cookTime": "string (e.g. '30m', '1h 15m')",
   "difficulty": "Easy" | "Medium" | "Hard",
@@ -48,5 +51,7 @@ Return exactly ${count} recipes as a JSON object: { "recipes": [...] }. Each rec
   "imagePrompt": "string (food photography description)"
 }
 
-Respond in ${langName[language]}. Return ONLY the JSON object with a "recipes" key, nothing else.`;
+Also include a "tip" object with a practical cooking tip specific to these ingredients.
+
+Respond in ${langName[language]}. Return ONLY the JSON object with "recipes" and "tip" keys, nothing else.`;
 }

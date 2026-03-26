@@ -1,7 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
-import type { AIProvider, GenerateRecipesParams, RecipeOutput, RecognizeIngredientsParams } from '../provider';
+import type { AIProvider, GenerateRecipesParams, GenerateRecipesResult, RecognizeIngredientsParams } from '../provider';
 import { buildRecipeSystemPrompt, buildRecipeUserPrompt } from '../prompts/recipe-suggest';
-import { RecipeArraySchema } from '../prompts/schema';
+import { RecipeArraySchema, CookingTipSchema } from '../prompts/schema';
 
 export class AnthropicProvider implements AIProvider {
   name = 'anthropic';
@@ -16,7 +16,7 @@ export class AnthropicProvider implements AIProvider {
     this.model = modelOverride || import.meta.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
   }
 
-  async generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]> {
+  async generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult> {
     const { ingredients, language, dietaryFilters, count = 4 } = params;
 
     const response = await this.client.messages.create({
@@ -47,7 +47,10 @@ export class AnthropicProvider implements AIProvider {
       }
     }
     if (!Array.isArray(recipesArray)) throw new Error('AI response does not contain a recipe array');
-    return RecipeArraySchema.parse(recipesArray);
+    const tip = typeof parsed === 'object' && parsed !== null && parsed.tip
+      ? CookingTipSchema.safeParse(parsed.tip).data
+      : undefined;
+    return { recipes: RecipeArraySchema.parse(recipesArray), tip };
   }
 
   async recognizeIngredients(params: RecognizeIngredientsParams): Promise<string[]> {

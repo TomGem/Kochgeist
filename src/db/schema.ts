@@ -83,6 +83,7 @@ export const recipes = sqliteTable('recipes', {
   description: text('description').notNull(),
   cookTime: text('cook_time').notNull(),
   difficulty: text('difficulty').notNull(),
+  highlight: text('highlight'),
   servings: text('servings'),
   ingredients: text('ingredients').notNull(), // JSON array
   instructions: text('instructions').notNull(), // JSON array
@@ -106,6 +107,7 @@ export const recipeCache = sqliteTable('recipe_cache', {
   language: text('language').notNull().default('en'),
   dietaryFilters: text('dietary_filters'), // JSON
   recipeIds: text('recipe_ids').notNull(), // JSON array of recipe IDs
+  tip: text('tip'), // JSON { title, text } - AI-generated cooking tip
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),

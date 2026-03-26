@@ -20,7 +20,7 @@
     "curatedResults": "Risultati selezionati",
     "recipesFor": "Ricette per:",
     "analysisNote": "Abbiamo analizzato la tua dispensa e selezionato 4 ricette che massimizzano il sapore.",
-    "editorsChoice": "Scelta della redazione",
+    "bestMatch": "Miglior scelta",
     "chefSecret": "Segreto dello chef",
     "chefSecretTitle": "Segreto dello chef: Lo sfrigolio",
     "chefSecretText": "Per ottenere il massimo dai tuoi ingredienti, assicurati che la padella sia ben calda prima di aggiungere la carne. Questo crea una reazione di Maillard che sigilla i succhi e intensifica il sapore."
@@ -29,7 +29,6 @@
     "ingredients": "Ingredienti",
     "cookingSteps": "Passaggi",
     "chefsNote": "Nota dello chef",
-    "chefsSelection": "Selezione dello chef",
     "backToFeed": "Indietro",
     "startCooking": "Inizia a cucinare",
     "save": "Salva",
@@ -180,6 +179,12 @@
     "defaultFilters": "Filtri predefiniti",
     "defaultFiltersDescription": "Questi filtri verranno preselezionati quando cerchi ricette.",
     "filtersSaved": "Filtri salvati."
+  },
+  "badges": {
+    "pantryPerfect": "Tutto in dispensa",
+    "quickEasy": "Veloce & facile",
+    "chefChallenge": "Sfida dello chef",
+    "homemade": "Fatto in casa"
   },
   "meta": {
     "generatedBy": "Generato da",

@@ -14,6 +14,7 @@ export interface RecipeStep {
 
 export interface RecipeOutput {
   title: string;
+  highlight?: string;
   description: string;
   cookTime: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
@@ -21,6 +22,16 @@ export interface RecipeOutput {
   ingredients: RecipeIngredient[];
   instructions: RecipeStep[];
   imagePrompt: string;
+}
+
+export interface CookingTip {
+  title: string;
+  text: string;
+}
+
+export interface GenerateRecipesResult {
+  recipes: RecipeOutput[];
+  tip?: CookingTip;
 }
 
 export interface GenerateRecipesParams {
@@ -38,7 +49,7 @@ export interface RecognizeIngredientsParams {
 export interface AIProvider {
   name: string;
   model: string;
-  generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]>;
+  generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult>;
   recognizeIngredients(params: RecognizeIngredientsParams): Promise<string[]>;
   listModels(): Promise<string[]>;
 }

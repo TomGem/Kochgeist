@@ -6,6 +6,7 @@ import { db } from '../../db/index';
 import { recipes, bookmarks } from '../../db/schema';
 import { eq } from 'drizzle-orm';
 import { t, type Locale } from '../../lib/i18n/index';
+import { computeDetailBadge } from '../../lib/badges';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 const { id } = Astro.params;
@@ -49,7 +50,7 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
         )}
       </div>
       <div class="lg:col-span-5 pb-4">
-        <span class="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">{t('detail.chefsSelection', lang)}</span>
+        <span class="inline-block bg-tertiary-container text-on-tertiary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">{recipe.highlight || computeDetailBadge(recipe, lang)}</span>
         <h1 class="font-headline font-extrabold text-5xl md:text-6xl text-on-surface leading-[1.1] tracking-tighter mb-6">{recipe.title}</h1>
         <div class="flex flex-wrap gap-3">
           <div class="flex items-center gap-2 bg-surface-container-high px-4 py-2 rounded-full">

@@ -20,7 +20,7 @@
     "curatedResults": "Résultats sélectionnés",
     "recipesFor": "Recettes pour :",
     "analysisNote": "Nous avons analysé ton garde-manger et sélectionné 4 recettes qui maximisent les saveurs.",
-    "editorsChoice": "Coup de cœur",
+    "bestMatch": "Meilleur choix",
     "chefSecret": "Secret du chef",
     "chefSecretTitle": "Secret du chef : Le grésillement",
     "chefSecretText": "Pour tirer le meilleur de tes ingrédients, assure-toi que ta poêle est bien chaude avant d'ajouter la viande. Cela crée une réaction de Maillard qui emprisonne les jus et intensifie les saveurs."
@@ -29,7 +29,6 @@
     "ingredients": "Ingrédients",
     "cookingSteps": "Étapes de préparation",
     "chefsNote": "Note du chef",
-    "chefsSelection": "Sélection du chef",
     "backToFeed": "Retour",
     "startCooking": "Commencer à cuisiner",
     "save": "Enregistrer",
@@ -180,6 +179,12 @@
     "defaultFilters": "Filtres par défaut",
     "defaultFiltersDescription": "Ces filtres seront présélectionnés lors de la recherche de recettes.",
     "filtersSaved": "Filtres enregistrés."
+  },
+  "badges": {
+    "pantryPerfect": "Tout en stock",
+    "quickEasy": "Rapide & facile",
+    "chefChallenge": "Défi du chef",
+    "homemade": "Fait maison"
   },
   "meta": {
     "generatedBy": "Généré par",

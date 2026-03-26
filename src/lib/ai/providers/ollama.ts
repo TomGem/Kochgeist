@@ -1,6 +1,6 @@
-import type { AIProvider, GenerateRecipesParams, RecipeOutput, RecognizeIngredientsParams } from '../provider';
+import type { AIProvider, GenerateRecipesParams, GenerateRecipesResult, RecognizeIngredientsParams } from '../provider';
 import { buildRecipeSystemPrompt, buildRecipeUserPrompt } from '../prompts/recipe-suggest';
-import { RecipeArraySchema } from '../prompts/schema';
+import { RecipeArraySchema, CookingTipSchema } from '../prompts/schema';
 
 export class OllamaProvider implements AIProvider {
   name = 'ollama';
@@ -12,7 +12,7 @@ export class OllamaProvider implements AIProvider {
     this.model = modelOverride || import.meta.env.OLLAMA_MODEL || 'llama3.1';
   }
 
-  async generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]> {
+  async generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult> {
     const { ingredients, language, dietaryFilters, count = 4 } = params;
 
     const response = await fetch(`${this.baseUrl}/api/chat`, {
@@ -49,7 +49,10 @@ export class OllamaProvider implements AIProvider {
       }
     }
     if (!Array.isArray(recipesArray)) throw new Error('AI response does not contain a recipe array');
-    return RecipeArraySchema.parse(recipesArray);
+    const tip = typeof parsed === 'object' && parsed !== null && parsed.tip
+      ? CookingTipSchema.safeParse(parsed.tip).data
+      : undefined;
+    return { recipes: RecipeArraySchema.parse(recipesArray), tip };
   }
 
   async recognizeIngredients(_params: RecognizeIngredientsParams): Promise<string[]> {

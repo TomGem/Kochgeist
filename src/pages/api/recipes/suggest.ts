@@ -4,9 +4,10 @@ import { recipes, recipeCache, searchHistory } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { getAIProvider } from '../../../lib/ai/registry';
+import type { CookingTip } from '../../../lib/ai/provider';
 import { computeIngredientHash } from '../../../lib/cache';
 import { generateImageForRecipe } from '../../../lib/images/queue';
-import type { Locale } from '../../../lib/i18n/index';
+import { t, type Locale } from '../../../lib/i18n/index';
 
 export const POST: APIRoute = async ({ request, locals }) => {
   try {
@@ -34,22 +35,25 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const cached = db.select().from(recipeCache).where(eq(recipeCache.ingredientHash, hash)).get();
 
     let recipeIds: string[];
+    let tip: CookingTip | undefined;
 
     if (cached) {
       recipeIds = JSON.parse(cached.recipeIds);
+      tip = cached.tip ? JSON.parse(cached.tip) : undefined;
     } else {
       // Call AI with timing
       const start = Date.now();
-      const aiRecipes = await provider.generateRecipes({
+      const aiResult = await provider.generateRecipes({
         ingredients,
         language: lang,
         dietaryFilters: filters,
       });
       const aiGenerationTimeMs = Date.now() - start;
+      tip = aiResult.tip;
 
       // Store recipes in DB
       recipeIds = [];
-      for (const recipe of aiRecipes) {
+      for (const recipe of aiResult.recipes) {
         const id = nanoid(12);
         recipeIds.push(id);
         db.insert(recipes).values({
@@ -58,6 +62,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           description: recipe.description,
           cookTime: recipe.cookTime,
           difficulty: recipe.difficulty,
+          highlight: recipe.highlight ?? null,
           servings: recipe.servings,
           ingredients: JSON.stringify(recipe.ingredients),
           instructions: JSON.stringify(recipe.instructions),
@@ -81,6 +86,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         language: lang,
         dietaryFilters: filters.length > 0 ? JSON.stringify(filters) : null,
         recipeIds: JSON.stringify(recipeIds),
+        tip: tip ? JSON.stringify(tip) : null,
       }).run();
 
       // Trigger image generation in background for each recipe
@@ -108,18 +114,24 @@ export const POST: APIRoute = async ({ request, locals }) => {
     ).filter(Boolean);
 
     // Build HTML partial response
-    const recipeCards = recipeRows.map((r) => ({
-      id: r!.id,
-      title: r!.title,
-      description: r!.description,
-      cookTime: r!.cookTime,
-      difficulty: r!.difficulty,
-      imageUrl: r!.imageUrl,
-    }));
+    const recipeCards = recipeRows.map((r) => {
+      const ingredientsList = JSON.parse(r!.ingredients) as unknown[];
+      const extraList = r!.extraIngredients ? JSON.parse(r!.extraIngredients) as unknown[] : [];
+      return {
+        id: r!.id,
+        title: r!.title,
+        description: r!.description,
+        cookTime: r!.cookTime,
+        difficulty: r!.difficulty,
+        imageUrl: r!.imageUrl,
+        extraCount: extraList.length,
+        totalIngredientCount: ingredientsList.length,
+      };
+    });
 
     // Return a redirect to the partial with recipe data stored in session
     // For htmx, we render the partial server-side
-    const html = renderResultsPartial(ingredients, recipeCards, lang);
+    const html = renderResultsPartial(ingredients, recipeCards, lang, tip);
     return new Response(html, {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -153,15 +165,30 @@ interface RecipeCard {
   cookTime: string;
   difficulty: string;
   imageUrl: string | null;
+  extraCount: number;
+  totalIngredientCount: number;
 }
 
-function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: string): string {
+function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: string, tip?: CookingTip): string {
   const ingredientText = ingredients.join(', ');
 
-  const featured = cards[0];
-  const vertical = cards[1];
-  const horiz1 = cards[2];
-  const horiz2 = cards[3];
+  // Pick the best-match recipe (fewest extras relative to total) as featured
+  let bestIdx = 0;
+  let bestRatio = Infinity;
+  for (let i = 0; i < cards.length; i++) {
+    const c = cards[i];
+    const ratio = c.totalIngredientCount > 0 ? c.extraCount / c.totalIngredientCount : 1;
+    if (ratio < bestRatio) {
+      bestRatio = ratio;
+      bestIdx = i;
+    }
+  }
+  const sorted = [cards[bestIdx], ...cards.filter((_, i) => i !== bestIdx)];
+
+  const featured = sorted[0];
+  const vertical = sorted[1];
+  const horiz1 = sorted[2];
+  const horiz2 = sorted[3];
 
   function imgOrPlaceholder(card: RecipeCard, icon: string, gradientClasses: string, minHeight: string) {
     if (card.imageUrl) {
@@ -207,7 +234,7 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
       <div class="md:w-1/2 relative overflow-hidden">
         ${imgOrPlaceholder(featured, 'restaurant', 'bg-gradient-to-br from-primary/20 to-tertiary-container/30', 'min-h-[240px]')}
         <div class="absolute top-4 left-4">
-          <span class="editorial-gradient text-on-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">Editor's Choice</span>
+          <span class="editorial-gradient text-on-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">${escapeHtml(t('results.bestMatch', lang as Locale))}</span>
         </div>
       </div>
       <div class="md:w-1/2 p-8 flex flex-col justify-between">
@@ -311,9 +338,9 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
   <div class="flex items-start gap-4">
     <span class="material-symbols-outlined text-tertiary p-2 bg-tertiary-container/20 rounded-xl">lightbulb</span>
     <div>
-      <h4 class="font-headline font-bold text-on-surface mb-1">Chef's Secret: The Sizzle</h4>
+      <h4 class="font-headline font-bold text-on-surface mb-1">${escapeHtml(tip?.title || t('results.chefSecretTitle', lang as Locale))}</h4>
       <p class="font-body text-on-surface-variant text-sm leading-relaxed">
-        To get the most out of your ingredients, ensure your pan is shimmering hot before adding protein. This creates a Maillard reaction that locks in juices and deepens the flavor.
+        ${escapeHtml(tip?.text || t('results.chefSecretText', lang as Locale))}
       </p>
     </div>
   </div>

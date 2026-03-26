@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
-import type { AIProvider, GenerateRecipesParams, RecipeOutput, RecognizeIngredientsParams } from '../provider';
+import type { AIProvider, GenerateRecipesParams, GenerateRecipesResult, RecognizeIngredientsParams } from '../provider';
 import { buildRecipeSystemPrompt, buildRecipeUserPrompt } from '../prompts/recipe-suggest';
-import { RecipeArraySchema } from '../prompts/schema';
+import { RecipeArraySchema, CookingTipSchema } from '../prompts/schema';
 
 export class LMStudioProvider implements AIProvider {
   name = 'lmstudio';
@@ -12,10 +12,10 @@ export class LMStudioProvider implements AIProvider {
     const baseUrl = import.meta.env.LMSTUDIO_BASE_URL || 'http://localhost:1234/v1';
     this.model = modelOverride || import.meta.env.LMSTUDIO_MODEL || 'local-model';
 
-    this.client = new OpenAI({ baseURL: baseUrl, apiKey: 'lm-studio' });
+    this.client = new OpenAI({ baseURL: baseUrl, apiKey: import.meta.env.LMSTUDIO_API_KEY || 'lm-studio' });
   }
 
-  async generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]> {
+  async generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult> {
     const { ingredients, language, dietaryFilters, count = 4 } = params;
 
     const response = await this.client.chat.completions.create({
@@ -48,7 +48,10 @@ export class LMStudioProvider implements AIProvider {
       }
     }
     if (!Array.isArray(recipesArray)) throw new Error('AI response does not contain a recipe array');
-    return RecipeArraySchema.parse(recipesArray);
+    const tip = typeof parsed === 'object' && parsed !== null && parsed.tip
+      ? CookingTipSchema.safeParse(parsed.tip).data
+      : undefined;
+    return { recipes: RecipeArraySchema.parse(recipesArray), tip };
   }
 
   async recognizeIngredients(_params: RecognizeIngredientsParams): Promise<string[]> {

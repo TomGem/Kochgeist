@@ -20,7 +20,7 @@
     "curatedResults": "Kuratierte Ergebnisse",
     "recipesFor": "Rezepte für:",
     "analysisNote": "Wir haben deinen Vorrat analysiert und 4 Rezepte ausgewählt, die den Geschmack maximieren.",
-    "editorsChoice": "Redaktionstipp",
+    "bestMatch": "Beste Wahl",
     "chefSecret": "Geheimtipp",
     "chefSecretTitle": "Geheimtipp: Das Brutzeln",
     "chefSecretText": "Für das Beste aus deinen Zutaten: Pfanne richtig heiß werden lassen, bevor du das Fleisch reinlegst. So bekommst du die perfekte Kruste und der Geschmack wird noch intensiver."
@@ -29,7 +29,6 @@
     "ingredients": "Zutaten",
     "cookingSteps": "Kochschritte",
     "chefsNote": "Tipp vom Chef",
-    "chefsSelection": "Chefkoch-Auswahl",
     "backToFeed": "Zurück",
     "startCooking": "Loskochen",
     "save": "Speichern",
@@ -180,6 +179,12 @@
     "defaultFilters": "Standardfilter",
     "defaultFiltersDescription": "Diese Filter werden bei der Rezeptsuche automatisch vorausgewählt.",
     "filtersSaved": "Filter gespeichert."
+  },
+  "badges": {
+    "pantryPerfect": "Alles da",
+    "quickEasy": "Schnell & Einfach",
+    "chefChallenge": "Herausforderung",
+    "homemade": "Hausgemacht"
   },
   "meta": {
     "generatedBy": "Erstellt mit",

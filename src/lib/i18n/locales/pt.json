@@ -20,7 +20,7 @@
     "curatedResults": "Resultados selecionados",
     "recipesFor": "Receitas para:",
     "analysisNote": "Analisámos a tua despensa e selecionámos 4 receitas que maximizam o sabor.",
-    "editorsChoice": "Escolha do editor",
+    "bestMatch": "Melhor escolha",
     "chefSecret": "Segredo do chef",
     "chefSecretTitle": "Segredo do chef: O chiar",
     "chefSecretText": "Para tirar o melhor dos teus ingredientes, certifica-te de que a frigideira está bem quente antes de adicionar a carne. Isso cria uma reação de Maillard que sela os sucos e intensifica o sabor."
@@ -29,7 +29,6 @@
     "ingredients": "Ingredientes",
     "cookingSteps": "Passos de preparação",
     "chefsNote": "Nota do chef",
-    "chefsSelection": "Seleção do chef",
     "backToFeed": "Voltar",
     "startCooking": "Começar a cozinhar",
     "save": "Guardar",
@@ -180,6 +179,12 @@
     "defaultFilters": "Filtros predefinidos",
     "defaultFiltersDescription": "Estes filtros serão pré-selecionados quando procurares receitas.",
     "filtersSaved": "Filtros guardados."
+  },
+  "badges": {
+    "pantryPerfect": "Tudo na despensa",
+    "quickEasy": "Rápido & fácil",
+    "chefChallenge": "Desafio do chef",
+    "homemade": "Caseiro"
   },
   "meta": {
     "generatedBy": "Gerado por",

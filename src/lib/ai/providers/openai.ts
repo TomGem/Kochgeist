@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
-import type { AIProvider, GenerateRecipesParams, RecipeOutput, RecognizeIngredientsParams } from '../provider';
+import type { AIProvider, GenerateRecipesParams, GenerateRecipesResult, RecognizeIngredientsParams } from '../provider';
 import { buildRecipeSystemPrompt, buildRecipeUserPrompt } from '../prompts/recipe-suggest';
-import { RecipeArraySchema } from '../prompts/schema';
+import { RecipeArraySchema, CookingTipSchema } from '../prompts/schema';
 
 export class OpenAIProvider implements AIProvider {
   name = 'openai';
@@ -16,7 +16,7 @@ export class OpenAIProvider implements AIProvider {
     this.model = modelOverride || import.meta.env.OPENAI_MODEL || 'gpt-4o';
   }
 
-  async generateRecipes(params: GenerateRecipesParams): Promise<RecipeOutput[]> {
+  async generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult> {
     const { ingredients, language, dietaryFilters, count = 4 } = params;
 
     const response = await this.client.chat.completions.create({
@@ -48,7 +48,10 @@ export class OpenAIProvider implements AIProvider {
       }
     }
     if (!Array.isArray(recipesArray)) throw new Error('AI response does not contain a recipe array');
-    return RecipeArraySchema.parse(recipesArray);
+    const tip = typeof parsed === 'object' && parsed !== null && parsed.tip
+      ? CookingTipSchema.safeParse(parsed.tip).data
+      : undefined;
+    return { recipes: RecipeArraySchema.parse(recipesArray), tip };
   }
 
   async recognizeIngredients(params: RecognizeIngredientsParams): Promise<string[]> {

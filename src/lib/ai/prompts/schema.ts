@@ -14,6 +14,7 @@ export const RecipeStepSchema = z.object({
 
 export const RecipeOutputSchema = z.object({
   title: z.string(),
+  highlight: z.string().optional(),
   description: z.string(),
   cookTime: z.string(),
   difficulty: z.enum(['Easy', 'Medium', 'Hard']),
@@ -24,3 +25,8 @@ export const RecipeOutputSchema = z.object({
 });
 
 export const RecipeArraySchema = z.array(RecipeOutputSchema);
+
+export const CookingTipSchema = z.object({
+  title: z.string(),
+  text: z.string(),
+});

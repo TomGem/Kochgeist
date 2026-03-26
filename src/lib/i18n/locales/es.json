@@ -20,7 +20,7 @@
     "curatedResults": "Resultados seleccionados",
     "recipesFor": "Recetas para:",
     "analysisNote": "Hemos analizado tu despensa y seleccionado 4 recetas que maximizan el sabor.",
-    "editorsChoice": "Selección del editor",
+    "bestMatch": "Mejor opción",
     "chefSecret": "Secreto del chef",
     "chefSecretTitle": "Secreto del chef: El chisporroteo",
     "chefSecretText": "Para sacar lo mejor de tus ingredientes, asegúrate de que la sartén esté bien caliente antes de añadir la carne. Esto crea una reacción de Maillard que sella los jugos e intensifica el sabor."
@@ -29,7 +29,6 @@
     "ingredients": "Ingredientes",
     "cookingSteps": "Pasos de cocción",
     "chefsNote": "Nota del chef",
-    "chefsSelection": "Selección del chef",
     "backToFeed": "Volver",
     "startCooking": "Empezar a cocinar",
     "save": "Guardar",
@@ -180,6 +179,12 @@
     "defaultFilters": "Filtros predeterminados",
     "defaultFiltersDescription": "Estos filtros se preseleccionarán al buscar recetas.",
     "filtersSaved": "Filtros guardados."
+  },
+  "badges": {
+    "pantryPerfect": "Todo a mano",
+    "quickEasy": "Rápido & fácil",
+    "chefChallenge": "Reto del chef",
+    "homemade": "Casero"
   },
   "meta": {
     "generatedBy": "Generado por",
