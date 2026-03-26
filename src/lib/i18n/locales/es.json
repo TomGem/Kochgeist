@@ -14,10 +14,16 @@
     "leafyGreens": "Verduras de hoja",
     "leafyGreensCount": "12 recetas rápidas",
     "quickMeals": "Platos en 15 min",
-    "quickMealsDesc": "Para cocineros con prisa"
+    "quickMealsDesc": "Para cocineros con prisa",
+    "surpriseTitle": "¡Tu despensa está vacía!",
+    "surpriseBody": "¿Quieres que sea creativo y te sorprenda con algo al azar?",
+    "surpriseConfirm": "¡Sorpréndeme!",
+    "surpriseDismiss": "Voy a añadir ingredientes"
   },
   "results": {
     "curatedResults": "Resultados seleccionados",
+    "surpriseHeader": "Selección del chef",
+    "surpriseNote": "Hemos seleccionado 4 recetas creativas solo para ti. No necesitas despensa — ¡solo apetito!",
     "recipesFor": "Recetas para:",
     "analysisNote": "Hemos analizado tu despensa y seleccionado 4 recetas que maximizan el sabor.",
     "bestMatch": "Mejor opción",

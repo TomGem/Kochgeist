@@ -14,10 +14,16 @@
     "leafyGreens": "Légumes verts",
     "leafyGreensCount": "12 recettes rapides",
     "quickMeals": "Repas en 15 min",
-    "quickMealsDesc": "Pour les cuisiniers pressés"
+    "quickMealsDesc": "Pour les cuisiniers pressés",
+    "surpriseTitle": "Ton garde-manger est vide !",
+    "surpriseBody": "Tu veux que je sois créatif et te surprenne avec quelque chose au hasard ?",
+    "surpriseConfirm": "Surprends-moi !",
+    "surpriseDismiss": "Je vais ajouter des ingrédients"
   },
   "results": {
     "curatedResults": "Résultats sélectionnés",
+    "surpriseHeader": "Choix du chef",
+    "surpriseNote": "Nous avons sélectionné 4 recettes créatives rien que pour toi. Pas besoin de garde-manger — juste de l'appétit !",
     "recipesFor": "Recettes pour :",
     "analysisNote": "Nous avons analysé ton garde-manger et sélectionné 4 recettes qui maximisent les saveurs.",
     "bestMatch": "Meilleur choix",

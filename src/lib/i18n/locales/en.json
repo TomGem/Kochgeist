@@ -14,12 +14,18 @@
     "leafyGreens": "Leafy Greens",
     "leafyGreensCount": "12 Quick Recipes",
     "quickMeals": "15 Min Meals",
-    "quickMealsDesc": "For busy chefs"
+    "quickMealsDesc": "For busy chefs",
+    "surpriseTitle": "Your pantry is empty!",
+    "surpriseBody": "Want me to get creative and surprise you with something random?",
+    "surpriseConfirm": "Surprise Me!",
+    "surpriseDismiss": "I'll add ingredients"
   },
   "results": {
     "curatedResults": "Curated Results",
     "recipesFor": "Recipes for:",
     "analysisNote": "We've analyzed your pantry and selected 4 recipes that maximize flavor while minimizing prep time.",
+    "surpriseHeader": "Chef's Pick",
+    "surpriseNote": "We've hand-picked 4 creative recipes just for you. No pantry required — just an appetite!",
     "bestMatch": "Best Match",
     "chefSecret": "Chef's Secret",
     "chefSecretTitle": "Chef's Secret: The Sizzle",

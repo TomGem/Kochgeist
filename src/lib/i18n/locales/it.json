@@ -14,10 +14,16 @@
     "leafyGreens": "Verdure a foglia",
     "leafyGreensCount": "12 ricette veloci",
     "quickMeals": "Piatti in 15 min",
-    "quickMealsDesc": "Per cuochi indaffarati"
+    "quickMealsDesc": "Per cuochi indaffarati",
+    "surpriseTitle": "La tua dispensa è vuota!",
+    "surpriseBody": "Vuoi che diventi creativo e ti sorprenda con qualcosa di casuale?",
+    "surpriseConfirm": "Sorprendimi!",
+    "surpriseDismiss": "Aggiungo degli ingredienti"
   },
   "results": {
     "curatedResults": "Risultati selezionati",
+    "surpriseHeader": "Scelta dello chef",
+    "surpriseNote": "Abbiamo selezionato 4 ricette creative solo per te. Niente dispensa necessaria — solo appetito!",
     "recipesFor": "Ricette per:",
     "analysisNote": "Abbiamo analizzato la tua dispensa e selezionato 4 ricette che massimizzano il sapore.",
     "bestMatch": "Miglior scelta",

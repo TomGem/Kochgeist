@@ -16,14 +16,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const filtersRaw = formData.get('filters') as string;
     const lang = (formData.get('lang') as Locale) || 'en';
 
-    if (!ingredientsRaw) {
+    const surpriseMe = formData.get('surpriseMe') === 'true';
+
+    if (!ingredientsRaw && !surpriseMe) {
       return new Response('Missing ingredients', { status: 400 });
     }
 
-    const ingredients: string[] = JSON.parse(ingredientsRaw);
+    const ingredients: string[] = ingredientsRaw ? JSON.parse(ingredientsRaw) : [];
     const filters: string[] = filtersRaw ? JSON.parse(filtersRaw) : [];
 
-    if (ingredients.length === 0) {
+    if (ingredients.length === 0 && !surpriseMe) {
       return new Response('No ingredients provided', { status: 400 });
     }
 
@@ -131,7 +133,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     // Return a redirect to the partial with recipe data stored in session
     // For htmx, we render the partial server-side
-    const html = renderResultsPartial(ingredients, recipeCards, lang, tip);
+    const html = renderResultsPartial(ingredients, recipeCards, lang, tip, surpriseMe);
     return new Response(html, {
       headers: { 'Content-Type': 'text/html; charset=utf-8' },
     });
@@ -169,7 +171,7 @@ interface RecipeCard {
   totalIngredientCount: number;
 }
 
-function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: string, tip?: CookingTip): string {
+function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: string, tip?: CookingTip, surpriseMe?: boolean): string {
   const ingredientText = ingredients.join(', ');
 
   // Pick the best-match recipe (fewest extras relative to total) as featured
@@ -210,18 +212,25 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
     return `hx-get="/partials/recipe-detail?id=${id}" hx-target="#recipe-modal" hx-swap="innerHTML"`;
   }
 
+  const headerTitle = surpriseMe
+    ? `<span class="text-primary italic">${escapeHtml(t('results.surpriseHeader', lang as Locale))}</span>`
+    : `${escapeHtml(t('results.recipesFor', lang as Locale))} <span class="text-primary italic">${escapeHtml(ingredientText)}</span>`;
+  const headerNote = surpriseMe
+    ? escapeHtml(t('results.surpriseNote', lang as Locale))
+    : escapeHtml(t('results.analysisNote', lang as Locale));
+
   return `
 <!-- Results Header -->
 <section class="mb-12">
   <div class="flex items-center gap-2 mb-2">
-    <span class="font-label text-[10px] uppercase tracking-[0.05em] font-semibold text-primary">Curated Results</span>
+    <span class="font-label text-[10px] uppercase tracking-[0.05em] font-semibold text-primary">${escapeHtml(t('results.curatedResults', lang as Locale))}</span>
     <div class="h-[1px] flex-grow bg-outline-variant/20"></div>
   </div>
   <h1 class="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-on-surface leading-tight mb-4">
-    Recipes for: <span class="text-primary italic">${escapeHtml(ingredientText)}</span>
+    ${headerTitle}
   </h1>
   <p class="font-body text-on-surface-variant max-w-2xl leading-relaxed">
-    We've analyzed your pantry and selected 4 recipes that maximize flavor while minimizing prep time.
+    ${headerNote}
   </p>
 </section>
 

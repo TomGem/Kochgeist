@@ -14,10 +14,16 @@
     "leafyGreens": "Blattgemüse",
     "leafyGreensCount": "12 schnelle Rezepte",
     "quickMeals": "15-Min-Gerichte",
-    "quickMealsDesc": "Für beschäftigte Köche"
+    "quickMealsDesc": "Für beschäftigte Köche",
+    "surpriseTitle": "Dein Vorrat ist leer!",
+    "surpriseBody": "Soll ich kreativ werden und dich mit etwas Zufälligem überraschen?",
+    "surpriseConfirm": "Überrasch mich!",
+    "surpriseDismiss": "Ich gebe Zutaten ein"
   },
   "results": {
     "curatedResults": "Kuratierte Ergebnisse",
+    "surpriseHeader": "Empfehlung vom Chefkoch",
+    "surpriseNote": "Wir haben 4 kreative Rezepte für dich ausgewählt. Kein Vorrat nötig — nur Appetit!",
     "recipesFor": "Rezepte für:",
     "analysisNote": "Wir haben deinen Vorrat analysiert und 4 Rezepte ausgewählt, die den Geschmack maximieren.",
     "bestMatch": "Beste Wahl",

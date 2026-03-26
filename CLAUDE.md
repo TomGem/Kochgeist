@@ -32,6 +32,26 @@ No test framework is configured.
 5. htmx partials in `src/pages/partials/` return HTML fragments (recipe detail, bookmark grid, image slots)
 6. Recipe detail modal is opened via Alpine `x-init="$store.ui.modalOpen = true"` inside the partial itself (not via afterSwap events)
 
+### Scanner
+- Standalone page at `/scanner` with camera access (`capture="environment"`) for ingredient recognition
+- Uploads photo to `/api/ingredients/recognize` which uses the AI provider's `recognizeIngredients()` method
+- Component: `src/components/home/CameraButton.astro`; accessible from bottom navigation
+
+### Cooking mode
+- Step-by-step fullscreen modal (`src/components/detail/CookingMode.astro`) launched from recipe detail
+- Auto-detects timers from step text via regex across all 6 languages
+- Timer controls (start/pause/reset) with audio alarm + vibration on completion
+- Keyboard navigation (arrow keys, escape) and touch-optimized UI
+- Progress visualization with progress bar and circular indicators
+
+### Shopping list & ingredient interaction
+- Interactive ingredient checkboxes in recipe detail — click to mark as done (green checkmark)
+- Export button filters unchecked ingredients and shares via `navigator.share()` (Web Share API); falls back to clipboard copy
+
+### Badges & cooking tips
+- `src/lib/badges.ts` — `computeDetailBadge()` generates contextual badges based on recipe metadata (Pantry Perfect, Quick & Easy, Chef's Challenge, Homemade)
+- AI generates a contextual cooking tip per ingredient search, stored as `tip` JSON column in `recipe_cache`; displayed as "Chef's Secret" in results
+
 ### Authentication & multi-user
 - Cookie-based sessions stored in SQLite (`sessions` table), 30-day expiry
 - `src/lib/auth/` — password hashing (bcrypt), session CRUD, email sending (nodemailer), token generation, first-user detection
@@ -72,6 +92,7 @@ No test framework is configured.
 - Schema in `src/db/schema.ts`: `users`, `sessions`, `invitations`, `passwordResets`, `emailVerifications`, `recipes`, `recipeCache`, `bookmarks`, `searchHistory`, `imageCache`, `settings`
 - Migrations in `src/db/migrations/`
 - JSON arrays stored as TEXT columns (ingredients, instructions, dietary tags, default filters)
+- `recipeCache.tip` stores AI-generated cooking tip as JSON TEXT
 - `settings` table stores runtime key-value config (e.g. `ai_provider`, `ai_model`, `image_provider`, `image_model`); managed via `src/lib/settings.ts`
 
 ### i18n
@@ -97,9 +118,9 @@ No test framework is configured.
 
 ### Component organization
 Components in `src/components/` are grouped by page context:
-- `home/` — ingredient input, filters, search
+- `home/` — ingredient input, filters, search, camera button for scanner
 - `recipes/` — bento grid cards (featured, vertical, horizontal)
-- `detail/` — recipe modal content (interactive ingredient checkboxes, dietary tag pills, AI provenance metadata)
+- `detail/` — recipe modal content (interactive ingredient checkboxes, dietary tag pills, AI provenance metadata, cooking mode)
 - `bookmarks/` — saved recipes grid
 - `layout/` — header, bottom nav, base layout
 - `shared/` — language switcher, loading spinner, error toast
