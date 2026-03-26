@@ -1,4 +1,5 @@
 import { nanoid, customAlphabet } from 'nanoid';
+import { randomInt, createHash } from 'crypto';
 
 export const RESET_EXPIRY_MS = 60 * 60 * 1000; // 1 hour
 export const VERIFICATION_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
@@ -19,5 +20,9 @@ export function generateResetToken(): string {
 }
 
 export function generateVerificationCode(): string {
-  return String(Math.floor(100000 + Math.random() * 900000));
+  return String(randomInt(100000, 1000000));
+}
+
+export function hashToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex');
 }

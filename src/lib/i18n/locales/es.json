@@ -114,6 +114,7 @@
     "resendCode": "Reenviar código",
     "codeSent": "Se ha enviado un nuevo código.",
     "resendCooldown": "Espera antes de solicitar otro código.",
+    "tooManyAttempts": "Demasiados intentos. Inténtalo más tarde.",
     "invalidCredentials": "Correo o contraseña no válidos.",
     "invalidCode": "Código no válido o expirado.",
     "invalidToken": "Este enlace no es válido o ha expirado.",

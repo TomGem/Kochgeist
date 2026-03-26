@@ -3,6 +3,7 @@ import { db } from '../../../db/index';
 import { users } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
 import { verifyPassword, hashPassword } from '../../../lib/auth/password';
+import { invalidateAllSessions, createSession, setSessionCookie } from '../../../lib/auth/session';
 
 export const PATCH: APIRoute = async ({ request, locals }) => {
   if (!locals.user) {
@@ -22,7 +23,7 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
   return new Response('Profile updated', { status: 200 });
 };
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request, locals, cookies }) => {
   if (!locals.user) {
     return new Response('Unauthorized', { status: 401 });
   }
@@ -51,6 +52,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
   const passwordHash = await hashPassword(newPassword);
   db.update(users).set({ passwordHash, updatedAt: new Date() }).where(eq(users.id, locals.user.id)).run();
+
+  // Invalidate all existing sessions and create a fresh one
+  invalidateAllSessions(locals.user.id);
+  const sessionId = createSession(locals.user.id);
+  setSessionCookie(cookies, sessionId);
 
   return new Response('Password changed', { status: 200 });
 };

@@ -53,6 +53,19 @@ if (Astro.request.method === 'POST') {
     }
 
     if (!error) {
+      // Atomically claim an invitation slot before creating user
+      if (invitation) {
+        const result = db.update(invitations)
+          .set({ useCount: sql`${invitations.useCount} + 1` })
+          .where(and(eq(invitations.id, invitation.id), sql`${invitations.useCount} < ${invitations.maxUses}`))
+          .run();
+        if (result.changes === 0) {
+          error = t('auth.invalidInviteCode', lang);
+        }
+      }
+    }
+
+    if (!error) {
       // Check if email already registered
       const existing = db.select().from(users).where(eq(users.email, email)).get();
       if (existing) {
@@ -70,14 +83,6 @@ if (Astro.request.method === 'POST') {
           role,
           language: lang,
         }).run();
-
-        // Increment invitation use count
-        if (invitation) {
-          db.update(invitations)
-            .set({ useCount: sql`${invitations.useCount} + 1` })
-            .where(eq(invitations.id, invitation.id))
-            .run();
-        }
 
         // Generate verification code and send email
         const code = generateVerificationCode();

@@ -6,6 +6,7 @@ import { users } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { verifyPassword } from '../lib/auth/password';
 import { createSession, setSessionCookie } from '../lib/auth/session';
+import { isRateLimited } from '../lib/rate-limit';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 let error = '';
@@ -16,11 +17,14 @@ if (Astro.locals.user) {
 }
 
 if (Astro.request.method === 'POST') {
+  const clientIp = Astro.request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
   const formData = await Astro.request.formData();
   const email = (formData.get('email') as string || '').trim().toLowerCase();
   const password = formData.get('password') as string || '';
 
-  if (!email || !password) {
+  if (isRateLimited(`login:${clientIp}`, 10, 15 * 60 * 1000)) {
+    error = t('auth.tooManyAttempts', lang);
+  } else if (!email || !password) {
     error = t('auth.invalidCredentials', lang);
   } else {
     const user = db.select().from(users).where(eq(users.email, email)).get();

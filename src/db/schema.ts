@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 
 // ── Auth tables ──────────────────────────────────────────────
 
@@ -25,7 +25,10 @@ export const sessions = sqliteTable('sessions', {
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
-});
+}, (table) => [
+  index('sessions_user_id_idx').on(table.userId),
+  index('sessions_expires_at_idx').on(table.expiresAt),
+]);
 
 export const invitations = sqliteTable('invitations', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -102,7 +105,9 @@ export const bookmarks = sqliteTable('bookmarks', {
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
-});
+}, (table) => [
+  index('bookmarks_user_id_idx').on(table.userId),
+]);
 
 export const searchHistory = sqliteTable('search_history', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -114,7 +119,9 @@ export const searchHistory = sqliteTable('search_history', {
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
-});
+}, (table) => [
+  index('search_history_user_id_idx').on(table.userId),
+]);
 
 export const imageCache = sqliteTable('image_cache', {
   id: integer('id').primaryKey({ autoIncrement: true }),

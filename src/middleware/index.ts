@@ -3,6 +3,34 @@ import { detectLocale } from '../lib/i18n/index';
 import { validateSession, SESSION_COOKIE } from '../lib/auth/session';
 import { isFirstUser } from '../lib/auth/setup';
 
+const securityHeadersMiddleware = defineMiddleware(async (context, next) => {
+  const response = await next();
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  if ((process.env.APP_URL || '').startsWith('https://')) {
+    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  return response;
+});
+
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+const csrfMiddleware = defineMiddleware((context, next) => {
+  if (SAFE_METHODS.has(context.request.method)) return next();
+
+  const origin = context.request.headers.get('origin');
+  const host = context.url.origin;
+
+  // Allow requests with matching origin, or same-site requests without origin (e.g. plain form posts)
+  if (origin && origin !== host) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
+  return next();
+});
+
 const languageMiddleware = defineMiddleware((context, next) => {
   const lang = detectLocale(context.request);
   context.locals.lang = lang;
@@ -73,8 +101,8 @@ const authMiddleware = defineMiddleware((context, next) => {
     return context.redirect('/login');
   }
 
-  // Admin-only routes
-  if (isAdminPath(pathname) && context.locals.user.role !== 'admin') {
+  // Admin-only routes (require admin role AND verified email)
+  if (isAdminPath(pathname) && (context.locals.user.role !== 'admin' || !context.locals.user.isVerified)) {
     if (pathname.startsWith('/api/')) {
       return new Response('Forbidden', { status: 403 });
     }
@@ -84,4 +112,4 @@ const authMiddleware = defineMiddleware((context, next) => {
   return next();
 });
 
-export const onRequest = sequence(languageMiddleware, authMiddleware);
+export const onRequest = sequence(securityHeadersMiddleware, csrfMiddleware, languageMiddleware, authMiddleware);

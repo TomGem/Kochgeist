@@ -36,7 +36,7 @@ const currentLabel = languages.find(l => l.code === lang)?.label ?? 'EN';
   >
     {languages.map(({ code, label }) => (
       <button
-        x-on:click={`current = '${label}'; open = false; document.cookie = 'kochgeist-lang=${code};path=/;max-age=31536000'; $store.ui.lang = '${code}'; location.reload();`}
+        x-on:click={`current = '${label}'; open = false; document.cookie = 'kochgeist-lang=${code};path=/;max-age=31536000;SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : ''); $store.ui.lang = '${code}'; location.reload();`}
         class:list={[
           'w-full px-4 py-2 text-xs font-bold uppercase tracking-wider text-left transition-colors hover:bg-surface-container-highest',
           code === lang ? 'text-primary' : 'text-on-surface-variant',

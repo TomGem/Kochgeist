@@ -7,6 +7,7 @@ import { eq, and, isNull, desc } from 'drizzle-orm';
 import { createSession, setSessionCookie } from '../../lib/auth/session';
 import { generateVerificationCode, VERIFICATION_EXPIRY_MS } from '../../lib/auth/tokens';
 import { sendVerificationEmail } from '../../lib/auth/email';
+import { isRateLimited } from '../../lib/rate-limit';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 let error = '';
@@ -56,7 +57,9 @@ if (Astro.request.method === 'POST') {
   } else {
     // Verify code
     const code = (formData.get('code') as string || '').trim();
-    if (!code || code.length !== 6) {
+    if (isRateLimited(`verify:${userId}`, 5, 15 * 60 * 1000)) {
+      error = t('auth.tooManyAttempts', lang);
+    } else if (!code || code.length !== 6) {
       error = t('auth.invalidCode', lang);
     } else {
       const verification = db

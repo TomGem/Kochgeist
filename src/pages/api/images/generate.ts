@@ -1,7 +1,11 @@
 import type { APIRoute } from 'astro';
 import { generateImageForRecipe } from '../../../lib/images/queue';
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
+  if (!locals.user) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
   const formData = await request.formData();
   const recipeId = formData.get('recipeId') as string;
 
