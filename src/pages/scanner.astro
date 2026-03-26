@@ -2,8 +2,8 @@
 import BaseLayout from '../components/layout/BaseLayout.astro';
 import Header from '../components/layout/Header.astro';
 import BottomNav from '../components/layout/BottomNav.astro';
-import HeroSearch from '../components/home/HeroSearch.astro';
 import IngredientTags from '../components/home/IngredientTags.astro';
+import CameraButton from '../components/home/CameraButton.astro';
 import DietaryFilters from '../components/home/DietaryFilters.astro';
 import SuggestButton from '../components/home/SuggestButton.astro';
 import LoadingSpinner from '../components/shared/LoadingSpinner.astro';
@@ -11,15 +11,15 @@ import ErrorToast from '../components/shared/ErrorToast.astro';
 import RecipeModal from '../components/detail/RecipeModal.astro';
 ---
 
-<BaseLayout title="Kochgeist - AI Kitchen Assistant" activePage="discover">
+<BaseLayout title="Kochgeist - Scanner" activePage="scanner">
   <Header />
   <main id="main-content" class="pt-24 pb-52 px-6 max-w-2xl mx-auto min-h-screen">
-    <HeroSearch />
+    <CameraButton />
     <IngredientTags />
     <DietaryFilters />
   </main>
   <SuggestButton />
-  <BottomNav active="discover" />
+  <BottomNav active="scanner" />
   <RecipeModal />
   <LoadingSpinner />
   <ErrorToast />

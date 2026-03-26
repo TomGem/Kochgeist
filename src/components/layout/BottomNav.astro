@@ -12,7 +12,7 @@ const user = Astro.locals.user;
 const items = [
   { id: 'discover', icon: 'auto_awesome', label: t('nav.discover', lang), href: '/', filled: true },
   { id: 'saved', icon: 'bookmark', label: t('nav.saved', lang), href: '/bookmarks', filled: true },
-  { id: 'scanner', icon: 'cooking', label: t('nav.scanner', lang), href: '#', filled: false },
+  { id: 'scanner', icon: 'cooking', label: t('nav.scanner', lang), href: '/scanner', filled: true },
   ...(user?.role === 'admin' ? [{ id: 'admin', icon: 'admin_panel_settings', label: t('admin.title', lang), href: '/admin', filled: true }] : []),
 ] as const;
 ---
