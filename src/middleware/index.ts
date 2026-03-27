@@ -37,6 +37,7 @@ const csrfMiddleware = defineMiddleware((context, next) => {
   }
 
   if (!allowedOrigins.has(origin)) {
+    console.warn(`[CSRF] Blocked: origin="${origin}" allowed=${JSON.stringify([...allowedOrigins])} APP_URL="${appUrl}" fwdProto="${fwdProto}" fwdHost="${fwdHost}"`);
     return new Response('Forbidden', { status: 403 });
   }
 
