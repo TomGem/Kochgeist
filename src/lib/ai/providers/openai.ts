@@ -9,11 +9,11 @@ export class OpenAIProvider implements AIProvider {
   private client: OpenAI;
 
   constructor(modelOverride?: string) {
-    const apiKey = import.meta.env.OPENAI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) throw new Error('OPENAI_API_KEY must be set');
 
     this.client = new OpenAI({ apiKey });
-    this.model = modelOverride || import.meta.env.OPENAI_MODEL || 'gpt-4o';
+    this.model = modelOverride || process.env.OPENAI_MODEL || 'gpt-4o';
   }
 
   async generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult> {

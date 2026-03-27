@@ -4,7 +4,7 @@ import { getSetting } from '../settings';
 const providerCache = new Map<string, AIProvider>();
 
 export async function getAIProvider(): Promise<AIProvider> {
-  const providerName = getSetting('ai_provider') || import.meta.env.AI_PROVIDER || 'azure';
+  const providerName = getSetting('ai_provider') || process.env.AI_PROVIDER || 'azure';
   const modelOverride = getSetting('ai_model') || undefined;
   const cacheKey = `${providerName}:${modelOverride || 'default'}`;
 

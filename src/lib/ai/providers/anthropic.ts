@@ -9,11 +9,11 @@ export class AnthropicProvider implements AIProvider {
   private client: Anthropic;
 
   constructor(modelOverride?: string) {
-    const apiKey = import.meta.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) throw new Error('ANTHROPIC_API_KEY must be set');
 
     this.client = new Anthropic({ apiKey });
-    this.model = modelOverride || import.meta.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
+    this.model = modelOverride || process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514';
   }
 
   async generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult> {

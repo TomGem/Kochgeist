@@ -9,10 +9,10 @@ export class LMStudioProvider implements AIProvider {
   private client: OpenAI;
 
   constructor(modelOverride?: string) {
-    const baseUrl = import.meta.env.LMSTUDIO_BASE_URL || 'http://localhost:1234/v1';
-    this.model = modelOverride || import.meta.env.LMSTUDIO_MODEL || 'local-model';
+    const baseUrl = process.env.LMSTUDIO_BASE_URL || 'http://localhost:1234/v1';
+    this.model = modelOverride || process.env.LMSTUDIO_MODEL || 'local-model';
 
-    this.client = new OpenAI({ baseURL: baseUrl, apiKey: import.meta.env.LMSTUDIO_API_KEY || 'lm-studio' });
+    this.client = new OpenAI({ baseURL: baseUrl, apiKey: process.env.LMSTUDIO_API_KEY || 'lm-studio' });
   }
 
   async generateRecipes(params: GenerateRecipesParams): Promise<GenerateRecipesResult> {

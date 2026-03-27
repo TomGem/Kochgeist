@@ -9,10 +9,10 @@ export class AzureAIProvider implements AIProvider {
   private client: AzureOpenAI;
 
   constructor(modelOverride?: string) {
-    const endpoint = import.meta.env.AZURE_ENDPOINT;
-    const apiKey = import.meta.env.AZURE_API_KEY;
-    const apiVersion = import.meta.env.AZURE_API_VERSION || '2024-12-01-preview';
-    this.model = modelOverride || import.meta.env.AZURE_DEPLOYMENT || 'gpt-4o';
+    const endpoint = process.env.AZURE_ENDPOINT;
+    const apiKey = process.env.AZURE_API_KEY;
+    const apiVersion = process.env.AZURE_API_VERSION || '2024-12-01-preview';
+    this.model = modelOverride || process.env.AZURE_DEPLOYMENT || 'gpt-4o';
 
     if (!endpoint || !apiKey) {
       throw new Error('AZURE_ENDPOINT and AZURE_API_KEY must be set');

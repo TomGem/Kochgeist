@@ -12,7 +12,7 @@ interface Props {
 const lang = (Astro.props.lang ?? (Astro.locals.lang as Locale) ?? 'en') as Locale;
 
 // Query average generation time for the current AI provider + model
-const currentProvider = getSetting('ai_provider') || import.meta.env.AI_PROVIDER || 'azure';
+const currentProvider = getSetting('ai_provider') || process.env.AI_PROVIDER || 'azure';
 const currentModel = getSetting('ai_model') || null;
 
 let estimatedSeconds = 50; // default fallback for unknown models

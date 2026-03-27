@@ -4,7 +4,7 @@ import { getSetting } from '../settings';
 const providerCache = new Map<string, ImageProvider>();
 
 export async function getImageProvider(): Promise<ImageProvider> {
-  const providerName = getSetting('image_provider') || import.meta.env.IMAGE_PROVIDER || 'azure';
+  const providerName = getSetting('image_provider') || process.env.IMAGE_PROVIDER || 'azure';
   const modelOverride = getSetting('image_model') || undefined;
   const cacheKey = `${providerName}:${modelOverride || 'default'}`;
 
