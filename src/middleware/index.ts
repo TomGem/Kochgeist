@@ -24,11 +24,16 @@ const csrfMiddleware = defineMiddleware((context, next) => {
   const origin = context.request.headers.get('origin');
   if (!origin) return next(); // same-site requests without origin (e.g. plain form posts)
 
-  // Check against both the request host and the configured APP_URL (for reverse proxy setups)
+  // Build set of allowed origins: request host, APP_URL, and X-Forwarded-* reconstructed origin
   const allowedOrigins = new Set([context.url.origin]);
   const appUrl = process.env.APP_URL;
   if (appUrl) {
     allowedOrigins.add(new URL(appUrl).origin);
+  }
+  const fwdProto = context.request.headers.get('x-forwarded-proto');
+  const fwdHost = context.request.headers.get('x-forwarded-host');
+  if (fwdProto && fwdHost) {
+    allowedOrigins.add(`${fwdProto}://${fwdHost}`);
   }
 
   if (!allowedOrigins.has(origin)) {
