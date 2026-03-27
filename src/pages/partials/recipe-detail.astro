@@ -149,16 +149,43 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
     <div class="mt-20 grid grid-cols-1 md:grid-cols-3 gap-16">
       <!-- Ingredients -->
       <aside class="md:col-span-1" x-data={`{
-        items: ${JSON.stringify(ingredientsList.map(i => ({ text: i.amount + ' ' + i.name, done: false }))).replace(/</g, '\\u003c')},
+        items: ${JSON.stringify(ingredientsList.map(i => ({ amount: i.amount, name: i.name, done: false }))).replace(/</g, '\\u003c')},
+        originalServings: ${(() => { const m = recipe.servings?.match(/\d+/); return m ? parseInt(m[0]) : 0; })()},
+        servings: ${(() => { const m = recipe.servings?.match(/\d+/); return m ? parseInt(m[0]) : 0; })()},
         exportLabel: ${JSON.stringify(t('detail.exportList', lang))},
         emptyLabel: ${JSON.stringify(t('detail.exportEmpty', lang))},
         copiedLabel: ${JSON.stringify(t('detail.copied', lang))},
         titleLabel: ${JSON.stringify(t('detail.shoppingListFor', lang) + ' ' + recipe.title)},
+        servingsLabel: ${JSON.stringify(t('metrics.servings', lang))},
         feedback: '',
+        parseFrac(s) {
+          const m = s.match(/^(\\d+)\\s*[/\u2044](\\d+)$/);
+          return m ? parseInt(m[1]) / parseInt(m[2]) : null;
+        },
+        scaleAmount(amount) {
+          if (!this.originalServings || this.servings === this.originalServings) return amount;
+          const ratio = this.servings / this.originalServings;
+          return amount.replace(/\\d+\\s*[/\u2044]\\s*\\d+|\\d+[.,]\\d+|\\d+/g, (match, offset, str) => {
+            const frac = this.parseFrac(match.replace(/\\s+/g, ''));
+            const num = frac !== null ? frac : parseFloat(match.replace(',', '.'));
+            if (isNaN(num)) return match;
+            const scaled = num * ratio;
+            if (scaled === Math.round(scaled)) return String(Math.round(scaled));
+            if (Math.abs(scaled - Math.round(scaled * 4) / 4) < 0.01) {
+              const q = Math.round(scaled * 4);
+              const whole = Math.floor(q / 4);
+              const frac = q % 4;
+              const fracs = ['', '1/4', '1/2', '3/4'];
+              return whole && frac ? whole + ' ' + fracs[frac] : frac ? fracs[frac] : String(whole);
+            }
+            return (Math.round(scaled * 100) / 100).toString();
+          });
+        },
+        itemText(item) { return this.scaleAmount(item.amount) + ' ' + item.name; },
         async exportList() {
           const needed = this.items.filter(i => !i.done);
           if (!needed.length) { this.showFeedback(this.emptyLabel); return; }
-          const lines = needed.map(i => '- ' + i.text);
+          const lines = needed.map(i => '- ' + this.itemText(i));
           const text = this.titleLabel + '\\n\\n' + lines.join('\\n');
           if (navigator.share) {
             try { await navigator.share({ title: this.titleLabel, text }); return; } catch {}
@@ -167,7 +194,29 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
         },
         showFeedback(msg) { this.feedback = msg; setTimeout(() => this.feedback = '', 2000); }
       }`}>
-        <h2 class="font-headline text-2xl font-bold mb-8 text-on-surface">{t('detail.ingredients', lang)}</h2>
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="font-headline text-2xl font-bold text-on-surface">{t('detail.ingredients', lang)}</h2>
+          {recipe.servings && (
+            <div class="flex items-center gap-2">
+              <button
+                x-on:click="servings = Math.max(1, servings - 1)"
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors cursor-pointer"
+              >
+                <span class="material-symbols-outlined text-base">remove</span>
+              </button>
+              <div class="flex items-center gap-1.5 px-2 min-w-[3.5rem] justify-center">
+                <span class="material-symbols-outlined text-primary text-sm">group</span>
+                <span class="text-sm font-bold text-on-surface" x-text="servings"></span>
+              </div>
+              <button
+                x-on:click="servings++"
+                class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-container-highest text-on-surface transition-colors cursor-pointer"
+              >
+                <span class="material-symbols-outlined text-base">add</span>
+              </button>
+            </div>
+          )}
+        </div>
         <ul class="space-y-4">
           <template x-for="(item, idx) in items" :key="idx">
             <li
@@ -176,7 +225,7 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
               class="flex items-start justify-between p-4 bg-surface-container-low rounded-xl group hover:bg-surface-container-high transition-colors cursor-pointer select-none"
             >
               <div class="flex items-center gap-2">
-                <span class="text-sm font-medium" :class="item.done && 'line-through'" x-text="item.text"></span>
+                <span class="text-sm font-medium" :class="item.done && 'line-through'" x-text="itemText(item)"></span>
               </div>
               <span
                 class="material-symbols-outlined transition-colors text-lg"
