@@ -33,12 +33,19 @@ jobs:
         id: version
         run: echo "tag=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      # 4. Build and push the Docker image with version + latest tags
+      # 4. Lowercase the owner name (container registries require lowercase)
+      - name: Lowercase owner
+        id: owner
+        run: echo "name=${OWNER,,}" >> "$GITHUB_OUTPUT"
+        env:
+          OWNER: ${{ github.repository_owner }}
+
+      # 5. Build and push the Docker image with version + latest tags
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/kochgeist:${{ steps.version.outputs.tag }}
-            ghcr.io/${{ github.repository_owner }}/kochgeist:latest
+            ghcr.io/${{ steps.owner.outputs.name }}/kochgeist:${{ steps.version.outputs.tag }}
+            ghcr.io/${{ steps.owner.outputs.name }}/kochgeist:latest
