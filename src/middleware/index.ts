@@ -22,10 +22,16 @@ const csrfMiddleware = defineMiddleware((context, next) => {
   if (SAFE_METHODS.has(context.request.method)) return next();
 
   const origin = context.request.headers.get('origin');
-  const host = context.url.origin;
+  if (!origin) return next(); // same-site requests without origin (e.g. plain form posts)
 
-  // Allow requests with matching origin, or same-site requests without origin (e.g. plain form posts)
-  if (origin && origin !== host) {
+  // Check against both the request host and the configured APP_URL (for reverse proxy setups)
+  const allowedOrigins = new Set([context.url.origin]);
+  const appUrl = process.env.APP_URL;
+  if (appUrl) {
+    allowedOrigins.add(new URL(appUrl).origin);
+  }
+
+  if (!allowedOrigins.has(origin)) {
     return new Response('Forbidden', { status: 403 });
   }
 
