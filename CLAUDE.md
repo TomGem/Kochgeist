@@ -25,7 +25,7 @@ No test framework is configured.
 **Astro SSR** with Node adapter (`output: 'server'`). No SPA framework — uses **htmx** for server interactions and **Alpine.js** for client-side state.
 
 ### Request flow
-1. Middleware (`src/middleware/index.ts`) runs four middleware in sequence: security headers, CSRF protection (validates origin for non-safe methods, supports `X-Forwarded-Proto`/`X-Forwarded-Host` for reverse proxies), language detection (sets `context.locals.lang`), then auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection). Astro's built-in origin check is disabled in `astro.config.mjs` (`security: { checkOrigin: false }`) in favour of custom CSRF middleware.
+1. Middleware (`src/middleware/index.ts`) runs four middleware in sequence: security headers, CSRF protection (validates origin for non-safe methods, supports `X-Forwarded-Proto`/`X-Forwarded-Host` for reverse proxies), auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection), then language detection (sets `context.locals.lang`). Astro's built-in origin check is disabled in `astro.config.mjs` (`security: { checkOrigin: false }`) in favour of custom CSRF middleware.
 2. If no users exist in DB, middleware redirects all routes to `/register?setup=true` (first-user bootstrap)
 3. Pages render Astro components; interactive parts use htmx (`hx-get`, `hx-post`, `hx-swap`) targeting partials
 4. API routes in `src/pages/api/` handle recipe suggestion, bookmarks, history, image generation, auth, and admin operations

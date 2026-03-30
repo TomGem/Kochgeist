@@ -13,8 +13,8 @@ Browser
 Astro Middleware (src/middleware/index.ts)
   |- Security headers  -> sets CSP, HSTS, etc.
   |- CSRF protection   -> validates origin for non-safe methods
-  |- Language detection -> sets context.locals.lang
   |- Auth validation    -> validates session cookie, sets context.locals.user
+  |- Language detection -> sets context.locals.lang
   |
   v
 Route Handler
@@ -23,7 +23,7 @@ Route Handler
   |- Partial routes -> return HTML fragments for htmx (src/pages/partials/)
 ```
 
-1. **Middleware** runs four handlers in sequence: security headers, CSRF protection (validates origin for non-safe methods), language detection (sets `context.locals.lang` from cookie/header), and auth (validates session cookie, sets user context, enforces route protection).
+1. **Middleware** runs four handlers in sequence: security headers, CSRF protection (validates origin for non-safe methods), auth (validates session cookie, sets user context, enforces route protection), and language detection (sets `context.locals.lang` from cookie/header).
 2. If no users exist in the database, all routes redirect to `/register?setup=true` for first-user bootstrap.
 3. **Page routes** render full Astro components. Interactive sections use htmx attributes (`hx-get`, `hx-post`, `hx-swap`) targeting partial endpoints.
 4. **API routes** (`src/pages/api/`) handle recipe suggestions, bookmarks, history, image serving, auth, and admin operations.
@@ -76,7 +76,7 @@ IMAGE_PROVIDER env var
   v
 Provider (src/lib/images/provider.ts)
   |- azure.ts       -- Azure AI (gpt-image-1)
-  |- placeholder.ts  -- Colored placeholder images
+  |- placeholder.ts  -- 1x1 transparent PNG fallback
 ```
 
 - Images saved to `data/images/`, served via `/api/images/[id]`
@@ -133,7 +133,7 @@ Components in `src/components/` are grouped by page context:
 
 | Directory | Contents |
 |-----------|----------|
-| `home/` | HeroSearch, IngredientTags, DietaryFilters, SuggestButton, QuickStart, CameraButton |
+| `home/` | HeroSearch, IngredientTags, DietaryFilters, FavouriteShortcuts, SuggestButton, CameraButton |
 | `detail/` | RecipeModal, CookingMode |
 | `bookmarks/` | BookmarkCard, FilterPills, EmptyState |
 | `layout/` | Header, BottomNav, BaseLayout |

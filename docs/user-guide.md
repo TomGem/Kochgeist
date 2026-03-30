@@ -18,10 +18,12 @@ If SMTP is not configured, the verification code is logged to the server console
 ## Searching for Recipes
 
 1. **Enter ingredients** -- type ingredients into the input field. Separate multiple ingredients with commas (e.g. "chicken, rice, garlic"). Tags are auto-capitalized.
-2. **Apply filters** (optional) -- tap any of the 16 dietary/lifestyle filters to narrow your results:
+2. **Apply filters** (optional) -- tap any of the 22 dietary/lifestyle/course filters to narrow your results:
    - **Diet**: Vegetarian, Vegan, Gluten-Free, Dairy-Free, Low-Carb, High-Protein, Low-Cholesterol
    - **Time & Budget**: Quick, Elaborate, Budget, Gourmet
    - **Occasion**: Kid-Friendly, Date Night, Comfort Food, One-Pot, Meal Prep
+   - **Course**: Amuse-Bouche, Starter, Salad, Soup, Main Course, Dessert
+   - Use the **Clear Filters** button to remove all active filters at once
 3. **Submit** -- the AI generates 4 recipe suggestions displayed in a bento grid layout
 4. **Images** -- recipe images generate in the background. You'll see a spinner that automatically updates when the image is ready.
 
@@ -29,9 +31,9 @@ If SMTP is not configured, the verification code is logged to the server console
 
 Click the suggest button without entering any ingredients to get random recipe inspiration. A confirmation modal will appear -- confirm to let the AI surprise you.
 
-### Quick Start Presets
+### Favourite Shortcuts
 
-Below the ingredient input, preset buttons offer common ingredient combos for quick inspiration.
+Below the filters, up to 4 user-configured shortcut tiles offer one-tap recipe searches. Each shortcut stores a name, icon, preset filters, and preset ingredients. Clicking a tile auto-fills the ingredient input and selects the saved filters. Configure shortcuts in `/settings`.
 
 ### Ingredient Scanner
 
@@ -45,7 +47,7 @@ If you search the same ingredient combination (with the same language and filter
 
 Tap any recipe card to open the detail modal with:
 
-- Full ingredient list with interactive checkboxes (tap to mark as done)
+- Full ingredient list with interactive checkboxes (tap to mark as done) and a servings adjuster that dynamically scales ingredient amounts
 - Step-by-step instructions
 - Dietary tags and contextual badge (Pantry Perfect, Quick & Easy, Chef's Challenge, or Homemade)
 - AI-generated food photo
@@ -54,7 +56,7 @@ Tap any recipe card to open the detail modal with:
 
 ### Shopping List
 
-In the recipe detail, tap ingredients to check them off. Use the export button to share unchecked ingredients via the system share sheet (or clipboard on unsupported browsers).
+In the recipe detail, adjust servings with the +/- buttons to scale ingredient amounts. Tap ingredients to check them off. Use the export button to share unchecked ingredients (using scaled quantities) via the system share sheet (or clipboard on unsupported browsers).
 
 ### Cooking Mode
 
@@ -122,7 +124,8 @@ Admins can access the admin panel at `/admin` to:
 Go to `/settings` to configure:
 
 - **Language preference** -- persisted per user
-- **Default dietary filters** -- pre-selected filters for every new search
+- **Favourite Shortcuts** -- configure up to 4 preset tiles with custom name, icon, ingredients, and filters
+- **Change password** -- update your account password
 
 ## Password Reset
 
