@@ -219,7 +219,7 @@
     "connectionFailed": "Error al conectar con el proveedor."
   },
   "settings": {
-    "subtitle": "Configura tus preferencias y proveedores de IA.",
+    "subtitle": "Configura tus preferencias.",
     "preferredLanguage": "Idioma preferido",
     "favouriteShortcuts": "Atajos favoritos",
     "favouriteShortcutsDescription": "Crea atajos que rellenan automáticamente ingredientes y filtros en la página principal.",

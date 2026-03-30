@@ -219,7 +219,7 @@
     "connectionFailed": "Failed to connect to provider."
   },
   "settings": {
-    "subtitle": "Configure your preferences and AI providers.",
+    "subtitle": "Configure your preferences.",
     "preferredLanguage": "Preferred Language",
     "favouriteShortcuts": "Favourite Shortcuts",
     "favouriteShortcutsDescription": "Create shortcuts that auto-fill ingredients and filters on the home page.",

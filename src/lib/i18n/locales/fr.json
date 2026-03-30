@@ -219,7 +219,7 @@
     "connectionFailed": "Connexion au fournisseur échouée."
   },
   "settings": {
-    "subtitle": "Configure tes préférences et fournisseurs d'IA.",
+    "subtitle": "Configure tes préférences.",
     "preferredLanguage": "Langue préférée",
     "favouriteShortcuts": "Raccourcis favoris",
     "favouriteShortcutsDescription": "Crée des raccourcis qui remplissent automatiquement les ingrédients et filtres sur la page d'accueil.",

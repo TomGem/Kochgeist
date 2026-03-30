@@ -219,7 +219,7 @@
     "connectionFailed": "Falha na ligação ao fornecedor."
   },
   "settings": {
-    "subtitle": "Configura as tuas preferências e fornecedores de IA.",
+    "subtitle": "Configura as tuas preferências.",
     "preferredLanguage": "Idioma preferido",
     "favouriteShortcuts": "Atalhos favoritos",
     "favouriteShortcutsDescription": "Cria atalhos que preenchem automaticamente ingredientes e filtros na página principal.",

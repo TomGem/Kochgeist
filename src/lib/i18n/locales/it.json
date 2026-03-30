@@ -219,7 +219,7 @@
     "connectionFailed": "Connessione al fornitore fallita."
   },
   "settings": {
-    "subtitle": "Configura le tue preferenze e i fornitori di IA.",
+    "subtitle": "Configura le tue preferenze.",
     "preferredLanguage": "Lingua preferita",
     "favouriteShortcuts": "Scorciatoie preferite",
     "favouriteShortcutsDescription": "Crea scorciatoie che compilano automaticamente ingredienti e filtri nella pagina principale.",

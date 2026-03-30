@@ -219,7 +219,7 @@
     "connectionFailed": "Verbindung zum Anbieter fehlgeschlagen."
   },
   "settings": {
-    "subtitle": "Konfiguriere deine Einstellungen und KI-Anbieter.",
+    "subtitle": "Konfiguriere deine Einstellungen.",
     "preferredLanguage": "Bevorzugte Sprache",
     "favouriteShortcuts": "Favoriten-Shortcuts",
     "favouriteShortcutsDescription": "Erstelle Shortcuts, die Zutaten und Filter auf der Startseite automatisch ausfüllen.",
