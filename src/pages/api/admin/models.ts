@@ -24,8 +24,8 @@ export const GET: APIRoute = async ({ url, locals }) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to fetch models';
-    return new Response(JSON.stringify({ error: message, models: [] }), {
+    console.error('Model fetch error:', error);
+    return new Response(JSON.stringify({ error: 'Failed to fetch models. Please verify provider configuration.', models: [] }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });

@@ -18,10 +18,6 @@ export function isRateLimited(
   return entry.count > maxAttempts;
 }
 
-export function clearRateLimit(key: string): void {
-  attempts.delete(key);
-}
-
 // Periodic cleanup of expired entries (every 10 minutes)
 setInterval(() => {
   const now = Date.now();

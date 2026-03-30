@@ -147,7 +147,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     });
   } catch (error) {
     console.error('Recipe suggest error:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
     const errorLang = lang;
     return new Response(
       `<div class="flex flex-col items-center justify-center py-24 text-center">
@@ -155,7 +154,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           <span class="material-symbols-outlined text-error text-3xl">error</span>
         </div>
         <h3 class="font-headline text-xl font-bold text-on-surface mb-2">${escapeHtml(t('errors.somethingWentWrong', errorLang as Locale))}</h3>
-        <p class="text-on-surface-variant mb-4 max-w-md">${escapeHtml(message)}</p>
+        <p class="text-on-surface-variant mb-4 max-w-md">${escapeHtml(t('errors.somethingWentWrong', errorLang as Locale))}</p>
         <button onclick="history.back()" class="editorial-gradient text-on-primary px-6 py-3 rounded-full font-bold">
           ${escapeHtml(t('errors.tryAgain', errorLang as Locale))}
         </button>
