@@ -87,6 +87,9 @@ const favouriteShortcuts = Astro.locals.user?.favouriteShortcuts ?? '[]';
         isActive(filter: string) {
           return this.active.includes(filter);
         },
+        clear() {
+          this.active = [];
+        },
       });
 
       Alpine.store('ui', {

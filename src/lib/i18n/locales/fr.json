@@ -89,7 +89,8 @@
     "salad": "Salade",
     "soup": "Soupe",
     "mainCourse": "Plat principal",
-    "dessert": "Dessert"
+    "dessert": "Dessert",
+    "clearAll": "Effacer les filtres"
   },
   "nav": {
     "discover": "Découvrir",

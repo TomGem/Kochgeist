@@ -89,7 +89,8 @@
     "salad": "Salad",
     "soup": "Soup",
     "mainCourse": "Main Course",
-    "dessert": "Dessert"
+    "dessert": "Dessert",
+    "clearAll": "Clear Filters"
   },
   "nav": {
     "discover": "Discover",

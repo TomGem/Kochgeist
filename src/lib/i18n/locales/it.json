@@ -89,7 +89,8 @@
     "salad": "Insalata",
     "soup": "Zuppa",
     "mainCourse": "Secondo piatto",
-    "dessert": "Dolce"
+    "dessert": "Dolce",
+    "clearAll": "Cancella filtri"
   },
   "nav": {
     "discover": "Scopri",
