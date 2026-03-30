@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { defineMiddleware, sequence } from 'astro:middleware';
 import { detectLocale } from '../lib/i18n/index';
 import { validateSession, SESSION_COOKIE } from '../lib/auth/session';
