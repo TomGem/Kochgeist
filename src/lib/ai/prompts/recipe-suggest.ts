@@ -22,6 +22,7 @@ IMPORTANT RULES:
 - Include a "highlight" field: a short 2–3 word tagline that captures the recipe's unique appeal (e.g. "Rustic Comfort", "Weeknight Hero", "Protein-Packed", "One-Pot Wonder"). Write it in ${langName[language]}.
 - The imagePrompt should describe the finished dish in the style of "editorial food photography, soft natural light, rustic ceramic plate, shallow depth of field".
 - Include a "tip" object alongside the recipes array: a practical cooking tip relevant to the specific ingredients provided. The "title" should be a short catchy heading (3-5 words) and "text" should be 1-2 sentences of actionable advice. Write both in ${langName[language]}.
+- Write detailed, beginner-friendly cooking instructions. Each step description should include precise quantities, timing (e.g. "3-4 minutes"), temperatures (e.g. "180°C / 350°F"), specific techniques (e.g. "dice into 1cm cubes"), and sensory cues so the cook knows what to look for (e.g. "until golden brown and fragrant", "the sauce should coat the back of a spoon"). Weave in brief tips where helpful (e.g. "pat the chicken dry — this ensures a crispy skin").
 - Return exactly 4 recipes.`;
 }
 
@@ -51,7 +52,7 @@ Return exactly ${count} recipes as a JSON object: { "recipes": [...], "tip": { "
   "difficulty": "Easy" | "Medium" | "Hard",
   "servings": "string (e.g. '4 Servings')",
   "ingredients": [{ "name": "string", "amount": "string", "isExtra": boolean }],
-  "instructions": [{ "step": number, "title": "string", "description": "string" }] (as many steps as the recipe naturally needs),
+  "instructions": [{ "step": number, "title": "string (short action phrase)", "description": "string (detailed: include precise quantities, timing, temperatures, and sensory cues so a beginner can follow along)" }] (as many steps as the recipe naturally needs),
   "imagePrompt": "string (food photography description)"
 }
 

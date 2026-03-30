@@ -26,7 +26,7 @@ export class OpenAIProvider implements AIProvider {
         { role: 'user', content: buildRecipeUserPrompt(ingredients, language, dietaryFilters, count) },
       ],
       temperature: 0.8,
-      max_tokens: 4000,
+      max_tokens: 6000,
       response_format: { type: 'json_object' },
     });
 

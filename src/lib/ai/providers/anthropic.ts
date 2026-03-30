@@ -21,7 +21,7 @@ export class AnthropicProvider implements AIProvider {
 
     const response = await this.client.messages.create({
       model: this.model,
-      max_tokens: 4000,
+      max_tokens: 6000,
       system: buildRecipeSystemPrompt(language),
       messages: [
         { role: 'user', content: buildRecipeUserPrompt(ingredients, language, dietaryFilters, count) },
