@@ -84,7 +84,13 @@
     "dateNight": "Date Night",
     "comfort": "Comfort Food",
     "onePot": "One Pot",
-    "mealPrep": "Meal Prep"
+    "mealPrep": "Meal Prep",
+    "amouseBouche": "Amuse-Bouche",
+    "starter": "Starter",
+    "salad": "Salad",
+    "soup": "Soup",
+    "mainCourse": "Main Course",
+    "dessert": "Dessert"
   },
   "nav": {
     "discover": "Discover",
@@ -125,6 +131,7 @@
     "displayName": "Display Name",
     "displayNamePlaceholder": "Your name",
     "forgotPassword": "Forgot Password?",
+    "forgotPasswordTitle": "Forgot Password",
     "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link.",
     "resetPassword": "Reset Password",
     "newPassword": "New Password",

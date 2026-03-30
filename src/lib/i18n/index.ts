@@ -20,18 +20,21 @@ export function t(key: string, locale: Locale = 'en'): string {
   return typeof value === 'string' ? value : key;
 }
 
-export function detectLocale(request: Request): Locale {
+export function detectLocale(request: Request, userLanguage?: string | null): Locale {
   // 1. URL query param
   const url = new URL(request.url);
   const langParam = url.searchParams.get('lang');
   if (langParam && allLocales.includes(langParam as Locale)) return langParam as Locale;
 
-  // 2. Cookie
+  // 2. Cookie (explicit user selection in this browser session)
   const cookies = request.headers.get('cookie') || '';
   const match = cookies.match(/kochgeist-lang=(\w+)/);
   if (match && allLocales.includes(match[1] as Locale)) return match[1] as Locale;
 
-  // 3. Accept-Language header
+  // 3. User's saved language preference from their profile
+  if (userLanguage && allLocales.includes(userLanguage as Locale)) return userLanguage as Locale;
+
+  // 4. Accept-Language header
   const acceptLang = request.headers.get('accept-language')?.toLowerCase() || '';
   for (const locale of allLocales) {
     if (locale !== 'en' && acceptLang.includes(locale)) return locale;

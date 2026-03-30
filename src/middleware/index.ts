@@ -44,7 +44,7 @@ const csrfMiddleware = defineMiddleware((context, next) => {
 });
 
 const languageMiddleware = defineMiddleware((context, next) => {
-  const lang = detectLocale(context.request);
+  const lang = detectLocale(context.request, context.locals.user?.language);
   context.locals.lang = lang;
   return next();
 });
@@ -124,4 +124,4 @@ const authMiddleware = defineMiddleware((context, next) => {
   return next();
 });
 
-export const onRequest = sequence(securityHeadersMiddleware, csrfMiddleware, languageMiddleware, authMiddleware);
+export const onRequest = sequence(securityHeadersMiddleware, csrfMiddleware, authMiddleware, languageMiddleware);

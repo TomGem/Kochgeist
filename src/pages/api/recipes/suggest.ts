@@ -230,21 +230,21 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
 
   return `
 <!-- Results Header -->
-<section class="mb-12">
+<section class="mb-8 sm:mb-12">
   <div class="flex items-center gap-2 mb-2">
     <span class="font-label text-[10px] uppercase tracking-[0.05em] font-semibold text-primary">${escapeHtml(t('results.curatedResults', lang as Locale))}</span>
     <div class="h-[1px] flex-grow bg-outline-variant/20"></div>
   </div>
-  <h1 class="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-on-surface leading-tight mb-4">
+  <h1 class="font-headline text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tighter text-on-surface leading-tight mb-3 sm:mb-4">
     ${headerTitle}
   </h1>
-  <p class="font-body text-on-surface-variant max-w-2xl leading-relaxed">
+  <p class="font-body text-sm sm:text-base text-on-surface-variant max-w-2xl leading-relaxed">
     ${headerNote}
   </p>
 </section>
 
 <!-- Bento Grid -->
-<div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-8">
   ${featured ? `
   <!-- Featured Card -->
   <article class="md:col-span-8 group relative overflow-hidden rounded-xl bg-surface-container-lowest recipe-card-shadow transition-all duration-300 hover:-translate-y-1 cursor-pointer" ${cardClick(featured.id)}>
@@ -255,10 +255,10 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
           <span class="editorial-gradient text-on-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">${escapeHtml(t('results.bestMatch', lang as Locale))}</span>
         </div>
       </div>
-      <div class="md:w-1/2 p-8 flex flex-col justify-between">
+      <div class="md:w-1/2 p-5 sm:p-8 flex flex-col justify-between">
         <div>
-          <h3 class="font-headline text-2xl font-bold leading-tight text-on-surface mb-4">${escapeHtml(featured.title)}</h3>
-          <p class="font-body text-on-surface-variant mb-6 leading-relaxed">${escapeHtml(featured.description)}</p>
+          <h3 class="font-headline text-lg sm:text-2xl font-bold leading-tight text-on-surface mb-2 sm:mb-4">${escapeHtml(featured.title)}</h3>
+          <p class="font-body text-sm sm:text-base text-on-surface-variant mb-4 sm:mb-6 leading-relaxed">${escapeHtml(featured.description)}</p>
         </div>
         <div class="flex gap-4">
           <div class="flex items-center gap-1.5">
@@ -277,13 +277,13 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
   ${vertical ? `
   <!-- Vertical Card -->
   <article class="md:col-span-4 group flex flex-col rounded-xl bg-surface-container-lowest recipe-card-shadow transition-all duration-300 hover:-translate-y-1 overflow-hidden cursor-pointer" ${cardClick(vertical.id)}>
-    <div class="h-64 overflow-hidden relative">
+    <div class="h-48 sm:h-64 overflow-hidden relative">
       ${imgOrPlaceholder(vertical, 'soup_kitchen', 'bg-gradient-to-br from-secondary/20 to-tertiary-container/30', '')}
     </div>
-    <div class="p-6 flex-grow flex flex-col justify-between">
+    <div class="p-4 sm:p-6 flex-grow flex flex-col justify-between">
       <div>
-        <h3 class="font-headline text-xl font-bold text-on-surface mb-3">${escapeHtml(vertical.title)}</h3>
-        <p class="font-body text-sm text-on-surface-variant mb-6">${escapeHtml(vertical.description)}</p>
+        <h3 class="font-headline text-lg sm:text-xl font-bold text-on-surface mb-2 sm:mb-3">${escapeHtml(vertical.title)}</h3>
+        <p class="font-body text-sm text-on-surface-variant mb-4 sm:mb-6">${escapeHtml(vertical.description)}</p>
       </div>
       <div class="flex gap-4">
         <div class="flex items-center gap-1.5">
@@ -303,11 +303,11 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
   <article class="md:col-span-6 group overflow-hidden rounded-xl bg-surface-container-lowest recipe-card-shadow transition-all duration-300 hover:-translate-y-1 cursor-pointer" ${cardClick(horiz1.id)}>
     <div class="flex h-full">
       <div class="w-2/5 overflow-hidden">
-        ${imgOrPlaceholder(horiz1, 'skillet', 'bg-gradient-to-br from-tertiary/20 to-primary-container/30', 'min-h-[180px]')}
+        ${imgOrPlaceholder(horiz1, 'skillet', 'bg-gradient-to-br from-tertiary/20 to-primary-container/30', 'min-h-[140px] sm:min-h-[180px]')}
       </div>
-      <div class="w-3/5 p-6 flex flex-col justify-between">
+      <div class="w-3/5 p-4 sm:p-6 flex flex-col justify-between">
         <div>
-          <h3 class="font-headline text-lg font-bold text-on-surface mb-2">${escapeHtml(horiz1.title)}</h3>
+          <h3 class="font-headline text-base sm:text-lg font-bold text-on-surface mb-1 sm:mb-2">${escapeHtml(horiz1.title)}</h3>
           <p class="font-body text-sm text-on-surface-variant line-clamp-2">${escapeHtml(horiz1.description)}</p>
         </div>
         <div class="flex gap-4 mt-4">
@@ -329,11 +329,11 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
   <article class="md:col-span-6 group overflow-hidden rounded-xl bg-surface-container-lowest recipe-card-shadow transition-all duration-300 hover:-translate-y-1 cursor-pointer" ${cardClick(horiz2.id)}>
     <div class="flex h-full">
       <div class="w-2/5 overflow-hidden">
-        ${imgOrPlaceholder(horiz2, 'skillet', 'bg-gradient-to-br from-secondary/15 to-tertiary/15', 'min-h-[180px]')}
+        ${imgOrPlaceholder(horiz2, 'skillet', 'bg-gradient-to-br from-secondary/15 to-tertiary/15', 'min-h-[140px] sm:min-h-[180px]')}
       </div>
-      <div class="w-3/5 p-6 flex flex-col justify-between">
+      <div class="w-3/5 p-4 sm:p-6 flex flex-col justify-between">
         <div>
-          <h3 class="font-headline text-lg font-bold text-on-surface mb-2">${escapeHtml(horiz2.title)}</h3>
+          <h3 class="font-headline text-base sm:text-lg font-bold text-on-surface mb-1 sm:mb-2">${escapeHtml(horiz2.title)}</h3>
           <p class="font-body text-sm text-on-surface-variant line-clamp-2">${escapeHtml(horiz2.description)}</p>
         </div>
         <div class="flex gap-4 mt-4">
@@ -352,8 +352,8 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
 </div>
 
 <!-- Pro Tip -->
-<section class="mt-16 p-8 rounded-2xl bg-tertiary-container/10 border-l-4 border-tertiary-fixed">
-  <div class="flex items-start gap-4">
+<section class="mt-8 sm:mt-16 p-5 sm:p-8 rounded-2xl bg-tertiary-container/10 border-l-4 border-tertiary-fixed">
+  <div class="flex items-start gap-3 sm:gap-4">
     <span class="material-symbols-outlined text-tertiary p-2 bg-tertiary-container/20 rounded-xl">lightbulb</span>
     <div>
       <h4 class="font-headline font-bold text-on-surface mb-1">${escapeHtml(tip?.title || t('results.chefSecretTitle', lang as Locale))}</h4>

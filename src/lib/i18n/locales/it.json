@@ -84,7 +84,13 @@
     "dateNight": "Cena romantica",
     "comfort": "Comfort Food",
     "onePot": "One Pot",
-    "mealPrep": "Preparazione anticipata"
+    "mealPrep": "Preparazione anticipata",
+    "amouseBouche": "Amuse-bouche",
+    "starter": "Antipasto",
+    "salad": "Insalata",
+    "soup": "Zuppa",
+    "mainCourse": "Secondo piatto",
+    "dessert": "Dolce"
   },
   "nav": {
     "discover": "Scopri",
@@ -125,6 +131,7 @@
     "displayName": "Nome visualizzato",
     "displayNamePlaceholder": "Il tuo nome",
     "forgotPassword": "Password dimenticata?",
+    "forgotPasswordTitle": "Password dimenticata",
     "forgotPasswordSubtitle": "Inserisci la tua e-mail e ti invieremo un link per reimpostare la password.",
     "resetPassword": "Reimposta password",
     "newPassword": "Nuova password",

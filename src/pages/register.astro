@@ -101,7 +101,7 @@ if (Astro.request.method === 'POST') {
 }
 ---
 
-<BaseLayout title="Kochgeist - Register">
+<BaseLayout title={`Kochgeist - ${t('auth.register', lang)}`}>
   <main class="min-h-screen flex items-center justify-center px-6 py-12">
     <div class="w-full max-w-md">
       <div class="text-center mb-10">

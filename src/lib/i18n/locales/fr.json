@@ -84,7 +84,13 @@
     "dateNight": "Dîner romantique",
     "comfort": "Réconfortant",
     "onePot": "One Pot",
-    "mealPrep": "Batch cooking"
+    "mealPrep": "Batch cooking",
+    "amouseBouche": "Amuse-bouche",
+    "starter": "Entrée",
+    "salad": "Salade",
+    "soup": "Soupe",
+    "mainCourse": "Plat principal",
+    "dessert": "Dessert"
   },
   "nav": {
     "discover": "Découvrir",
@@ -125,6 +131,7 @@
     "displayName": "Nom d'affichage",
     "displayNamePlaceholder": "Ton nom",
     "forgotPassword": "Mot de passe oublié ?",
+    "forgotPasswordTitle": "Mot de passe oublié",
     "forgotPasswordSubtitle": "Entre ton e-mail et nous t'enverrons un lien de réinitialisation.",
     "resetPassword": "Réinitialiser le mot de passe",
     "newPassword": "Nouveau mot de passe",

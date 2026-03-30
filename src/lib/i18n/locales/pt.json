@@ -84,7 +84,13 @@
     "dateNight": "Jantar romântico",
     "comfort": "Comfort Food",
     "onePot": "One Pot",
-    "mealPrep": "Preparação antecipada"
+    "mealPrep": "Preparação antecipada",
+    "amouseBouche": "Amuse-bouche",
+    "starter": "Entrada",
+    "salad": "Salada",
+    "soup": "Sopa",
+    "mainCourse": "Prato principal",
+    "dessert": "Sobremesa"
   },
   "nav": {
     "discover": "Descobrir",
@@ -125,6 +131,7 @@
     "displayName": "Nome de exibição",
     "displayNamePlaceholder": "O teu nome",
     "forgotPassword": "Esqueceste a palavra-passe?",
+    "forgotPasswordTitle": "Palavra-passe esquecida",
     "forgotPasswordSubtitle": "Insere o teu e-mail e enviaremos um link para redefinir.",
     "resetPassword": "Redefinir palavra-passe",
     "newPassword": "Nova palavra-passe",

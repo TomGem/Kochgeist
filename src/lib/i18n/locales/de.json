@@ -84,7 +84,13 @@
     "dateNight": "Romantisch",
     "comfort": "Soulfood",
     "onePot": "One Pot",
-    "mealPrep": "Vorkochen"
+    "mealPrep": "Vorkochen",
+    "amouseBouche": "Amuse-Bouche",
+    "starter": "Vorspeise",
+    "salad": "Salat",
+    "soup": "Suppe",
+    "mainCourse": "Hauptgericht",
+    "dessert": "Dessert"
   },
   "nav": {
     "discover": "Entdecken",
@@ -125,6 +131,7 @@
     "displayName": "Anzeigename",
     "displayNamePlaceholder": "Dein Name",
     "forgotPassword": "Passwort vergessen?",
+    "forgotPasswordTitle": "Passwort vergessen",
     "forgotPasswordSubtitle": "Gib deine E-Mail-Adresse ein und wir senden dir einen Link zum Zurücksetzen.",
     "resetPassword": "Passwort zurücksetzen",
     "newPassword": "Neues Passwort",

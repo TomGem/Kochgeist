@@ -4,7 +4,7 @@ import { t, type Locale } from '../../lib/i18n/index';
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 ---
 
-<div class="fixed bottom-24 left-0 w-full px-6 pointer-events-none z-40">
+<div class="fixed bottom-24 left-0 w-full px-6 pointer-events-none z-40" x-show="!$store.ui.hasResults" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-4">
   <div class="max-w-2xl mx-auto flex flex-col items-center gap-3" x-data="{ showSurprise: false }">
 
     <!-- Surprise Me prompt -->
@@ -42,7 +42,7 @@ const lang = (Astro.locals.lang ?? 'en') as Locale;
                 lang: $store.ui.lang,
                 surpriseMe: 'true'
               }
-            }).finally(() => { $store.ui.loading = false; });
+            }).then(() => { $store.ui.hasResults = true; }).finally(() => { $store.ui.loading = false; });
           "
           class="flex-1 py-2.5 rounded-full editorial-gradient text-white font-headline font-bold text-sm flex items-center justify-center gap-2 hover:opacity-95 active:scale-95 transition-all"
         >
@@ -73,7 +73,7 @@ const lang = (Astro.locals.lang ?? 'en') as Locale;
             filters: JSON.stringify($store.filters.active),
             lang: $store.ui.lang
           }
-        }).finally(() => { $store.ui.loading = false; });
+        }).then(() => { $store.ui.hasResults = true; }).finally(() => { $store.ui.loading = false; });
       "
     >
       <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>

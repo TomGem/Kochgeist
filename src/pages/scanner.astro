@@ -9,9 +9,12 @@ import SuggestButton from '../components/home/SuggestButton.astro';
 import LoadingSpinner from '../components/shared/LoadingSpinner.astro';
 import ErrorToast from '../components/shared/ErrorToast.astro';
 import RecipeModal from '../components/detail/RecipeModal.astro';
+import { t, type Locale } from '../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
 ---
 
-<BaseLayout title="Kochgeist - Scanner" activePage="scanner">
+<BaseLayout title={`Kochgeist - ${t('nav.scanner', lang)}`} activePage="scanner">
   <Header />
   <main id="main-content" class="pt-24 pb-52 px-6 max-w-2xl mx-auto min-h-screen">
     <CameraButton />
