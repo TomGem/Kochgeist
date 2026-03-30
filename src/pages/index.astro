@@ -5,6 +5,7 @@ import BottomNav from '../components/layout/BottomNav.astro';
 import HeroSearch from '../components/home/HeroSearch.astro';
 import IngredientTags from '../components/home/IngredientTags.astro';
 import DietaryFilters from '../components/home/DietaryFilters.astro';
+import FavouriteShortcuts from '../components/home/FavouriteShortcuts.astro';
 import SuggestButton from '../components/home/SuggestButton.astro';
 import LoadingSpinner from '../components/shared/LoadingSpinner.astro';
 import ErrorToast from '../components/shared/ErrorToast.astro';
@@ -20,6 +21,7 @@ const lang = (Astro.locals.lang ?? 'en') as Locale;
     <HeroSearch />
     <IngredientTags />
     <DietaryFilters />
+    <FavouriteShortcuts />
   </main>
   <SuggestButton />
   <BottomNav active="discover" />

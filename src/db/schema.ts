@@ -10,7 +10,7 @@ export const users = sqliteTable('users', {
   role: text('role').notNull().default('user'), // 'admin' | 'user'
   isVerified: integer('is_verified').notNull().default(0),
   language: text('language').default('en'),
-  defaultFilters: text('default_filters'), // JSON array of filter IDs
+  favouriteShortcuts: text('default_filters'), // JSON array of shortcut objects
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),

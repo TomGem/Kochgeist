@@ -6,7 +6,7 @@ interface Props {
 
 const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
 const lang = (Astro.locals.lang as string) ?? 'en';
-const defaultFilters = Astro.locals.user?.defaultFilters ?? '[]';
+const favouriteShortcuts = Astro.locals.user?.favouriteShortcuts ?? '[]';
 ---
 
 <!DOCTYPE html>
@@ -34,7 +34,7 @@ const defaultFilters = Astro.locals.user?.defaultFilters ?? '[]';
   class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"
   hx-boost="true"
   data-lang={lang}
-  data-default-filters={defaultFilters}
+  data-shortcuts={favouriteShortcuts}
 >
   <slot />
 
@@ -74,9 +74,8 @@ const defaultFilters = Astro.locals.user?.defaultFilters ?? '[]';
         },
       });
 
-      const defaultFilters = JSON.parse(document.body.dataset.defaultFilters || '[]');
       Alpine.store('filters', {
-        active: [...defaultFilters] as string[],
+        active: [] as string[],
         toggle(filter: string) {
           const idx = this.active.indexOf(filter);
           if (idx === -1) {
@@ -98,6 +97,18 @@ const defaultFilters = Astro.locals.user?.defaultFilters ?? '[]';
         hasResults: false,
         error: null as string | null,
         toastMessage: null as string | null,
+      });
+
+      const rawShortcuts = JSON.parse(document.body.dataset.shortcuts || '[]');
+      const shortcuts = Array.isArray(rawShortcuts) && rawShortcuts.length > 0 && typeof rawShortcuts[0] === 'object' && rawShortcuts[0] !== null && 'name' in rawShortcuts[0] ? rawShortcuts : [];
+      Alpine.store('shortcuts', {
+        items: shortcuts as Array<{ name: string; icon: string; filters: string[]; ingredients: string[] }>,
+        apply(index: number) {
+          const sc = this.items[index];
+          if (!sc) return;
+          (Alpine.store('ingredients') as any).items = [...(sc.ingredients || [])];
+          (Alpine.store('filters') as any).active = [...(sc.filters || [])];
+        },
       });
 
       window.Alpine = Alpine;

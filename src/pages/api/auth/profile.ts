@@ -13,12 +13,22 @@ export const PATCH: APIRoute = async ({ request, locals }) => {
   const formData = await request.formData();
   const displayName = formData.get('displayName') as string | null;
   const language = formData.get('language') as string | null;
-  const defaultFilters = formData.get('defaultFilters') as string | null;
+  const favouriteShortcuts = formData.get('favouriteShortcuts') as string | null;
 
   const updates: Record<string, unknown> = { updatedAt: new Date() };
   if (displayName !== null) updates.displayName = displayName.trim() || null;
   if (language !== null) updates.language = language;
-  if (defaultFilters !== null) updates.defaultFilters = defaultFilters;
+  if (favouriteShortcuts !== null) {
+    try {
+      const parsed = JSON.parse(favouriteShortcuts);
+      if (!Array.isArray(parsed) || parsed.some((s: any) => typeof s.name !== 'string')) {
+        return new Response('Invalid shortcuts', { status: 400 });
+      }
+    } catch {
+      return new Response('Invalid JSON', { status: 400 });
+    }
+    updates.favouriteShortcuts = favouriteShortcuts;
+  }
 
   db.update(users).set(updates).where(eq(users.id, locals.user.id)).run();
 

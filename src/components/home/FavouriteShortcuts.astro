@@ -1,0 +1,42 @@
+---
+import { t, type Locale } from '../../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+const raw = Astro.locals.user?.favouriteShortcuts;
+let shortcuts: Array<{ name: string; icon?: string; filters?: string[]; ingredients?: string[] }> = [];
+try {
+  const parsed = raw ? JSON.parse(raw) : [];
+  shortcuts = Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null && 'name' in parsed[0] ? parsed : [];
+} catch { shortcuts = []; }
+---
+
+{shortcuts.length > 0 && (
+  <div class="mb-8" x-data>
+    <p class="text-xs font-label font-semibold text-on-surface-variant/60 uppercase tracking-wider mb-3">
+      {t('settings.favouriteShortcuts', lang)}
+    </p>
+    <div class="grid grid-cols-2 gap-2">
+      {shortcuts.map((sc, i) => (
+        <button
+          type="button"
+          x-on:click={`$store.shortcuts.apply(${i})`}
+          class="flex items-center gap-2.5 bg-surface-container-low hover:bg-surface-container-high active:scale-[0.98] rounded-xl px-4 py-3 text-left transition-all group"
+        >
+          <span
+            class="material-symbols-outlined text-primary text-xl shrink-0"
+            style="font-variation-settings: 'FILL' 1;"
+          >{sc.icon || 'star'}</span>
+          <div class="min-w-0">
+            <span class="block text-sm font-semibold text-on-surface truncate">{sc.name}</span>
+            <span class="block text-xs text-on-surface-variant/70 truncate">
+              {[
+                (sc.filters?.length ?? 0) > 0 ? `${sc.filters!.length} ${t('settings.nFilters', lang)}` : null,
+                (sc.ingredients?.length ?? 0) > 0 ? `${sc.ingredients!.length} ${t('settings.nIngredients', lang)}` : null,
+              ].filter(Boolean).join(' \u00b7 ')}
+            </span>
+          </div>
+        </button>
+      ))}
+    </div>
+  </div>
+)}

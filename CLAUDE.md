@@ -25,7 +25,7 @@ No test framework is configured.
 **Astro SSR** with Node adapter (`output: 'server'`). No SPA framework — uses **htmx** for server interactions and **Alpine.js** for client-side state.
 
 ### Request flow
-1. Middleware (`src/middleware/index.ts`) runs four middleware in sequence: security headers, CSRF protection (validates origin for non-safe methods), language detection (sets `context.locals.lang`), then auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection)
+1. Middleware (`src/middleware/index.ts`) runs four middleware in sequence: security headers, CSRF protection (validates origin for non-safe methods, supports `X-Forwarded-Proto`/`X-Forwarded-Host` for reverse proxies), language detection (sets `context.locals.lang`), then auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection). Astro's built-in origin check is disabled in `astro.config.mjs` (`security: { checkOrigin: false }`) in favour of custom CSRF middleware.
 2. If no users exist in DB, middleware redirects all routes to `/register?setup=true` (first-user bootstrap)
 3. Pages render Astro components; interactive parts use htmx (`hx-get`, `hx-post`, `hx-swap`) targeting partials
 4. API routes in `src/pages/api/` handle recipe suggestion, bookmarks, history, image generation, auth, and admin operations
@@ -44,12 +44,14 @@ No test framework is configured.
 - Keyboard navigation (arrow keys, escape) and touch-optimized UI
 - Progress visualization with progress bar and circular indicators
 
-### Surprise Me & QuickStart
+### Surprise Me & Favourite Shortcuts
 - "Surprise Me" mode: if the user clicks suggest without entering ingredients, a confirmation modal appears; confirming sends `surpriseMe: 'true'` to `/api/recipes/suggest`, which generates random recipes without ingredient input
-- QuickStart cards (`src/components/home/QuickStart.astro`): 2 preset ingredient combinations per language; clicking a card auto-populates ingredients and triggers suggestion
+- Favourite Shortcuts (`src/components/home/FavouriteShortcuts.astro`): 1–4 user-configured tiles below DietaryFilters on home page; each stores a name, icon, preset filters, and preset ingredients; clicking a tile auto-fills ingredients and selects filters via `$store.shortcuts.apply(index)`
+- Configured in `/settings` with an inline card editor (add/edit/delete); stored as JSON array on `users.favouriteShortcuts` (SQLite column `default_filters`)
 
 ### Shopping list & ingredient interaction
 - Interactive ingredient checkboxes in recipe detail — click to mark as done (green checkmark)
+- Servings adjuster (Alpine.js) scales ingredient amounts dynamically; export uses scaled quantities
 - Export button filters unchecked ingredients and shares via `navigator.share()` (Web Share API); falls back to clipboard copy
 
 ### Badges & cooking tips
@@ -58,7 +60,7 @@ No test framework is configured.
 
 ### Authentication & multi-user
 - Cookie-based sessions stored in SQLite (`sessions` table), 30-day expiry
-- `src/lib/auth/` — password hashing (bcrypt), session CRUD, email sending (nodemailer), token generation, first-user detection
+- `src/lib/auth/` — password hashing (bcryptjs), session CRUD, email sending (nodemailer), token generation, first-user detection
 - Registration requires an invitation code (entered on `/register` form) except for the first user (`/register?setup=true` — becomes admin)
 - Invitation codes are short, readable format (`ABCD-1234`), generated in admin panel with configurable expiry date and max uses
 - Email verification via 6-digit code after registration
@@ -67,7 +69,7 @@ No test framework is configured.
 - Bookmarks and search history are user-scoped (`userId` column); recipe cache and recipes are shared across all users
 - Admin panel at `/admin`: generate invitation codes (with expiry date picker and max uses), manage users (promote/demote, verify), configure AI/image providers and models at runtime
 - Auth pages: `/login`, `/register`, `/register/verify`, `/forgot-password`, `/reset-password`
-- User settings at `/settings`: language preference, default dietary filters
+- User settings at `/settings`: language preference, favourite shortcuts (1–4 presets with filters + ingredients)
 - SMTP config in `.env` for emails; falls back to console logging in dev
 
 ### AI provider system
@@ -107,7 +109,7 @@ No test framework is configured.
 - SQLite at `data/kochgeist.db` via Drizzle ORM + better-sqlite3
 - Schema in `src/db/schema.ts`: `users`, `sessions`, `invitations`, `passwordResets`, `emailVerifications`, `recipes`, `recipeCache`, `bookmarks`, `searchHistory`, `imageCache`, `settings`
 - Migrations in `src/db/migrations/`
-- JSON arrays stored as TEXT columns (ingredients, instructions, dietary tags, default filters)
+- JSON arrays stored as TEXT columns (ingredients, instructions, dietary tags, favourite shortcuts)
 - `recipeCache.tip` stores AI-generated cooking tip as JSON TEXT
 - `settings` table stores runtime key-value config (e.g. `ai_provider`, `ai_model`, `image_provider`, `image_model`); managed via `src/lib/settings.ts`
 
@@ -119,8 +121,8 @@ No test framework is configured.
 - AI prompts explicitly instruct models to use proper native characters per language
 
 ### Filters
-- 16 dietary/lifestyle filters defined in `DietaryFilters.astro` (home) and `FilterPills.astro` (bookmarks)
-- Categories: Diet (vegetarian, vegan, gluten-free, dairy-free, low-carb, high-protein, low-cholesterol), Time & Budget (quick, elaborate, budget, gourmet), Occasion (kid-friendly, date-night, comfort, one-pot, meal-prep)
+- 22 dietary/lifestyle/course filters defined in `DietaryFilters.astro` (home) and `FilterPills.astro` (bookmarks)
+- Categories: Diet (vegetarian, vegan, gluten-free, dairy-free, low-carb, high-protein, low-cholesterol), Time & Budget (quick, elaborate, budget, gourmet), Occasion (kid-friendly, date-night, comfort, one-pot, meal-prep), Course (amuse-bouche, starter, salad, soup, main-course, dessert)
 - Filter IDs are stored in `dietaryTags` JSON column on recipes; bookmark filtering matches against these
 - Each filter has a Material Symbols icon and is translated in all 6 locales
 - Ingredient input supports comma-separated entry and auto-capitalizes the first letter
@@ -134,7 +136,7 @@ No test framework is configured.
 
 ### Component organization
 Components in `src/components/` are grouped by page context:
-- `home/` — HeroSearch, IngredientTags, DietaryFilters, SuggestButton, QuickStart, CameraButton
+- `home/` — HeroSearch, IngredientTags, DietaryFilters, FavouriteShortcuts, SuggestButton, CameraButton
 - `detail/` — RecipeModal, CookingMode
 - `bookmarks/` — BookmarkCard, FilterPills, EmptyState
 - `layout/` — Header, BottomNav, BaseLayout
@@ -148,6 +150,11 @@ Copy `.env.example` to `.env`. Key vars:
 - Provider-specific keys: `AZURE_ENDPOINT`, `AZURE_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` — SMTP config for auth emails (falls back to console logging if not set)
 - `APP_URL` — base URL for email links (default: `http://localhost:4321`)
+
+### Deployment
+- `Dockerfile` — multi-stage build (Node 22 alpine); runtime exposes port 4321, persists data via `/app/data` volume
+- `docker-compose.yml` — mounts `.env` and a named volume for `data/`
+- `.github/workflows/docker-publish.yml` — builds and pushes to GitHub Container Registry (ghcr.io) on release; tags with version + `latest`
 
 ## Design reference
 

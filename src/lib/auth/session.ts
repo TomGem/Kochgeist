@@ -25,7 +25,7 @@ export function validateSession(sessionId: string) {
       role: users.role,
       isVerified: users.isVerified,
       language: users.language,
-      defaultFilters: users.defaultFilters,
+      favouriteShortcuts: users.favouriteShortcuts,
     })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))
@@ -42,7 +42,7 @@ export function validateSession(sessionId: string) {
       role: row.role as 'admin' | 'user',
       isVerified: row.isVerified,
       language: row.language,
-      defaultFilters: row.defaultFilters,
+      favouriteShortcuts: row.favouriteShortcuts,
     },
     session: {
       id: row.sessionId,

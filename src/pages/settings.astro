@@ -6,7 +6,11 @@ import { t, type Locale } from '../lib/i18n/index';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 const user = Astro.locals.user;
-const savedFilters: string[] = user?.defaultFilters ? JSON.parse(user.defaultFilters) : [];
+let savedShortcuts: Array<{ name: string; icon: string; filters: string[]; ingredients: string[] }> = [];
+try {
+  const parsed = user?.favouriteShortcuts ? JSON.parse(user.favouriteShortcuts) : [];
+  savedShortcuts = Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === 'object' && parsed[0] !== null && 'name' in parsed[0] ? parsed : [];
+} catch { savedShortcuts = []; }
 
 const filters = [
   // Diet
@@ -54,19 +58,69 @@ const locales = [
     profileMsg: '',
     passwordMsg: '',
     passwordError: '',
-    filtersMsg: '',
-    selectedFilters: ${JSON.stringify(savedFilters)},
-    toggleFilter(id) {
-      const idx = this.selectedFilters.indexOf(id);
-      if (idx === -1) { this.selectedFilters.push(id); } else { this.selectedFilters.splice(idx, 1); }
+    shortcutsMsg: '',
+    shortcuts: ${JSON.stringify(savedShortcuts)},
+    editingIndex: -1,
+    editForm: { name: '', icon: 'star', filters: [], ingredients: [], ingredientInput: '' },
+    startEdit(index) {
+      if (index >= 0) {
+        const sc = JSON.parse(JSON.stringify(this.shortcuts[index]));
+        this.editForm = { ...sc, ingredientInput: '' };
+      } else {
+        this.editForm = { name: '', icon: 'star', filters: [], ingredients: [], ingredientInput: '' };
+      }
+      this.editingIndex = index >= 0 ? index : this.shortcuts.length;
     },
-    isFilterActive(id) { return this.selectedFilters.includes(id); },
-    async saveFilters() {
+    cancelEdit() { this.editingIndex = -1; },
+    addIngredientToEdit() {
+      const val = this.editForm.ingredientInput.trim();
+      if (val) {
+        const parts = val.includes(',') ? val.split(',') : [val];
+        for (const part of parts) {
+          const trimmed = part.trim();
+          if (!trimmed) continue;
+          const cap = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+          if (!this.editForm.ingredients.includes(cap)) {
+            this.editForm.ingredients.push(cap);
+          }
+        }
+      }
+      this.editForm.ingredientInput = '';
+    },
+    removeIngredientFromEdit(index) { this.editForm.ingredients.splice(index, 1); },
+    toggleEditFilter(id) {
+      const idx = this.editForm.filters.indexOf(id);
+      if (idx === -1) this.editForm.filters.push(id);
+      else this.editForm.filters.splice(idx, 1);
+    },
+    isEditFilterActive(id) { return this.editForm.filters.includes(id); },
+    async saveShortcut() {
+      if (!this.editForm.name.trim()) return;
+      const sc = {
+        name: this.editForm.name.trim().slice(0, 30),
+        icon: this.editForm.icon || 'star',
+        filters: this.editForm.filters,
+        ingredients: this.editForm.ingredients,
+      };
+      if (this.editingIndex >= this.shortcuts.length) {
+        this.shortcuts.push(sc);
+      } else {
+        this.shortcuts.splice(this.editingIndex, 1, sc);
+      }
+      this.editingIndex = -1;
+      await this.persistShortcuts();
+    },
+    async deleteShortcut(index) {
+      this.shortcuts.splice(index, 1);
+      if (this.editingIndex === index) this.editingIndex = -1;
+      await this.persistShortcuts();
+    },
+    async persistShortcuts() {
       const form = new FormData();
-      form.set('defaultFilters', JSON.stringify(this.selectedFilters));
+      form.set('favouriteShortcuts', JSON.stringify(this.shortcuts));
       const res = await fetch('/api/auth/profile', { method: 'PATCH', body: form });
-      this.filtersMsg = res.ok ? '${t('settings.filtersSaved', lang)}' : 'Error';
-      setTimeout(() => this.filtersMsg = '', 3000);
+      this.shortcutsMsg = res.ok ? '${t('settings.shortcutsSaved', lang)}' : 'Error';
+      setTimeout(() => this.shortcutsMsg = '', 3000);
     },
     async saveProfile() {
       const form = new FormData(document.getElementById('profile-form'));
@@ -149,32 +203,141 @@ const locales = [
           </form>
         </section>
 
-        <!-- Default Filters -->
+        <!-- Favourite Shortcuts -->
         <section class="mb-12">
           <h3 class="font-headline font-bold text-xl mb-2 flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary">tune</span>
-            {t('settings.defaultFilters', lang)}
+            <span class="material-symbols-outlined text-primary">bookmarks</span>
+            {t('settings.favouriteShortcuts', lang)}
           </h3>
-          <p class="text-on-surface-variant text-sm mb-6">{t('settings.defaultFiltersDescription', lang)}</p>
-          <div class="flex flex-wrap gap-2 mb-6">
-            {filters.map((filter) => (
-              <button
-                type="button"
-                x-on:click={`toggleFilter('${filter.id}')`}
-                x-bind:class={`isFilterActive('${filter.id}') ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-low text-on-surface-variant'`}
-                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold transition-colors hover:bg-surface-container-high"
-              >
-                <span class="material-symbols-outlined text-base">{filter.icon}</span>
-                {t(filter.labelKey, lang)}
-              </button>
-            ))}
-          </div>
-          <div class="flex items-center gap-4">
-            <button type="button" x-on:click="saveFilters()" class="editorial-gradient text-white font-headline font-bold px-6 py-2.5 rounded-full transition-all active:scale-[0.98] text-sm">
-              {t('auth.save', lang)}
+          <p class="text-on-surface-variant text-sm mb-6">{t('settings.favouriteShortcutsDescription', lang)}</p>
+
+          <!-- Shortcut cards -->
+          <div class="space-y-2 mb-4">
+            <template x-for="(sc, i) in shortcuts" x-bind:key="i">
+              <div class="flex items-center gap-3 bg-surface-container-low rounded-xl px-4 py-3">
+                <span class="material-symbols-outlined text-primary text-xl shrink-0" style="font-variation-settings: 'FILL' 1;" x-text="sc.icon || 'star'"></span>
+                <div class="min-w-0 flex-1">
+                  <span class="block text-sm font-semibold text-on-surface truncate" x-text="sc.name"></span>
+                  <span class="block text-xs text-on-surface-variant/70 truncate" x-text="[
+                    sc.filters?.length ? sc.filters.length + ' ${t('settings.nFilters', lang)}' : null,
+                    sc.ingredients?.length ? sc.ingredients.length + ' ${t('settings.nIngredients', lang)}' : null,
+                  ].filter(Boolean).join(' \u00b7 ')"></span>
+                </div>
+                <button type="button" x-on:click="startEdit(i)" class="text-on-surface-variant hover:text-primary transition-colors p-1">
+                  <span class="material-symbols-outlined text-lg">edit</span>
+                </button>
+                <button type="button" x-on:click="deleteShortcut(i)" class="text-on-surface-variant hover:text-error transition-colors p-1">
+                  <span class="material-symbols-outlined text-lg">delete</span>
+                </button>
+              </div>
+            </template>
+
+            <!-- Empty state -->
+            <div x-show="shortcuts.length === 0 && editingIndex < 0" class="text-center py-6 text-on-surface-variant/60 text-sm">
+              {t('settings.noShortcuts', lang)}
+            </div>
+
+            <!-- Add button -->
+            <button
+              type="button"
+              x-show="editingIndex < 0"
+              x-on:click="startEdit(-1)"
+              class="w-full flex items-center justify-center gap-2 border-2 border-dashed border-outline-variant/30 hover:border-primary/40 rounded-xl px-4 py-3 text-on-surface-variant hover:text-primary transition-colors text-sm font-semibold"
+            >
+              <span class="material-symbols-outlined text-lg">add</span>
+              {t('settings.addShortcut', lang)}
             </button>
-            <span x-show="filtersMsg" x-text="filtersMsg" x-transition class="text-sm text-secondary font-medium"></span>
           </div>
+
+          <!-- Inline editor -->
+          <div x-show="editingIndex >= 0" x-transition class="bg-surface-container rounded-2xl p-5 space-y-5">
+            <!-- Name -->
+            <div>
+              <label class="block text-sm font-medium text-on-surface mb-2">{t('settings.shortcutName', lang)}</label>
+              <input
+                type="text"
+                x-model="editForm.name"
+                maxlength="30"
+                placeholder={t('settings.shortcutNamePlaceholder', lang)}
+                class="w-full bg-surface-container-highest rounded-xl py-3 px-4 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+
+            <!-- Icon picker -->
+            <div>
+              <label class="block text-sm font-medium text-on-surface mb-2">{t('settings.shortcutIcon', lang)}</label>
+              <div class="flex flex-wrap gap-2">
+                {['star', 'eco', 'spa', 'timer', 'dinner_dining', 'cake', 'favorite', 'local_dining', 'kitchen', 'savings', 'cottage', 'soup_kitchen', 'child_care', 'ramen_dining', 'tapas', 'nutrition'].map((icon) => (
+                  <button
+                    type="button"
+                    x-on:click={`editForm.icon = '${icon}'`}
+                    x-bind:class={`editForm.icon === '${icon}' ? 'bg-primary-container text-on-primary-container ring-2 ring-primary/30' : 'bg-surface-container-low text-on-surface-variant'`}
+                    class="w-10 h-10 rounded-xl flex items-center justify-center transition-colors"
+                  >
+                    <span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">{icon}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <!-- Filters -->
+            <div>
+              <label class="block text-sm font-medium text-on-surface mb-2">{t('settings.shortcutFilters', lang)}</label>
+              <div class="flex flex-wrap gap-1.5">
+                {filters.map((filter) => (
+                  <button
+                    type="button"
+                    x-on:click={`toggleEditFilter('${filter.id}')`}
+                    x-bind:class={`isEditFilterActive('${filter.id}') ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container-low text-on-surface-variant'`}
+                    class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+                  >
+                    <span class="material-symbols-outlined text-sm">{filter.icon}</span>
+                    {t(filter.labelKey, lang)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <!-- Ingredients -->
+            <div>
+              <label class="block text-sm font-medium text-on-surface mb-2">{t('settings.shortcutIngredients', lang)}</label>
+              <div class="flex items-center gap-2 mb-2">
+                <input
+                  type="text"
+                  x-model="editForm.ingredientInput"
+                  x-on:keydown.enter.prevent="addIngredientToEdit()"
+                  placeholder={t('settings.shortcutIngredientsPlaceholder', lang)}
+                  class="flex-1 bg-surface-container-highest rounded-xl py-2.5 px-4 text-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/30"
+                />
+                <button type="button" x-on:click="addIngredientToEdit()" class="bg-primary-container text-on-primary-container rounded-xl p-2.5 transition-colors hover:bg-primary/20">
+                  <span class="material-symbols-outlined text-lg">add</span>
+                </button>
+              </div>
+              <div class="flex flex-wrap gap-1.5">
+                <template x-for="(ing, idx) in editForm.ingredients" x-bind:key="idx">
+                  <span class="inline-flex items-center gap-1 bg-tertiary-container text-on-tertiary-container py-1 px-3 rounded-full text-xs font-semibold">
+                    <span x-text="ing"></span>
+                    <button type="button" x-on:click="removeIngredientFromEdit(idx)" class="hover:text-error transition-colors">
+                      <span class="material-symbols-outlined text-sm">close</span>
+                    </button>
+                  </span>
+                </template>
+              </div>
+            </div>
+
+            <!-- Editor actions -->
+            <div class="flex items-center gap-3 pt-2">
+              <button type="button" x-on:click="saveShortcut()" class="editorial-gradient text-white font-headline font-bold px-6 py-2.5 rounded-full transition-all active:scale-[0.98] text-sm">
+                {t('auth.save', lang)}
+              </button>
+              <button type="button" x-on:click="cancelEdit()" class="text-on-surface-variant hover:text-on-surface font-semibold text-sm transition-colors">
+                {t('detail.exitCooking', lang)}
+              </button>
+            </div>
+          </div>
+
+          <!-- Save confirmation -->
+          <span x-show="shortcutsMsg" x-text="shortcutsMsg" x-transition class="block mt-3 text-sm text-secondary font-medium"></span>
         </section>
 
         <!-- Change Password -->
