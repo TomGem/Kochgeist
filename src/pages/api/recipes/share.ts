@@ -47,7 +47,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   return new Response(
     `<button
       id="share-${escapeAttr(recipeId)}"
-      class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+      class="flex items-center sm:gap-3 bg-surface-container-highest p-2.5 sm:px-6 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
       x-data
       data-share-url="${escapeAttr(shareUrl)}"
       data-success-label="${escapeAttr(successLabel)}"
@@ -56,7 +56,7 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
       x-on:click="navigator.clipboard.writeText($el.dataset.shareUrl).then(() => { $store.ui.toastMessage = $el.dataset.copiedLabel; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
     >
       <span class="material-symbols-outlined text-lg sm:text-2xl">link</span>
-      ${escapeHtml(copyLabel)}
+      <span class="hidden sm:inline">${escapeHtml(copyLabel)}</span>
     </button>`,
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
   );

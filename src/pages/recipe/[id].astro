@@ -116,49 +116,49 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
   <div class="fixed bottom-0 left-0 w-full flex justify-between items-center h-16 sm:h-20 px-4 sm:px-8 pb-2 sm:pb-4 glass-nav border-t border-outline-variant/20 z-50">
     <a href={user ? "/" : "/feed"} class="flex items-center gap-1.5 sm:gap-2 text-on-surface font-semibold hover:opacity-70 transition-opacity">
       <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_back</span>
-      <span class="text-[10px] sm:text-xs uppercase tracking-widest font-label">{t('detail.backToFeed', lang)}</span>
+      <span class="hidden sm:inline text-xs uppercase tracking-widest font-label">{t('detail.backToFeed', lang)}</span>
     </a>
     <div class="flex gap-2 sm:gap-4">
       {user ? (
         <>
           <button
             id={`bookmark-${recipe.id}`}
-            class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+            class="flex items-center sm:gap-3 bg-surface-container-highest p-2.5 sm:px-6 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
             hx-post="/api/bookmarks"
             hx-vals={JSON.stringify({ recipeId: recipe.id })}
             hx-target={`#bookmark-${recipe.id}`}
             hx-swap="outerHTML"
           >
             <span class="material-symbols-outlined text-lg sm:text-2xl" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
-            {isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}
+            <span class="hidden sm:inline">{isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}</span>
           </button>
           <button
             id={`share-${recipe.id}`}
-            class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+            class="flex items-center sm:gap-3 bg-surface-container-highest p-2.5 sm:px-6 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
             hx-post="/api/recipes/share"
             hx-vals={JSON.stringify({ recipeId: recipe.id })}
             hx-target={`#share-${recipe.id}`}
             hx-swap="outerHTML"
           >
             <span class="material-symbols-outlined text-lg sm:text-2xl" style={recipe.sharedAt ? "font-variation-settings: 'FILL' 1;" : ''}>share</span>
-            {recipe.sharedAt ? t('detail.shared', lang) : t('detail.share', lang)}
+            <span class="hidden sm:inline">{recipe.sharedAt ? t('detail.shared', lang) : t('detail.share', lang)}</span>
           </button>
         </>
       ) : (
         <a
           href="/login"
-          class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+          class="flex items-center sm:gap-3 bg-surface-container-highest p-2.5 sm:px-6 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
         >
           <span class="material-symbols-outlined text-lg sm:text-2xl">login</span>
-          {t('feed.signInToSave', lang)}
+          <span class="hidden sm:inline">{t('feed.signInToSave', lang)}</span>
         </a>
       )}
       <button
         x-on:click="$dispatch('start-cooking')"
-        class="flex items-center gap-1.5 sm:gap-3 editorial-gradient px-4 sm:px-8 py-2 sm:py-3 rounded-full text-on-primary font-bold text-xs sm:text-sm shadow-xl shadow-primary/20 transition-all active:scale-95"
+        class="flex items-center sm:gap-3 editorial-gradient p-2.5 sm:px-8 sm:py-3 rounded-full text-on-primary font-bold text-xs sm:text-sm shadow-xl shadow-primary/20 transition-all active:scale-95"
       >
         <span class="material-symbols-outlined text-lg sm:text-2xl">restaurant</span>
-        {t('detail.startCooking', lang)}
+        <span class="hidden sm:inline">{t('detail.startCooking', lang)}</span>
       </button>
     </div>
   </div>
