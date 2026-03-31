@@ -33,6 +33,8 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
 
   const shareUrl = `${url.origin}/recipe/${recipeId}`;
   const successLabel = t('detail.shareSuccess', lang);
+  const copyLabel = t('detail.copyLink', lang);
+  const copiedLabel = t('detail.linkCopied', lang);
 
   return new Response(
     `<button
@@ -40,9 +42,10 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
       class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
       x-data
       x-init="navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = '${successLabel}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
+      x-on:click="navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = '${copiedLabel}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
     >
-      <span class="material-symbols-outlined text-lg sm:text-2xl" style="font-variation-settings: 'FILL' 1;">share</span>
-      ${t('detail.shared', lang)}
+      <span class="material-symbols-outlined text-lg sm:text-2xl">link</span>
+      ${copyLabel}
     </button>`,
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
   );

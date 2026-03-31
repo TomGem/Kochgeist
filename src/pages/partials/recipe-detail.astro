@@ -302,7 +302,7 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
         <span class="material-symbols-outlined text-lg sm:text-2xl" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
         {isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}
       </button>
-      {user && (
+      {user && !recipe.sharedAt && (
         <button
           id={`share-${recipe.id}`}
           class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
@@ -311,8 +311,19 @@ const tagMeta: Record<string, { labelKey: string; icon: string }> = {
           hx-target={`#share-${recipe.id}`}
           hx-swap="outerHTML"
         >
-          <span class="material-symbols-outlined text-lg sm:text-2xl" style={recipe.sharedAt ? "font-variation-settings: 'FILL' 1;" : ''}>share</span>
-          {recipe.sharedAt ? t('detail.shared', lang) : t('detail.share', lang)}
+          <span class="material-symbols-outlined text-lg sm:text-2xl">share</span>
+          {t('detail.share', lang)}
+        </button>
+      )}
+      {user && recipe.sharedAt && (
+        <button
+          id={`share-${recipe.id}`}
+          class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+          x-data
+          x-on:click={`navigator.clipboard.writeText('${Astro.url.origin}/recipe/${recipe.id}').then(() => { $store.ui.toastMessage = '${t('detail.linkCopied', lang)}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })`}
+        >
+          <span class="material-symbols-outlined text-lg sm:text-2xl">link</span>
+          {t('detail.copyLink', lang)}
         </button>
       )}
       <button

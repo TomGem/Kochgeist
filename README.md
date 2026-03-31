@@ -11,7 +11,7 @@ AI-powered recipe suggestion app. Enter the ingredients you have on hand and Koc
 - **Ingredient scanner** -- photograph ingredients with your camera for automatic recognition
 - **Cooking mode** -- step-by-step fullscreen walkthrough with auto-detected timers, audio alarms, and keyboard/touch navigation
 - **Shopping list** -- interactive ingredient checkboxes with servings adjuster and export via Web Share API or clipboard
-- **Recipe sharing** -- shareable recipe links at `/recipe/[id]`
+- **Recipe sharing** -- share recipes to the community feed with a copy-to-clipboard link at `/recipe/[id]`
 - **Badges & cooking tips** -- contextual badges (Pantry Perfect, Quick & Easy, etc.) and AI-generated "Chef's Secret" tips
 - **Bookmarks** -- save recipes for later
 - **Search history** -- revisit past ingredient searches
@@ -114,7 +114,6 @@ src/
     cache.ts        # Ingredient hash for recipe caching
     badges.ts       # Contextual recipe badges
     rate-limit.ts   # In-memory rate limiter
-    share.ts        # Recipe sharing URLs
     settings.ts     # Runtime key-value settings (DB-backed)
   db/
     schema.ts       # Drizzle schema (users, sessions, recipes, bookmarks, cache, etc.)

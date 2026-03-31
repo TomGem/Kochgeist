@@ -54,7 +54,9 @@
     "pauseTimer": "Pause",
     "resetTimer": "Zurücksetzen",
     "shared": "Geteilt",
-    "shareSuccess": "Rezept geteilt! Link kopiert."
+    "shareSuccess": "Rezept geteilt! Link kopiert.",
+    "copyLink": "Link kopieren",
+    "linkCopied": "Link kopiert!"
   },
   "feed": {
     "title": "Gemeinschaftsrezepte",

@@ -54,7 +54,9 @@
     "pauseTimer": "Pausa",
     "resetTimer": "Ripristina",
     "shared": "Condiviso",
-    "shareSuccess": "Ricetta condivisa! Link copiato."
+    "shareSuccess": "Ricetta condivisa! Link copiato.",
+    "copyLink": "Copia link",
+    "linkCopied": "Link copiato!"
   },
   "feed": {
     "title": "Ricette della comunità",

@@ -95,8 +95,10 @@ No test framework is configured.
 - Selection algorithm picks the best-match recipe (lowest extra ingredient ratio) as featured
 
 ### Recipe sharing
-- `src/lib/share.ts` — `getShareUrl()` builds shareable recipe URLs
+- Share button in recipe detail POSTs to `/api/recipes/share`, which marks the recipe as shared (`sharedAt`/`sharedBy` columns) and copies the link to clipboard
+- Once shared, the button becomes "Copy Link" — copies the `/recipe/[id]` URL client-side without an API call
 - `/recipe/[id]` page renders a standalone recipe view for shared links
+- Community feed at `/feed` shows all shared recipes
 
 ### Rate limiting
 - `src/lib/rate-limit.ts` — in-memory rate limiter (`isRateLimited`, `clearRateLimit`) with periodic cleanup of expired entries

@@ -69,7 +69,9 @@ Tap the cooking mode button in the recipe detail to enter a fullscreen step-by-s
 
 ### Recipe Sharing
 
-Share a recipe via its permanent link at `/recipe/[id]`. The link is accessible to any authenticated user.
+Tap the **Share** button in the recipe detail to share a recipe to the community feed. The recipe's link is automatically copied to your clipboard and a confirmation toast appears.
+
+Once shared, the button changes to **Copy Link** — tap it anytime to copy the `/recipe/[id]` URL again. Shared recipes are visible to all authenticated users on the community feed at `/feed`.
 
 ## Bookmarks
 
