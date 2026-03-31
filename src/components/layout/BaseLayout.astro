@@ -38,6 +38,41 @@ const favouriteShortcuts = Astro.locals.user?.favouriteShortcuts ?? '[]';
 >
   <slot />
 
+  <!-- Server-rendered page data (inside swapped content so always fresh) -->
+  <script id="page-data" type="application/json" set:html={JSON.stringify({ lang, shortcuts: favouriteShortcuts })} />
+
+  <!-- Inline script: htmx re-executes this on every boosted swap -->
+  <script is:inline>
+    (function() {
+      var Alpine = window.Alpine;
+      if (!Alpine) return;
+      // Read fresh data from the server-rendered JSON block
+      var el = document.getElementById('page-data');
+      if (!el) return;
+      try {
+        var data = JSON.parse(el.textContent || '{}');
+        // Reset UI state
+        var ui = Alpine.store('ui');
+        ui.lang = data.lang || 'en';
+        ui.hasResults = false;
+        ui.loading = false;
+        ui.modalOpen = false;
+        ui.modalRecipeId = null;
+        ui.error = null;
+        ui.toastMessage = null;
+        Alpine.store('ingredients').items = [];
+        Alpine.store('filters').active = [];
+        // Refresh shortcuts
+        var raw = typeof data.shortcuts === 'string' ? JSON.parse(data.shortcuts) : data.shortcuts;
+        if (Array.isArray(raw) && raw.length > 0 && typeof raw[0] === 'object' && raw[0] !== null && 'name' in raw[0]) {
+          Alpine.store('shortcuts').items = raw;
+        } else {
+          Alpine.store('shortcuts').items = [];
+        }
+      } catch(e) {}
+    })();
+  </script>
+
   <script>
     import htmx from 'htmx.org';
     import Alpine from 'alpinejs';
@@ -112,22 +147,6 @@ const favouriteShortcuts = Astro.locals.user?.favouriteShortcuts ?? '[]';
           (Alpine.store('ingredients') as any).items = [...(sc.ingredients || [])];
           (Alpine.store('filters') as any).active = [...(sc.filters || [])];
         },
-      });
-
-      // Reset UI state on boosted (htmx AJAX) navigations so Alpine stores
-      // don't carry stale flags (e.g. hasResults) across page changes.
-      document.body.addEventListener('htmx:beforeSwap', (evt: any) => {
-        if (evt.detail.boosted) {
-          const ui = Alpine.store('ui') as any;
-          ui.hasResults = false;
-          ui.loading = false;
-          ui.modalOpen = false;
-          ui.modalRecipeId = null;
-          ui.error = null;
-          ui.toastMessage = null;
-          (Alpine.store('ingredients') as any).items = [];
-          (Alpine.store('filters') as any).active = [];
-        }
       });
 
       window.Alpine = Alpine;
