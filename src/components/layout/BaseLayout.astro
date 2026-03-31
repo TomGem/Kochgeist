@@ -114,6 +114,22 @@ const favouriteShortcuts = Astro.locals.user?.favouriteShortcuts ?? '[]';
         },
       });
 
+      // Reset UI state on boosted (htmx AJAX) navigations so Alpine stores
+      // don't carry stale flags (e.g. hasResults) across page changes.
+      document.body.addEventListener('htmx:beforeSwap', (evt: any) => {
+        if (evt.detail.boosted) {
+          const ui = Alpine.store('ui') as any;
+          ui.hasResults = false;
+          ui.loading = false;
+          ui.modalOpen = false;
+          ui.modalRecipeId = null;
+          ui.error = null;
+          ui.toastMessage = null;
+          (Alpine.store('ingredients') as any).items = [];
+          (Alpine.store('filters') as any).active = [];
+        }
+      });
+
       window.Alpine = Alpine;
       Alpine.start();
     }

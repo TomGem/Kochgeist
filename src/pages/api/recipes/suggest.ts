@@ -42,9 +42,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
     // Resolve provider before cache check (needed for cache key)
     const provider = await getAIProvider();
 
+    // Skip cache when no ingredients (filters-only / surprise-me) — always generate fresh results
+    const useCache = ingredients.length > 0;
+
     // Check cache (includes provider+model so switching models produces fresh results)
-    const hash = computeIngredientHash(ingredients, lang, filters, provider.name, provider.model);
-    const cached = db.select().from(recipeCache).where(eq(recipeCache.ingredientHash, hash)).get();
+    const hash = useCache ? computeIngredientHash(ingredients, lang, filters, provider.name, provider.model) : '';
+    const cached = useCache ? db.select().from(recipeCache).where(eq(recipeCache.ingredientHash, hash)).get() : undefined;
 
     let recipeIds: string[];
     let tip: CookingTip | undefined;
@@ -91,15 +94,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }).run();
       }
 
-      // Cache the result
-      db.insert(recipeCache).values({
-        ingredientHash: hash,
-        ingredientsRaw: JSON.stringify(ingredients),
-        language: lang,
-        dietaryFilters: filters.length > 0 ? JSON.stringify(filters) : null,
-        recipeIds: JSON.stringify(recipeIds),
-        tip: tip ? JSON.stringify(tip) : null,
-      }).run();
+      // Cache the result (only when ingredients were provided)
+      if (useCache) {
+        db.insert(recipeCache).values({
+          ingredientHash: hash,
+          ingredientsRaw: JSON.stringify(ingredients),
+          language: lang,
+          dietaryFilters: filters.length > 0 ? JSON.stringify(filters) : null,
+          recipeIds: JSON.stringify(recipeIds),
+          tip: tip ? JSON.stringify(tip) : null,
+        }).run();
+      }
 
       // Trigger image generation in background for each recipe
       for (const id of recipeIds) {
