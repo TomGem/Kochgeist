@@ -31,11 +31,12 @@ No test framework is configured.
 4. API routes in `src/pages/api/` handle recipe suggestion, bookmarks, history, image generation, auth, and admin operations
 5. htmx partials in `src/pages/partials/` return HTML fragments (recipe detail, bookmark grid, image slots)
 6. Recipe detail modal is opened via Alpine `x-init="$store.ui.modalOpen = true"` inside the partial itself (not via afterSwap events)
+7. `hx-boost="true"` on `<body>` makes all link clicks AJAX navigations (htmx swaps body innerHTML). Alpine stores persist across navigations since the JS context is never destroyed. A `<script id="page-data" type="application/json">` block carries server-rendered data (lang, shortcuts) inside the swapped content, and an `is:inline` script (re-executed by htmx on every swap) resets Alpine stores and syncs them with the fresh page data
 
-### Scanner
-- Standalone page at `/scanner` with camera access (`capture="environment"`) for ingredient recognition
-- Uploads photo to `/api/ingredients/recognize` which uses the AI provider's `recognizeIngredients()` method
-- Component: `src/components/home/CameraButton.astro`; accessible from bottom navigation
+### Ingredient scanner
+- Camera icon button integrated into the HeroSearch input bar on the Discover page (`src/components/home/HeroSearch.astro`)
+- Uses `capture="environment"` to open the rear camera on mobile; uploads photo to `/api/ingredients/recognize` which uses the AI provider's `recognizeIngredients()` method
+- Recognized ingredients are added to the ingredient store automatically
 
 ### Cooking mode
 - Step-by-step fullscreen modal (`src/components/detail/CookingMode.astro`) launched from recipe detail
@@ -106,6 +107,7 @@ No test framework is configured.
 ### Caching
 - SHA-256 hash of normalized ingredients + language + dietary filters + provider + model (`src/lib/cache.ts`)
 - Cache stored in `recipe_cache` table; same ingredient combo with same provider/model returns cached recipes without AI call
+- Cache is skipped (no read or write) when no ingredients are provided (surprise-me / filters-only) — always generates fresh results
 
 ### Database
 - SQLite at `data/kochgeist.db` via Drizzle ORM + better-sqlite3
@@ -138,7 +140,7 @@ No test framework is configured.
 
 ### Component organization
 Components in `src/components/` are grouped by page context:
-- `home/` — HeroSearch, IngredientTags, DietaryFilters, FavouriteShortcuts, SuggestButton, CameraButton
+- `home/` — HeroSearch, IngredientTags, DietaryFilters, FavouriteShortcuts, SuggestButton
 - `detail/` — RecipeModal, CookingMode
 - `bookmarks/` — BookmarkCard, FilterPills, EmptyState
 - `layout/` — Header, BottomNav, BaseLayout

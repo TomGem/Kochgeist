@@ -8,7 +8,7 @@ const lang = (Astro.locals.lang ?? 'en') as Locale;
   <h2 class="font-headline font-bold text-4xl mb-6 tracking-tight leading-tight text-on-surface">
     {t('home.hero', lang)}
   </h2>
-  <div class="relative group" x-data="{ input: '', focused: false }">
+  <div class="relative group" x-data="{ input: '', focused: false, scanning: false }">
     <div
       class="flex items-center gap-3 bg-white/80 px-5 py-4.5 rounded-2xl border border-outline/15 shadow-sm transition-all duration-200"
       :class="focused && 'ring-2 ring-primary/30 border-primary/30 shadow-md'"
@@ -26,6 +26,38 @@ const lang = (Astro.locals.lang ?? 'en') as Locale;
         placeholder={t('home.searchPlaceholder', lang)}
         type="text"
       />
+      <button
+        type="button"
+        x-on:click="$refs.cameraInput.click()"
+        class="flex-shrink-0 p-1.5 rounded-lg text-outline hover:text-primary transition-colors duration-200"
+        :aria-label="scanning ? '' : ''"
+      >
+        <span x-show="!scanning" class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+        <div x-show="scanning" x-cloak class="w-5 h-5 border-2 border-outline/30 border-t-primary rounded-full animate-spin"></div>
+      </button>
     </div>
+    <input
+      x-ref="cameraInput"
+      type="file"
+      accept="image/*"
+      capture="environment"
+      class="hidden"
+      x-on:change={`
+        if ($event.target.files.length === 0) return;
+        scanning = true;
+        const formData = new FormData();
+        formData.append('image', $event.target.files[0]);
+        formData.append('lang', $store.ui.lang);
+        fetch('/api/ingredients/recognize', { method: 'POST', body: formData })
+          .then(r => { if (!r.ok) throw new Error(r.statusText); return r.json(); })
+          .then(data => {
+            if (Array.isArray(data)) {
+              data.forEach(name => $store.ingredients.add(name));
+            }
+          })
+          .catch(err => { $store.ui.error = '${t('errors.scanFailed', lang)}'; })
+          .finally(() => { scanning = false; $event.target.value = ''; });
+      `}
+    />
   </div>
 </section>
