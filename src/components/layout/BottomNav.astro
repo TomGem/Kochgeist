@@ -2,13 +2,14 @@
 import { t, type Locale } from '../../lib/i18n/index';
 
 interface Props {
-  active?: 'discover' | 'saved' | 'scanner';
+  active?: 'discover' | 'saved' | 'scanner' | 'feed';
 }
 
 const { active = 'discover' } = Astro.props;
 const lang = (Astro.locals.lang ?? 'en') as Locale;
 const items = [
   { id: 'discover', icon: 'auto_awesome', label: t('nav.discover', lang), href: '/', filled: true },
+  { id: 'feed', icon: 'dynamic_feed', label: t('nav.feed', lang), href: '/feed', filled: true },
   { id: 'saved', icon: 'bookmark', label: t('nav.saved', lang), href: '/bookmarks', filled: true },
   { id: 'scanner', icon: 'cooking', label: t('nav.scanner', lang), href: '/scanner', filled: true },
 ] as const;

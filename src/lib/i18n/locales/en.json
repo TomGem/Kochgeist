@@ -52,7 +52,20 @@
     "exitCooking": "Exit",
     "startTimer": "Start",
     "pauseTimer": "Pause",
-    "resetTimer": "Reset"
+    "resetTimer": "Reset",
+    "shared": "Shared",
+    "shareSuccess": "Recipe shared! Link copied."
+  },
+  "feed": {
+    "title": "Community Recipes",
+    "subtitle": "Recipes shared by the community",
+    "emptyTitle": "No shared recipes yet",
+    "emptyDescription": "Be the first to share a recipe!",
+    "emptyAction": "Discover Recipes",
+    "viewAll": "View All",
+    "communityRecipe": "Community Recipe",
+    "loadMore": "Load More",
+    "signInToSave": "Sign in to save recipes"
   },
   "bookmarks": {
     "collection": "Personal Collection",
@@ -94,6 +107,7 @@
   },
   "nav": {
     "discover": "Discover",
+    "feed": "Feed",
     "saved": "Saved",
     "scanner": "Scanner",
     "settings": "Settings"
@@ -216,7 +230,18 @@
     "set": "Set",
     "notSet": "Not set",
     "modelListingUnavailable": "Model listing not available for this provider. Enter the deployment/model name manually.",
-    "connectionFailed": "Failed to connect to provider."
+    "connectionFailed": "Failed to connect to provider.",
+    "recipeCache": "Recipe Cache",
+    "recipeCacheDescription": "Cached ingredient searches and their generated recipes.",
+    "noCacheEntries": "No cached recipes yet.",
+    "cacheIngredients": "Ingredients",
+    "cacheRecipes": "Recipes",
+    "cacheCreated": "Cached",
+    "clearAllCache": "Clear All",
+    "clearAllCacheConfirm": "Delete all cached recipes? This cannot be undone.",
+    "deleteCacheEntry": "Delete cache entry",
+    "cacheCleared": "Cache cleared",
+    "cacheEntries": "entries"
   },
   "settings": {
     "subtitle": "Configure your preferences.",

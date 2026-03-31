@@ -1,0 +1,14 @@
+---
+import { t, type Locale } from '../../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+---
+
+<div class="flex flex-col items-center justify-center py-24 px-6 text-center">
+  <span class="material-symbols-outlined text-7xl text-outline-variant/30 mb-6">dynamic_feed</span>
+  <h3 class="font-headline text-2xl font-bold text-on-surface mb-2">{t('feed.emptyTitle', lang)}</h3>
+  <p class="text-on-surface-variant mb-8 max-w-sm">{t('feed.emptyDescription', lang)}</p>
+  <a href="/" class="editorial-gradient text-on-primary font-bold px-8 py-3 rounded-full transition-all active:scale-[0.98]">
+    {t('feed.emptyAction', lang)}
+  </a>
+</div>

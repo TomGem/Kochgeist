@@ -52,7 +52,20 @@
     "exitCooking": "Esci",
     "startTimer": "Avvia",
     "pauseTimer": "Pausa",
-    "resetTimer": "Ripristina"
+    "resetTimer": "Ripristina",
+    "shared": "Condiviso",
+    "shareSuccess": "Ricetta condivisa! Link copiato."
+  },
+  "feed": {
+    "title": "Ricette della comunità",
+    "subtitle": "Ricette condivise dalla comunità",
+    "emptyTitle": "Nessuna ricetta condivisa",
+    "emptyDescription": "Sii il primo a condividere una ricetta!",
+    "emptyAction": "Scopri ricette",
+    "viewAll": "Vedi tutte",
+    "communityRecipe": "Ricetta della comunità",
+    "loadMore": "Carica altro",
+    "signInToSave": "Accedi per salvare le ricette"
   },
   "bookmarks": {
     "collection": "Collezione personale",
@@ -94,6 +107,7 @@
   },
   "nav": {
     "discover": "Scopri",
+    "feed": "Feed",
     "saved": "Salvati",
     "scanner": "Scanner",
     "settings": "Impostazioni"
@@ -216,7 +230,18 @@
     "set": "Impostato",
     "notSet": "Non impostato",
     "modelListingUnavailable": "Elenco modelli non disponibile per questo fornitore. Inserisci il nome del modello manualmente.",
-    "connectionFailed": "Connessione al fornitore fallita."
+    "connectionFailed": "Connessione al fornitore fallita.",
+    "recipeCache": "Cache ricette",
+    "recipeCacheDescription": "Ricerche di ingredienti memorizzate e le ricette generate.",
+    "noCacheEntries": "Nessuna ricetta in cache.",
+    "cacheIngredients": "Ingredienti",
+    "cacheRecipes": "Ricette",
+    "cacheCreated": "In cache dal",
+    "clearAllCache": "Cancella tutto",
+    "clearAllCacheConfirm": "Eliminare tutte le ricette in cache? Questa azione è irreversibile.",
+    "deleteCacheEntry": "Elimina voce cache",
+    "cacheCleared": "Cache svuotata",
+    "cacheEntries": "voci"
   },
   "settings": {
     "subtitle": "Configura le tue preferenze.",

@@ -3,6 +3,9 @@ import { defineMiddleware, sequence } from 'astro:middleware';
 import { detectLocale } from '../lib/i18n/index';
 import { validateSession, SESSION_COOKIE } from '../lib/auth/session';
 import { isFirstUser } from '../lib/auth/setup';
+import { db } from '../db/index';
+import { recipes } from '../db/schema';
+import { eq } from 'drizzle-orm';
 
 const securityHeadersMiddleware = defineMiddleware(async (context, next) => {
   const response = await next();
@@ -56,6 +59,8 @@ const AUTH_PATHS = [
   '/forgot-password',
   '/reset-password',
   '/api/auth/',
+  '/feed',
+  '/partials/feed-grid',
 ];
 
 const ADMIN_PATHS = ['/admin', '/api/admin/'];
@@ -103,6 +108,22 @@ const authMiddleware = defineMiddleware((context, next) => {
 
   // Auth pages (login, register, etc.) — always accessible
   if (isAuthPath(pathname)) {
+    return next();
+  }
+
+  // Shared recipes are publicly accessible
+  if (!context.locals.user && pathname.startsWith('/recipe/')) {
+    const recipeId = pathname.replace('/recipe/', '');
+    if (recipeId) {
+      const recipe = db.select({ sharedAt: recipes.sharedAt }).from(recipes).where(eq(recipes.id, recipeId)).get();
+      if (recipe?.sharedAt) {
+        return next();
+      }
+    }
+  }
+
+  // Allow read-only image access without authentication
+  if (pathname.startsWith('/api/images/')) {
     return next();
   }
 

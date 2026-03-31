@@ -1,0 +1,55 @@
+---
+import { t, type Locale } from '../../lib/i18n/index';
+
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  cookTime: string;
+  imageUrl?: string | null;
+  tall?: boolean;
+  linkMode?: boolean;
+}
+
+const { id, title, description, cookTime, imageUrl, tall = false, linkMode = false } = Astro.props;
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+---
+
+<article class:list={[
+  'group relative bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl cursor-pointer',
+  tall && 'md:row-span-2',
+]}
+  {...linkMode ? {} : { 'hx-get': `/partials/recipe-detail?id=${id}`, 'hx-target': '#recipe-modal', 'hx-swap': 'innerHTML' }}
+>
+  {linkMode && <a href={`/recipe/${id}`} class="absolute inset-0 z-10"></a>}
+  <div class:list={[
+    'relative overflow-hidden',
+    tall ? 'h-[400px] md:h-[calc(100%-180px)]' : 'h-64',
+  ]}>
+    {imageUrl ? (
+      <img
+        alt={title}
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+        src={imageUrl}
+      />
+    ) : (
+      <div class="w-full h-full bg-gradient-to-br from-primary/15 to-secondary/15 flex items-center justify-center">
+        <span class="material-symbols-outlined text-6xl text-primary/20">restaurant</span>
+      </div>
+    )}
+    <div class="absolute top-4 right-4 bg-surface-container-lowest/90 backdrop-blur p-2 rounded-full shadow-sm">
+      <span class="material-symbols-outlined text-primary">share</span>
+    </div>
+  </div>
+  <div class="p-6">
+    <div class="flex gap-2 mb-3">
+      <span class="bg-tertiary-container text-on-tertiary-container text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">{t('feed.communityRecipe', lang)}</span>
+      <span class="bg-surface-container-high text-on-surface-variant text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">{cookTime}</span>
+    </div>
+    <h3 class:list={[
+      'font-headline font-bold text-on-surface leading-tight mb-2 group-hover:text-primary transition-colors',
+      tall ? 'text-2xl font-extrabold' : 'text-xl',
+    ]}>{title}</h3>
+    <p class="text-on-surface-variant text-sm line-clamp-2">{description}</p>
+  </div>
+</article>

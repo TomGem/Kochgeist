@@ -15,7 +15,7 @@ const lang = (Astro.props.lang ?? (Astro.locals.lang as Locale) ?? 'en') as Loca
 const currentProvider = getSetting('ai_provider') || process.env.AI_PROVIDER || 'azure';
 const currentModel = getSetting('ai_model') || null;
 
-let estimatedSeconds = 50; // default fallback for unknown models
+let estimatedSeconds = 90; // default fallback for unknown models
 
 try {
   const conditions = currentModel

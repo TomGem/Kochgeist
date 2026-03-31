@@ -95,10 +95,14 @@ export const recipes = sqliteTable('recipes', {
   aiProvider: text('ai_provider'),
   aiModel: text('ai_model'),
   aiGenerationTimeMs: integer('ai_generation_time_ms'),
+  sharedAt: integer('shared_at', { mode: 'timestamp' }),
+  sharedBy: text('shared_by'),
   createdAt: integer('created_at', { mode: 'timestamp' })
     .notNull()
     .$defaultFn(() => new Date()),
-});
+}, (table) => [
+  index('recipes_shared_at_idx').on(table.sharedAt),
+]);
 
 export const recipeCache = sqliteTable('recipe_cache', {
   id: integer('id').primaryKey({ autoIncrement: true }),

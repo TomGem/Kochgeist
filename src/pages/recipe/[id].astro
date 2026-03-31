@@ -4,19 +4,22 @@ import Header from '../../components/layout/Header.astro';
 import BottomNav from '../../components/layout/BottomNav.astro';
 import { db } from '../../db/index';
 import { recipes, bookmarks } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { t, type Locale } from '../../lib/i18n/index';
 import { computeDetailBadge } from '../../lib/badges';
 import CookingMode from '../../components/detail/CookingMode.astro';
 
 const lang = (Astro.locals.lang ?? 'en') as Locale;
+const user = Astro.locals.user;
 const { id } = Astro.params;
 if (!id) return Astro.redirect('/');
 
 const recipe = db.select().from(recipes).where(eq(recipes.id, id)).get();
 if (!recipe) return Astro.redirect('/');
 
-const isBookmarked = !!db.select().from(bookmarks).where(eq(bookmarks.recipeId, id)).get();
+const isBookmarked = user
+  ? !!db.select().from(bookmarks).where(and(eq(bookmarks.recipeId, id), eq(bookmarks.userId, user.id))).get()
+  : false;
 const ingredientsList = JSON.parse(recipe.ingredients) as Array<{ name: string; amount: string; isExtra: boolean }>;
 const stepsList = JSON.parse(recipe.instructions) as Array<{ step: number; title: string; description: string }>;
 
@@ -111,30 +114,45 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
 
   <!-- Bottom Action Bar -->
   <div class="fixed bottom-0 left-0 w-full flex justify-between items-center h-16 sm:h-20 px-4 sm:px-8 pb-2 sm:pb-4 glass-nav border-t border-outline-variant/20 z-50">
-    <a href="/" class="flex items-center gap-1.5 sm:gap-2 text-on-surface font-semibold hover:opacity-70 transition-opacity">
+    <a href={user ? "/" : "/feed"} class="flex items-center gap-1.5 sm:gap-2 text-on-surface font-semibold hover:opacity-70 transition-opacity">
       <span class="material-symbols-outlined text-xl sm:text-2xl">arrow_back</span>
       <span class="text-[10px] sm:text-xs uppercase tracking-widest font-label">{t('detail.backToFeed', lang)}</span>
     </a>
     <div class="flex gap-2 sm:gap-4">
-      <button
-        id={`bookmark-${recipe.id}`}
-        class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
-        hx-post="/api/bookmarks"
-        hx-vals={JSON.stringify({ recipeId: recipe.id })}
-        hx-target={`#bookmark-${recipe.id}`}
-        hx-swap="outerHTML"
-      >
-        <span class="material-symbols-outlined text-lg sm:text-2xl" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
-        {isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}
-      </button>
-      <button
-        class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
-        x-data
-        x-on:click={`navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = '${t('detail.copied', lang)}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })`}
-      >
-        <span class="material-symbols-outlined text-lg sm:text-2xl">share</span>
-        {t('detail.share', lang)}
-      </button>
+      {user ? (
+        <>
+          <button
+            id={`bookmark-${recipe.id}`}
+            class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+            hx-post="/api/bookmarks"
+            hx-vals={JSON.stringify({ recipeId: recipe.id })}
+            hx-target={`#bookmark-${recipe.id}`}
+            hx-swap="outerHTML"
+          >
+            <span class="material-symbols-outlined text-lg sm:text-2xl" style={isBookmarked ? "font-variation-settings: 'FILL' 1;" : ''}>bookmark</span>
+            {isBookmarked ? t('detail.saved', lang) : t('detail.save', lang)}
+          </button>
+          <button
+            id={`share-${recipe.id}`}
+            class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+            hx-post="/api/recipes/share"
+            hx-vals={JSON.stringify({ recipeId: recipe.id })}
+            hx-target={`#share-${recipe.id}`}
+            hx-swap="outerHTML"
+          >
+            <span class="material-symbols-outlined text-lg sm:text-2xl" style={recipe.sharedAt ? "font-variation-settings: 'FILL' 1;" : ''}>share</span>
+            {recipe.sharedAt ? t('detail.shared', lang) : t('detail.share', lang)}
+          </button>
+        </>
+      ) : (
+        <a
+          href="/login"
+          class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+        >
+          <span class="material-symbols-outlined text-lg sm:text-2xl">login</span>
+          {t('feed.signInToSave', lang)}
+        </a>
+      )}
       <button
         x-on:click="$dispatch('start-cooking')"
         class="flex items-center gap-1.5 sm:gap-3 editorial-gradient px-4 sm:px-8 py-2 sm:py-3 rounded-full text-on-primary font-bold text-xs sm:text-sm shadow-xl shadow-primary/20 transition-all active:scale-95"
@@ -146,5 +164,5 @@ const ogImage = recipe.imageUrl ? `${Astro.url.origin}${recipe.imageUrl}` : unde
   </div>
 
   <CookingMode steps={stepsList} recipeTitle={recipe.title} lang={lang} />
-  <BottomNav />
+  {user && <BottomNav />}
 </BaseLayout>

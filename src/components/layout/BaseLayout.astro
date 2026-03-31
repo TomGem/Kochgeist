@@ -1,7 +1,7 @@
 ---
 interface Props {
   title?: string;
-  activePage?: 'discover' | 'saved' | 'scanner';
+  activePage?: 'discover' | 'saved' | 'scanner' | 'feed';
 }
 
 const { title = 'Kochgeist', activePage = 'discover' } = Astro.props;
@@ -29,6 +29,7 @@ const favouriteShortcuts = Astro.locals.user?.favouriteShortcuts ?? '[]';
   <style is:global>
     @import '../../assets/css/global.css';
   </style>
+  <slot name="head" />
 </head>
 <body
   class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container"

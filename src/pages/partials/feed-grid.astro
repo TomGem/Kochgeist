@@ -1,0 +1,35 @@
+---
+import FeedCard from '../../components/feed/FeedCard.astro';
+import { db } from '../../db/index';
+import { recipes } from '../../db/schema';
+import { isNotNull, desc } from 'drizzle-orm';
+
+const PAGE_SIZE = 24;
+const page = parseInt(Astro.url.searchParams.get('page') ?? '1');
+const offset = (page - 1) * PAGE_SIZE;
+
+const sharedRecipes = db
+  .select({
+    id: recipes.id,
+    title: recipes.title,
+    description: recipes.description,
+    cookTime: recipes.cookTime,
+    imageUrl: recipes.imageUrl,
+  })
+  .from(recipes)
+  .where(isNotNull(recipes.sharedAt))
+  .orderBy(desc(recipes.sharedAt))
+  .limit(PAGE_SIZE)
+  .offset(offset)
+  .all();
+---
+
+{sharedRecipes.map((recipe) => (
+  <FeedCard
+    id={recipe.id}
+    title={recipe.title}
+    description={recipe.description}
+    cookTime={recipe.cookTime}
+    imageUrl={recipe.imageUrl}
+  />
+))}

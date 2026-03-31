@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../components/layout/BaseLayout.astro';
+import Header from '../components/layout/Header.astro';
+import BottomNav from '../components/layout/BottomNav.astro';
+import FeedCard from '../components/feed/FeedCard.astro';
+import EmptyState from '../components/feed/EmptyState.astro';
+import RecipeModal from '../components/detail/RecipeModal.astro';
+import LoadingSpinner from '../components/shared/LoadingSpinner.astro';
+import ErrorToast from '../components/shared/ErrorToast.astro';
+import { db } from '../db/index';
+import { recipes } from '../db/schema';
+import { isNotNull, desc } from 'drizzle-orm';
+import { t, type Locale } from '../lib/i18n/index';
+
+const lang = (Astro.locals.lang ?? 'en') as Locale;
+const user = Astro.locals.user;
+const PAGE_SIZE = 24;
+
+const sharedRecipes = db
+  .select({
+    id: recipes.id,
+    title: recipes.title,
+    description: recipes.description,
+    cookTime: recipes.cookTime,
+    imageUrl: recipes.imageUrl,
+  })
+  .from(recipes)
+  .where(isNotNull(recipes.sharedAt))
+  .orderBy(desc(recipes.sharedAt))
+  .limit(PAGE_SIZE)
+  .all();
+
+const hasMore = sharedRecipes.length === PAGE_SIZE;
+---
+
+<BaseLayout title={`Kochgeist - ${t('feed.title', lang)}`} activePage="feed">
+  <Header />
+  <main class="pt-24 pb-32 px-6 max-w-7xl mx-auto min-h-screen">
+    <div class="mb-12">
+      <span class="font-label text-xs uppercase tracking-[0.2em] text-primary font-bold mb-2 block">{t('feed.communityRecipe', lang)}</span>
+      <h2 class="font-headline text-5xl md:text-6xl font-extrabold tracking-tighter text-on-surface">{t('feed.title', lang)}</h2>
+      <p class="text-on-surface-variant mt-2">{t('feed.subtitle', lang)}</p>
+    </div>
+    <div id="feed-grid">
+      {sharedRecipes.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <section class="grid gap-8" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+          {sharedRecipes.map((recipe, i) => (
+            <FeedCard
+              id={recipe.id}
+              title={recipe.title}
+              description={recipe.description}
+              cookTime={recipe.cookTime}
+              imageUrl={recipe.imageUrl}
+              tall={i === 1}
+              linkMode={!user}
+            />
+          ))}
+        </section>
+      )}
+    </div>
+    {hasMore && (
+      <div class="flex justify-center mt-12">
+        <button
+          class="bg-surface-container-high text-on-surface font-bold px-8 py-3 rounded-full transition-all hover:bg-surface-container-highest active:scale-[0.98]"
+          hx-get="/partials/feed-grid?page=2"
+          hx-target="#feed-grid section"
+          hx-swap="beforeend"
+          hx-on::after-request="this.remove()"
+        >
+          {t('feed.loadMore', lang)}
+        </button>
+      </div>
+    )}
+  </main>
+  {user ? (
+    <BottomNav active="feed" />
+  ) : (
+    <div class="fixed bottom-0 left-0 w-full flex justify-center items-center h-20 px-4 pb-safe glass-nav border-t border-outline-variant/20 z-50">
+      <a href="/login" class="editorial-gradient text-on-primary font-bold px-8 py-3 rounded-full transition-all active:scale-[0.98]">
+        {t('feed.signInToSave', lang)}
+      </a>
+    </div>
+  )}
+  <RecipeModal />
+  <LoadingSpinner />
+  <ErrorToast />
+</BaseLayout>
