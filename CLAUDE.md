@@ -97,6 +97,7 @@ No test framework is configured.
 
 ### Recipe sharing
 - Share button in recipe detail POSTs to `/api/recipes/share`, which marks the recipe as shared (`sharedAt`/`sharedBy` columns) and copies the link to clipboard
+- Share/copy-link URLs are built client-side using `window.location.origin` (not server-side `Astro.url.origin`) so they reflect the actual domain behind reverse proxies; OG meta tags use `APP_URL` server-side for crawlers
 - Once shared, the button becomes "Copy Link" (with icon-swap feedback on click: link → check for 2s) plus an "Unshare" button; unshare POSTs to `/api/recipes/unshare`, clears `sharedAt`/`sharedBy`, and removes the recipe from the feed
 - Unshare is restricted to the user who shared the recipe or an admin
 - `/recipe/[id]` page renders a standalone recipe view for shared links
@@ -157,7 +158,7 @@ Copy `.env.example` to `.env`. Key vars:
 - `IMAGE_PROVIDER` — image generation provider (azure/placeholder)
 - Provider-specific keys: `AZURE_ENDPOINT`, `AZURE_API_KEY`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, etc.
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` — SMTP config for auth emails (falls back to console logging if not set)
-- `APP_URL` — base URL for email links (default: `http://localhost:4321`)
+- `APP_URL` — public base URL used for email links and OG meta tags on shared recipes (default: `http://localhost:4321`)
 
 ### Deployment
 - `Dockerfile` — multi-stage build (Node 22 alpine); runtime exposes port 4321, persists data via `/app/data` volume
