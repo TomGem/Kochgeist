@@ -151,7 +151,7 @@ const ogImage = recipe.imageUrl ? `${baseUrl}${recipe.imageUrl}` : undefined;
               <button
                 class="flex items-center lg:gap-3 bg-surface-container-highest p-2.5 lg:px-6 lg:py-3 rounded-full text-on-surface font-bold text-xs lg:text-sm transition-all active:scale-95"
                 x-data="{ copied: false }"
-                x-on:click={`navigator.clipboard.writeText('${Astro.url.origin}/recipe/${recipe.id}').then(() => { copied = true; $store.ui.toastMessage = '${t('detail.linkCopied', lang)}'; setTimeout(() => { $store.ui.toastMessage = null; copied = false; }, 2000); })`}
+                x-on:click={`navigator.clipboard.writeText(window.location.origin + '/recipe/${recipe.id}').then(() => { copied = true; $store.ui.toastMessage = '${t('detail.linkCopied', lang)}'; setTimeout(() => { $store.ui.toastMessage = null; copied = false; }, 2000); })`}
               >
                 <span class="material-symbols-outlined text-lg lg:text-2xl" x-text="copied ? 'check' : 'link'">link</span>
                 <span class="hidden lg:inline" x-text={`copied ? '${t('detail.linkCopied', lang)}' : '${t('detail.copyLink', lang)}'`}>{t('detail.copyLink', lang)}</span>
