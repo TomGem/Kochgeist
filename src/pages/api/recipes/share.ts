@@ -39,7 +39,8 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
       .run();
   }
 
-  const shareUrl = `${url.origin}/recipe/${encodeURIComponent(recipeId)}`;
+  const baseUrl = (process.env.APP_URL || url.origin).replace(/\/+$/, '');
+  const shareUrl = `${baseUrl}/recipe/${encodeURIComponent(recipeId)}`;
   const successLabel = t('detail.shareSuccess', lang);
   const copyLabel = t('detail.copyLink', lang);
   const copiedLabel = t('detail.linkCopied', lang);
