@@ -25,7 +25,7 @@ No test framework is configured.
 **Astro SSR** with Node adapter (`output: 'server'`). No SPA framework — uses **htmx** for server interactions and **Alpine.js** for client-side state.
 
 ### Request flow
-1. Middleware (`src/middleware/index.ts`) runs four middleware in sequence: security headers, CSRF protection (validates origin for non-safe methods, supports `X-Forwarded-Proto`/`X-Forwarded-Host` for reverse proxies), auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection), then language detection (sets `context.locals.lang`). Astro's built-in origin check is disabled in `astro.config.mjs` (`security: { checkOrigin: false }`) in favour of custom CSRF middleware.
+1. Middleware (`src/middleware/index.ts`) runs four middleware in sequence: security headers, CSRF protection (validates Origin header for non-safe methods, falls back to Referer header, rejects if neither is present; supports `X-Forwarded-Proto`/`X-Forwarded-Host` for reverse proxies), auth (validates session cookie, sets `context.locals.user`/`context.locals.session`, enforces route protection), then language detection (sets `context.locals.lang`). Astro's built-in origin check is disabled in `astro.config.mjs` (`security: { checkOrigin: false }`) in favour of custom CSRF middleware.
 2. If no users exist in DB, middleware redirects all routes to `/register?setup=true` (first-user bootstrap)
 3. Pages render Astro components; interactive parts use htmx (`hx-get`, `hx-post`, `hx-swap`) targeting partials
 4. API routes in `src/pages/api/` handle recipe suggestion, bookmarks, history, image generation, auth, and admin operations
@@ -47,7 +47,7 @@ No test framework is configured.
 ### Surprise Me & Favourite Shortcuts
 - "Surprise Me" mode: if the user clicks suggest without entering ingredients, a confirmation modal appears; confirming sends `surpriseMe: 'true'` to `/api/recipes/suggest`, which generates random recipes without ingredient input
 - Favourite Shortcuts (`src/components/home/FavouriteShortcuts.astro`): 1–4 user-configured tiles below DietaryFilters on home page; each stores a name, icon, preset filters, and preset ingredients; clicking a tile auto-fills ingredients and selects filters via `$store.shortcuts.apply(index)`
-- Configured in `/settings` with an inline card editor (add/edit/delete); stored as JSON array on `users.favouriteShortcuts` (SQLite column `default_filters`)
+- Configured in `/settings` with an inline card editor (add/edit/delete); stored as JSON array on `users.favouriteShortcuts` (SQLite column `favourite_shortcuts`)
 
 ### Shopping list & ingredient interaction
 - Interactive ingredient checkboxes in recipe detail — click to mark as done (green checkmark)
@@ -63,7 +63,7 @@ No test framework is configured.
 - `src/lib/auth/` — password hashing (bcryptjs), session CRUD, email sending (nodemailer), token generation, first-user detection
 - Registration requires an invitation code (entered on `/register` form) except for the first user (`/register?setup=true` — becomes admin)
 - Invitation codes are short, readable format (`ABCD-1234`), generated in admin panel with configurable expiry date and max uses
-- Email verification via 6-digit code after registration
+- Email verification via 8-character alphanumeric code after registration
 - Password reset via email token link
 - Route protection in middleware: only auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) are public; all other routes require authentication; admin routes (`/admin`, `/api/admin/*`) require admin role
 - Bookmarks and search history are user-scoped (`userId` column); recipe cache and recipes are shared across all users
@@ -87,7 +87,7 @@ No test framework is configured.
 - Images saved to `data/images/`, served via `/api/images/[id]`
 - Azure image provider (`name: 'azure-image'`) does not send `response_format` (newer models like gpt-image-1.5 reject it); handles both `b64_json` and `url` responses
 - Each image stores `model` and `generationTimeMs` in `imageCache` for provenance tracking
-- Async: recipes appear immediately with "Generating image" spinner placeholders; a plain JS polling script (in `suggest.ts`) fetches `/partials/image-slot` every 3s per recipe and swaps in the `<img>` via `outerHTML` when ready
+- Async: recipes appear immediately with "Generating image" spinner placeholders that use htmx native polling (`hx-trigger="every 3s"` + `hx-swap="outerHTML"` + `hx-target="this"`) to fetch `/partials/image-slot`; when the image is ready, the partial returns a plain `<img>` (no htmx attributes) so polling stops automatically
 
 ### Recipe cards (bento grid)
 - Recipe cards are generated as inline HTML strings in `src/pages/api/recipes/suggest.ts` via `renderResultsPartial()` — there are no separate card components
@@ -101,7 +101,7 @@ No test framework is configured.
 - Community feed at `/feed` shows all shared recipes
 
 ### Rate limiting
-- `src/lib/rate-limit.ts` — in-memory rate limiter (`isRateLimited`, `clearRateLimit`) with periodic cleanup of expired entries
+- `src/lib/rate-limit.ts` — in-memory rate limiter (`isRateLimited`, `getClientIp`) with periodic cleanup of expired entries; unauthenticated users are rate-limited per IP address
 
 ### Caching
 - SHA-256 hash of normalized ingredients + language + dietary filters + provider + model (`src/lib/cache.ts`)

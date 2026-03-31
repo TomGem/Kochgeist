@@ -5,19 +5,28 @@ import { eq, desc } from 'drizzle-orm';
 import { generateVerificationCode, VERIFICATION_EXPIRY_MS } from '../../../lib/auth/tokens';
 import { sendVerificationEmail } from '../../../lib/auth/email';
 import type { Locale } from '../../../lib/i18n/index';
+import { isRateLimited } from '../../../lib/rate-limit';
+import { getClientIp } from '../../../lib/rate-limit';
 
 export const POST: APIRoute = async ({ request, locals }) => {
   const formData = await request.formData();
-  const userId = formData.get('userId') as string;
   const lang = (locals.lang ?? 'en') as Locale;
+  const userId = formData.get('userId') as string;
 
   if (!userId) {
     return new Response('Missing userId', { status: 400 });
   }
 
+  // Rate limit by IP to prevent abuse of resend for arbitrary users
+  const ip = getClientIp(request);
+  if (isRateLimited(`resend-ip:${ip}`, 5, 15 * 60 * 1000)) {
+    return new Response('Too many requests', { status: 429 });
+  }
+
   const user = db.select().from(users).where(eq(users.id, userId)).get();
   if (!user || user.isVerified) {
-    return new Response('Invalid request', { status: 400 });
+    // Return generic response to avoid user enumeration
+    return new Response('OK', { status: 200 });
   }
 
   // Rate limit: 60 seconds between resends

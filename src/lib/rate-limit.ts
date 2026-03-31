@@ -1,5 +1,14 @@
 const attempts = new Map<string, { count: number; resetAt: number }>();
 
+/** Extract client IP from request, respecting reverse proxy headers. */
+export function getClientIp(request: Request): string {
+  return (
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
 /** Returns true if the action should be blocked. */
 export function isRateLimited(
   key: string,

@@ -4,6 +4,14 @@ import { recipes } from '../../../db/schema';
 import { eq } from 'drizzle-orm';
 import { t, type Locale } from '../../../lib/i18n/index';
 
+function escapeHtml(str: string): string {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function escapeAttr(str: string): string {
+  return escapeHtml(str);
+}
+
 export const POST: APIRoute = async ({ request, locals, url }) => {
   if (!locals.user) {
     return new Response('Unauthorized', { status: 401 });
@@ -31,21 +39,24 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
       .run();
   }
 
-  const shareUrl = `${url.origin}/recipe/${recipeId}`;
+  const shareUrl = `${url.origin}/recipe/${encodeURIComponent(recipeId)}`;
   const successLabel = t('detail.shareSuccess', lang);
   const copyLabel = t('detail.copyLink', lang);
   const copiedLabel = t('detail.linkCopied', lang);
 
   return new Response(
     `<button
-      id="share-${recipeId}"
+      id="share-${escapeAttr(recipeId)}"
       class="flex items-center gap-1.5 sm:gap-3 bg-surface-container-highest px-3 sm:px-6 py-2 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
       x-data
-      x-init="navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = '${successLabel}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
-      x-on:click="navigator.clipboard.writeText('${shareUrl}').then(() => { $store.ui.toastMessage = '${copiedLabel}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
+      data-share-url="${escapeAttr(shareUrl)}"
+      data-success-label="${escapeAttr(successLabel)}"
+      data-copied-label="${escapeAttr(copiedLabel)}"
+      x-init="navigator.clipboard.writeText($el.dataset.shareUrl).then(() => { $store.ui.toastMessage = $el.dataset.successLabel; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
+      x-on:click="navigator.clipboard.writeText($el.dataset.shareUrl).then(() => { $store.ui.toastMessage = $el.dataset.copiedLabel; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
     >
       <span class="material-symbols-outlined text-lg sm:text-2xl">link</span>
-      ${copyLabel}
+      ${escapeHtml(copyLabel)}
     </button>`,
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
   );

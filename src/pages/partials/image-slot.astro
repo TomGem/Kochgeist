@@ -21,6 +21,10 @@ const imageReady = recipe?.imageStatus === 'ready' && recipe?.imageUrl;
 ) : (
   <div
     id={`image-slot-${recipeId}`}
+    hx-get={`/partials/image-slot?recipeId=${encodeURIComponent(recipeId)}`}
+    hx-trigger="every 3s"
+    hx-target="this"
+    hx-swap="outerHTML"
     class="h-full w-full bg-gradient-to-br from-primary/10 to-tertiary-container/20 flex flex-col items-center justify-center gap-3"
   >
     <span class="material-symbols-outlined text-4xl text-primary/20 animate-pulse">restaurant</span>

@@ -59,7 +59,7 @@ if (Astro.request.method === 'POST') {
     const code = (formData.get('code') as string || '').trim();
     if (isRateLimited(`verify:${userId}`, 5, 15 * 60 * 1000)) {
       error = t('auth.tooManyAttempts', lang);
-    } else if (!code || code.length !== 6) {
+    } else if (!code || code.length !== 8) {
       error = t('auth.invalidCode', lang);
     } else {
       const verification = db
@@ -123,12 +123,11 @@ if (Astro.request.method === 'POST') {
             id="code"
             name="code"
             required
-            maxlength="6"
-            pattern="[0-9]{6}"
-            inputmode="numeric"
+            maxlength="8"
+            pattern="[0-9A-HJ-NP-Z]{8}"
             autocomplete="one-time-code"
-            class="w-full bg-surface-container-highest rounded-xl py-4 px-4 text-center text-2xl font-bold tracking-[0.5em] text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
-            placeholder="000000"
+            class="w-full bg-surface-container-highest rounded-xl py-4 px-4 text-center text-2xl font-bold tracking-[0.3em] text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-2 focus:ring-primary/30 uppercase"
+            placeholder="ABCD1234"
           />
         </div>
 

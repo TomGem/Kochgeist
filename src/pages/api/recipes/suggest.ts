@@ -8,14 +8,16 @@ import type { CookingTip } from '../../../lib/ai/provider';
 import { computeIngredientHash } from '../../../lib/cache';
 import { generateImageForRecipe } from '../../../lib/images/queue';
 import { t, type Locale } from '../../../lib/i18n/index';
-import { isRateLimited } from '../../../lib/rate-limit';
+import { isRateLimited, getClientIp } from '../../../lib/rate-limit';
 
 export const POST: APIRoute = async ({ request, locals }) => {
   let lang: Locale = 'en';
   try {
-    // Rate limit: 20 recipe suggestions per 15 minutes per user
-    const userId = locals.user?.id || 'anon';
-    if (isRateLimited(`suggest:${userId}`, 20, 15 * 60 * 1000)) {
+    // Rate limit: 20 recipe suggestions per 15 minutes per user (or per IP for unauthenticated)
+    const rateLimitKey = locals.user?.id
+      ? `suggest:user:${locals.user.id}`
+      : `suggest:ip:${getClientIp(request)}`;
+    if (isRateLimited(rateLimitKey, 20, 15 * 60 * 1000)) {
       return new Response('Rate limit exceeded. Please wait before generating more recipes.', { status: 429 });
     }
 
@@ -206,6 +208,10 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
     }
     return `<div
       id="image-slot-${card.id}"
+      hx-get="/partials/image-slot?recipeId=${encodeURIComponent(card.id)}"
+      hx-trigger="every 3s"
+      hx-target="this"
+      hx-swap="outerHTML"
       class="h-full w-full ${minHeight} ${gradientClasses} flex flex-col items-center justify-center gap-3"
     >
       <span class="material-symbols-outlined text-4xl text-primary/20 animate-pulse">${icon}</span>
@@ -217,7 +223,7 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
   }
 
   function cardClick(id: string) {
-    return `hx-get="/partials/recipe-detail?id=${id}" hx-target="#recipe-modal" hx-swap="innerHTML"`;
+    return `hx-get="/partials/recipe-detail?id=${encodeURIComponent(id)}" hx-target="#recipe-modal" hx-swap="innerHTML"`;
   }
 
   const headerTitle = surpriseMe
@@ -362,29 +368,5 @@ function renderResultsPartial(ingredients: string[], cards: RecipeCard[], lang: 
     </div>
   </div>
 </section>
-
-<script>
-(function() {
-  const slots = ${JSON.stringify(cards.filter(c => !c.imageUrl).map(c => c.id))};
-  const pending = new Set(slots);
-
-  function poll() {
-    if (pending.size === 0) return;
-    pending.forEach(async (id) => {
-      try {
-        const res = await fetch('/partials/image-slot?recipeId=' + id);
-        const html = await res.text();
-        if (html.includes('<img')) {
-          const el = document.getElementById('image-slot-' + id);
-          if (el) el.outerHTML = html;
-          pending.delete(id);
-        }
-      } catch (e) {}
-    });
-    if (pending.size > 0) setTimeout(poll, 3000);
-  }
-
-  setTimeout(poll, 3000);
-})();
-</script>`;
+`;
 }

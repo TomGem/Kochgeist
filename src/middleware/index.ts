@@ -25,9 +25,6 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 const csrfMiddleware = defineMiddleware((context, next) => {
   if (SAFE_METHODS.has(context.request.method)) return next();
 
-  const origin = context.request.headers.get('origin');
-  if (!origin) return next(); // same-site requests without origin (e.g. plain form posts)
-
   // Build set of allowed origins: request host, APP_URL, and X-Forwarded-* reconstructed origin
   const allowedOrigins = new Set([context.url.origin]);
   const appUrl = process.env.APP_URL;
@@ -40,11 +37,31 @@ const csrfMiddleware = defineMiddleware((context, next) => {
     allowedOrigins.add(`${fwdProto}://${fwdHost}`);
   }
 
-  if (!allowedOrigins.has(origin)) {
-    return new Response('Forbidden', { status: 403 });
+  // Check Origin header first, fall back to Referer
+  const origin = context.request.headers.get('origin');
+  if (origin) {
+    if (!allowedOrigins.has(origin)) {
+      return new Response('Forbidden', { status: 403 });
+    }
+    return next();
   }
 
-  return next();
+  // No Origin header — check Referer as fallback
+  const referer = context.request.headers.get('referer');
+  if (referer) {
+    try {
+      const refererOrigin = new URL(referer).origin;
+      if (!allowedOrigins.has(refererOrigin)) {
+        return new Response('Forbidden', { status: 403 });
+      }
+      return next();
+    } catch {
+      return new Response('Forbidden', { status: 403 });
+    }
+  }
+
+  // Neither Origin nor Referer present — reject for safety
+  return new Response('Forbidden', { status: 403 });
 });
 
 const languageMiddleware = defineMiddleware((context, next) => {
