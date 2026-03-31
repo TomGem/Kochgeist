@@ -273,5 +273,31 @@
   "meta": {
     "generatedBy": "Erstellt mit",
     "imageBy": "Bild von"
+  },
+  "features": {
+    "title": "Funktionen",
+    "subtitle": "Alles, was du von deinem KI-Küchenassistenten brauchst",
+    "cta": "Loslegen",
+    "backToLogin": "Zurück zur Anmeldung",
+    "aiRecipes": "KI-Rezeptvorschläge",
+    "aiRecipesDesc": "Gib ein, was du im Vorrat hast, und erhalte 4 perfekt kuratierte Rezepte mit generierten Bildern — powered by KI.",
+    "scanner": "Zutaten-Scanner",
+    "scannerDesc": "Mach ein Foto von deinem Kühlschrank oder Vorrat. Die KI erkennt deine Zutaten und fügt sie automatisch hinzu.",
+    "cookingMode": "Kochmodus",
+    "cookingModeDesc": "Schritt-für-Schritt-Anleitung im Vollbildmodus mit automatisch erkannten Timern, Audioalarmen und Touch-optimierten Bedienelementen.",
+    "filters": "Smarte Filter",
+    "filtersDesc": "22 Ernährungs-, Lifestyle- und Gangfilter. Von vegan bis Gourmet, schnelle Gerichte bis aufwendige Festmahle.",
+    "community": "Community-Feed",
+    "communityDesc": "Teile deine Lieblingsrezepte mit anderen und entdecke, was die Community kocht.",
+    "shoppingList": "Einkaufsliste",
+    "shoppingListDesc": "Hake Zutaten beim Einkaufen ab. Passe Portionen an und exportiere deine Liste mit einem Tipp.",
+    "shortcuts": "Favoriten-Shortcuts",
+    "shortcutsDesc": "Speichere deine liebsten Zutaten- und Filterkombinationen als Ein-Tipp-Shortcuts auf der Startseite.",
+    "multilingual": "6 Sprachen",
+    "multilingualDesc": "Verfügbar in Deutsch, Englisch, Französisch, Italienisch, Spanisch und Portugiesisch.",
+    "surpriseMe": "Überrasch mich",
+    "surpriseMeDesc": "Keine Zutaten? Kein Problem. Lass die KI dich mit kreativen Zufallsrezepten überraschen.",
+    "sharing": "Rezepte teilen",
+    "sharingDesc": "Teile jedes Rezept mit einem Link. Freunde können es ohne Konto ansehen."
   }
 }

@@ -273,5 +273,31 @@
   "meta": {
     "generatedBy": "Generado por",
     "imageBy": "Imagen por"
+  },
+  "features": {
+    "title": "Funcionalidades",
+    "subtitle": "Todo lo que necesitas en tu asistente culinario IA",
+    "cta": "Empezar",
+    "backToLogin": "Volver al inicio de sesión",
+    "aiRecipes": "Sugerencias de recetas IA",
+    "aiRecipesDesc": "Indica qué tienes en la despensa y obtén 4 recetas perfectamente seleccionadas con imágenes generadas — impulsado por IA.",
+    "scanner": "Escáner de ingredientes",
+    "scannerDesc": "Toma una foto de tu nevera o despensa. La IA reconoce tus ingredientes y los añade automáticamente.",
+    "cookingMode": "Modo cocina",
+    "cookingModeDesc": "Guía paso a paso en pantalla completa con temporizadores autodetectados, alarmas de audio y controles táctiles optimizados.",
+    "filters": "Filtros inteligentes",
+    "filtersDesc": "22 filtros dietéticos, de estilo de vida y de categoría. De vegano a gourmet, comidas rápidas a banquetes elaborados.",
+    "community": "Feed de la comunidad",
+    "communityDesc": "Comparte tus recetas favoritas con otros y descubre lo que cocina la comunidad.",
+    "shoppingList": "Lista de compras",
+    "shoppingListDesc": "Marca los ingredientes mientras compras. Ajusta las porciones y exporta tu lista con un toque.",
+    "shortcuts": "Atajos favoritos",
+    "shortcutsDesc": "Guarda tus combinaciones favoritas de ingredientes y filtros como atajos en la página principal.",
+    "multilingual": "6 idiomas",
+    "multilingualDesc": "Disponible en español, inglés, alemán, francés, italiano y portugués.",
+    "surpriseMe": "Sorpréndeme",
+    "surpriseMeDesc": "¿Sin ingredientes? Sin problema. Deja que la IA te sorprenda con recetas creativas al azar.",
+    "sharing": "Compartir recetas",
+    "sharingDesc": "Comparte cualquier receta con un enlace. Tus amigos pueden verla sin cuenta."
   }
 }

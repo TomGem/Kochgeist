@@ -78,6 +78,7 @@ const AUTH_PATHS = [
   '/api/auth/',
   '/feed',
   '/partials/feed-grid',
+  '/features',
 ];
 
 const ADMIN_PATHS = ['/admin', '/api/admin/'];

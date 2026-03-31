@@ -273,5 +273,31 @@
   "meta": {
     "generatedBy": "Gerado por",
     "imageBy": "Imagem por"
+  },
+  "features": {
+    "title": "Funcionalidades",
+    "subtitle": "Tudo o que precisas no teu assistente culinário IA",
+    "cta": "Começar",
+    "backToLogin": "Voltar ao início de sessão",
+    "aiRecipes": "Sugestões de receitas IA",
+    "aiRecipesDesc": "Indica o que tens na despensa e obtém 4 receitas perfeitamente selecionadas com imagens geradas — powered by IA.",
+    "scanner": "Scanner de ingredientes",
+    "scannerDesc": "Tira uma foto do teu frigorífico ou despensa. A IA reconhece os teus ingredientes e adiciona-os automaticamente.",
+    "cookingMode": "Modo cozinha",
+    "cookingModeDesc": "Guia passo a passo em ecrã inteiro com temporizadores autodetectados, alarmes áudio e controlos tácteis otimizados.",
+    "filters": "Filtros inteligentes",
+    "filtersDesc": "22 filtros dietéticos, de estilo de vida e de categoria. De vegano a gourmet, refeições rápidas a banquetes elaborados.",
+    "community": "Feed da comunidade",
+    "communityDesc": "Partilha as tuas receitas favoritas com outros e descobre o que a comunidade está a cozinhar.",
+    "shoppingList": "Lista de compras",
+    "shoppingListDesc": "Risca ingredientes enquanto fazes compras. Ajusta porções e exporta a tua lista com um toque.",
+    "shortcuts": "Atalhos favoritos",
+    "shortcutsDesc": "Guarda as tuas combinações favoritas de ingredientes e filtros como atalhos na página principal.",
+    "multilingual": "6 idiomas",
+    "multilingualDesc": "Disponível em português, inglês, alemão, francês, italiano e espanhol.",
+    "surpriseMe": "Surpreende-me",
+    "surpriseMeDesc": "Sem ingredientes? Sem problema. Deixa a IA surpreender-te com receitas criativas aleatórias.",
+    "sharing": "Partilha de receitas",
+    "sharingDesc": "Partilha qualquer receita com um link. Os teus amigos podem vê-la sem conta."
   }
 }

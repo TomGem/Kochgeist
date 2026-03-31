@@ -273,5 +273,31 @@
   "meta": {
     "generatedBy": "Généré par",
     "imageBy": "Image par"
+  },
+  "features": {
+    "title": "Fonctionnalités",
+    "subtitle": "Tout ce dont tu as besoin dans ton assistant culinaire IA",
+    "cta": "Commencer",
+    "backToLogin": "Retour à la connexion",
+    "aiRecipes": "Suggestions de recettes IA",
+    "aiRecipesDesc": "Indique ce que tu as dans ton garde-manger et obtiens 4 recettes parfaitement sélectionnées avec des images générées — propulsé par l'IA.",
+    "scanner": "Scanner d'ingrédients",
+    "scannerDesc": "Prends une photo de ton frigo ou de ton garde-manger. L'IA reconnaît tes ingrédients et les ajoute automatiquement.",
+    "cookingMode": "Mode cuisine",
+    "cookingModeDesc": "Guide pas à pas en plein écran avec minuteries auto-détectées, alarmes audio et commandes tactiles optimisées.",
+    "filters": "Filtres intelligents",
+    "filtersDesc": "22 filtres alimentaires, lifestyle et de catégorie. Du végan au gourmet, repas rapides aux festins élaborés.",
+    "community": "Fil communautaire",
+    "communityDesc": "Partage tes recettes préférées avec d'autres et découvre ce que la communauté cuisine.",
+    "shoppingList": "Liste de courses",
+    "shoppingListDesc": "Coche les ingrédients en faisant tes courses. Ajuste les portions et exporte ta liste en un clic.",
+    "shortcuts": "Raccourcis favoris",
+    "shortcutsDesc": "Enregistre tes combinaisons d'ingrédients et de filtres préférées comme raccourcis sur la page d'accueil.",
+    "multilingual": "6 langues",
+    "multilingualDesc": "Disponible en français, anglais, allemand, italien, espagnol et portugais.",
+    "surpriseMe": "Surprends-moi",
+    "surpriseMeDesc": "Pas d'ingrédients ? Pas de problème. Laisse l'IA te surprendre avec des recettes créatives au hasard.",
+    "sharing": "Partage de recettes",
+    "sharingDesc": "Partage n'importe quelle recette avec un lien. Tes amis peuvent la voir sans compte."
   }
 }
