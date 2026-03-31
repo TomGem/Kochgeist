@@ -43,21 +43,29 @@ export const POST: APIRoute = async ({ request, locals, url }) => {
   const successLabel = t('detail.shareSuccess', lang);
   const copyLabel = t('detail.copyLink', lang);
   const copiedLabel = t('detail.linkCopied', lang);
+  const unshareLabel = t('detail.unshare', lang);
 
   return new Response(
-    `<button
-      id="share-${escapeAttr(recipeId)}"
-      class="flex items-center sm:gap-3 bg-surface-container-highest p-2.5 sm:px-6 sm:py-3 rounded-full text-on-surface font-bold text-xs sm:text-sm transition-all active:scale-95"
+    `<span id="share-${escapeAttr(recipeId)}" class="flex gap-2 lg:gap-4"
       x-data
-      data-share-url="${escapeAttr(shareUrl)}"
-      data-success-label="${escapeAttr(successLabel)}"
-      data-copied-label="${escapeAttr(copiedLabel)}"
-      x-init="navigator.clipboard.writeText($el.dataset.shareUrl).then(() => { $store.ui.toastMessage = $el.dataset.successLabel; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
-      x-on:click="navigator.clipboard.writeText($el.dataset.shareUrl).then(() => { $store.ui.toastMessage = $el.dataset.copiedLabel; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
-    >
-      <span class="material-symbols-outlined text-lg sm:text-2xl">link</span>
-      <span class="hidden sm:inline">${escapeHtml(copyLabel)}</span>
-    </button>`,
+      x-init="navigator.clipboard.writeText('${escapeAttr(shareUrl)}').then(() => { $store.ui.toastMessage = '${escapeAttr(successLabel)}'; setTimeout(() => $store.ui.toastMessage = null, 2000); })"
+    ><button
+        class="flex items-center lg:gap-3 bg-surface-container-highest p-2.5 lg:px-6 lg:py-3 rounded-full text-on-surface font-bold text-xs lg:text-sm transition-all active:scale-95"
+        x-data="{ copied: false }"
+        x-on:click="navigator.clipboard.writeText('${escapeAttr(shareUrl)}').then(() => { copied = true; $store.ui.toastMessage = '${escapeAttr(copiedLabel)}'; setTimeout(() => { $store.ui.toastMessage = null; copied = false; }, 2000); })"
+      >
+        <span class="material-symbols-outlined text-lg lg:text-2xl" x-text="copied ? 'check' : 'link'">link</span>
+        <span class="hidden lg:inline" x-text="copied ? '${escapeAttr(copiedLabel)}' : '${escapeAttr(copyLabel)}'">${escapeHtml(copyLabel)}</span>
+      </button><button
+        class="flex items-center lg:gap-3 bg-surface-container-highest p-2.5 lg:px-6 lg:py-3 rounded-full text-on-surface font-bold text-xs lg:text-sm transition-all active:scale-95"
+        hx-post="/api/recipes/unshare"
+        hx-vals='${escapeAttr(JSON.stringify({ recipeId }))}'
+        hx-target="#share-${escapeAttr(recipeId)}"
+        hx-swap="outerHTML"
+      >
+        <span class="material-symbols-outlined text-lg lg:text-2xl">visibility_off</span>
+        <span class="hidden lg:inline">${escapeHtml(unshareLabel)}</span>
+      </button></span>`,
     { headers: { 'Content-Type': 'text/html; charset=utf-8' } },
   );
 };

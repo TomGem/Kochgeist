@@ -56,7 +56,9 @@
     "shared": "Shared",
     "shareSuccess": "Recipe shared! Link copied.",
     "copyLink": "Copy Link",
-    "linkCopied": "Link copied!"
+    "linkCopied": "Link copied!",
+    "unshare": "Unshare",
+    "unshareSuccess": "Recipe removed from feed."
   },
   "feed": {
     "title": "Community Recipes",

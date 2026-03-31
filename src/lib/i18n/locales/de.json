@@ -56,7 +56,9 @@
     "shared": "Geteilt",
     "shareSuccess": "Rezept geteilt! Link kopiert.",
     "copyLink": "Link kopieren",
-    "linkCopied": "Link kopiert!"
+    "linkCopied": "Link kopiert!",
+    "unshare": "Teilen aufheben",
+    "unshareSuccess": "Rezept aus dem Feed entfernt."
   },
   "feed": {
     "title": "Gemeinschaftsrezepte",

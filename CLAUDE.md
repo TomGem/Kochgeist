@@ -97,10 +97,12 @@ No test framework is configured.
 
 ### Recipe sharing
 - Share button in recipe detail POSTs to `/api/recipes/share`, which marks the recipe as shared (`sharedAt`/`sharedBy` columns) and copies the link to clipboard
-- Once shared, the button becomes "Copy Link" — copies the `/recipe/[id]` URL client-side without an API call
+- Once shared, the button becomes "Copy Link" (with icon-swap feedback on click: link → check for 2s) plus an "Unshare" button; unshare POSTs to `/api/recipes/unshare`, clears `sharedAt`/`sharedBy`, and removes the recipe from the feed
+- Unshare is restricted to the user who shared the recipe or an admin
 - `/recipe/[id]` page renders a standalone recipe view for shared links
 - Community feed at `/feed` shows all shared recipes (publicly accessible, no login required)
 - `/features` page showcases the app's multilingual capabilities
+- Action bar buttons (Bookmark, Share/Copy Link/Unshare, Start Cooking) are icon-only below `lg` (1024px) and expand to show text labels at `lg`+
 
 ### Rate limiting
 - `src/lib/rate-limit.ts` — in-memory rate limiter (`isRateLimited`, `getClientIp`) with periodic cleanup of expired entries; unauthenticated users are rate-limited per IP address

@@ -56,7 +56,9 @@
     "shared": "Partilhado",
     "shareSuccess": "Receita partilhada! Link copiado.",
     "copyLink": "Copiar link",
-    "linkCopied": "Link copiado!"
+    "linkCopied": "Link copiado!",
+    "unshare": "Deixar de partilhar",
+    "unshareSuccess": "Receita removida do feed."
   },
   "feed": {
     "title": "Receitas da comunidade",
