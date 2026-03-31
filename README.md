@@ -76,6 +76,9 @@ Copy `.env.example` to `.env` and configure:
 | `OPENAI_API_KEY` | OpenAI API key (if using OpenAI provider) |
 | `ANTHROPIC_API_KEY` | Anthropic API key (if using Anthropic provider) |
 | `OLLAMA_BASE_URL` | Ollama server URL (default `http://localhost:11434`) |
+| `LMSTUDIO_BASE_URL` | LM Studio server URL (default `http://localhost:1234/v1`) |
+| `LMSTUDIO_MODEL` | LM Studio model name (e.g. `local-model`) |
+| `LMSTUDIO_API_KEY` | LM Studio API key (optional, if authentication is enabled) |
 | `SMTP_HOST` | SMTP server hostname |
 | `SMTP_PORT` | SMTP server port (default `587`) |
 | `SMTP_USER` | SMTP username |

@@ -66,7 +66,7 @@ No test framework is configured.
 - Invitation codes are short, readable format (`ABCD-1234`), generated in admin panel with configurable expiry date and max uses
 - Email verification via 8-character alphanumeric code after registration
 - Password reset via email token link
-- Route protection in middleware: only auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`) are public; all other routes require authentication; admin routes (`/admin`, `/api/admin/*`) require admin role
+- Route protection in middleware: auth pages (`/login`, `/register`, `/forgot-password`, `/reset-password`), community pages (`/feed`, `/features`), and shared recipe pages (`/recipe/[id]` if shared) are public; all other routes require authentication; admin routes (`/admin`, `/api/admin/*`) require admin role
 - Bookmarks and search history are user-scoped (`userId` column); recipe cache and recipes are shared across all users
 - Admin panel at `/admin`: generate invitation codes (with expiry date picker and max uses), manage users (promote/demote, verify), configure AI/image providers and models at runtime
 - Auth pages: `/login`, `/register`, `/register/verify`, `/forgot-password`, `/reset-password`
@@ -99,7 +99,8 @@ No test framework is configured.
 - Share button in recipe detail POSTs to `/api/recipes/share`, which marks the recipe as shared (`sharedAt`/`sharedBy` columns) and copies the link to clipboard
 - Once shared, the button becomes "Copy Link" — copies the `/recipe/[id]` URL client-side without an API call
 - `/recipe/[id]` page renders a standalone recipe view for shared links
-- Community feed at `/feed` shows all shared recipes
+- Community feed at `/feed` shows all shared recipes (publicly accessible, no login required)
+- `/features` page showcases the app's multilingual capabilities
 
 ### Rate limiting
 - `src/lib/rate-limit.ts` — in-memory rate limiter (`isRateLimited`, `getClientIp`) with periodic cleanup of expired entries; unauthenticated users are rate-limited per IP address
@@ -143,6 +144,7 @@ Components in `src/components/` are grouped by page context:
 - `home/` — HeroSearch, IngredientTags, DietaryFilters, FavouriteShortcuts, SuggestButton
 - `detail/` — RecipeModal, CookingMode
 - `bookmarks/` — BookmarkCard, FilterPills, EmptyState
+- `feed/` — FeedCard, EmptyState
 - `layout/` — Header, BottomNav, BaseLayout
 - `shared/` — LanguageSwitcher, LoadingSpinner, ErrorToast
 

@@ -12,7 +12,7 @@ RUN npm run build
 # --- Runtime stage ---
 FROM node:22-alpine AS runtime
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -S -g 1000 appgroup && adduser -S -u 1000 appuser -G appgroup
 
 WORKDIR /app
 
