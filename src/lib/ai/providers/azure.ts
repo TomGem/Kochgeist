@@ -34,7 +34,6 @@ export class AzureAIProvider implements AIProvider {
         { role: 'system', content: buildRecipeSystemPrompt(language) },
         { role: 'user', content: buildRecipeUserPrompt(ingredients, language, dietaryFilters, count) },
       ],
-      temperature: 0.8,
       max_completion_tokens: 6000,
       response_format: { type: 'json_object' },
     });
@@ -92,7 +91,6 @@ export class AzureAIProvider implements AIProvider {
           ],
         },
       ],
-      temperature: 0.3,
       max_completion_tokens: 500,
     });
 

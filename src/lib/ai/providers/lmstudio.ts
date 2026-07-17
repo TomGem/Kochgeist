@@ -24,7 +24,6 @@ export class LMStudioProvider implements AIProvider {
         { role: 'system', content: buildRecipeSystemPrompt(language) },
         { role: 'user', content: buildRecipeUserPrompt(ingredients, language, dietaryFilters, count) },
       ],
-      temperature: 0.8,
       max_tokens: 6000,
     });
 

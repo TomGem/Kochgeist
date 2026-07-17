@@ -25,7 +25,6 @@ export class OpenAIProvider implements AIProvider {
         { role: 'system', content: buildRecipeSystemPrompt(language) },
         { role: 'user', content: buildRecipeUserPrompt(ingredients, language, dietaryFilters, count) },
       ],
-      temperature: 0.8,
       max_tokens: 6000,
       response_format: { type: 'json_object' },
     });
@@ -73,7 +72,6 @@ export class OpenAIProvider implements AIProvider {
           ],
         },
       ],
-      temperature: 0.3,
       max_tokens: 500,
     });
 
